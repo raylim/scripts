@@ -1,0 +1,23 @@
+#!/bin/sh
+files=$(ls graphics/*.eps 2> /dev/null | wc -l)
+if [ "$files" != "0" ] ; then
+    for i in graphics/*.eps; do
+        basename=${i%.eps}
+        rm -f $basename.png
+        convert $basename.eps $basename.png
+    done
+fi
+sed -e 's/\\begin{Sinput}/ { \\color{red} \\begin{verbatim}/
+        s/\\end{Sinput}/ \\end{verbatim} }/
+        s/\\begin{Soutput}/ { \\color{blue} \\begin{verbatim}/
+        s/\\end{Soutput}/ \\end{verbatim} }/
+        s/\\begin{Schunk}/ /
+        s/\\end{Schunk}/ /
+		s/\\hfill/ /
+		s/\\smallskip//
+		s/\\bigskip//
+		s/\\medskip//
+		s/\\hrule/\n\\hrule\n\n/
+		s/\\vbox//
+		s/\\begin{spacing}{.*}/\\begin{spacing}{}/
+		s/\\vspace{[^}]*}//' $1.tex | tth -a -e2 -L$1 >$1.html

@@ -7,7 +7,7 @@ arguments <- commandArgs(T);
 
 tables <- list();
 for (arg in arguments) {
-    tables[[arg]] <- read.table(file = arg, sep = '\t', header = T, as.is = T);
+    tables[[arg]] <- read.table(file = arg, sep = '\t', header = T, as.is = T, comment.char = '');
 }
 
 fields <- unique(unlist(c(sapply(tables, names))));

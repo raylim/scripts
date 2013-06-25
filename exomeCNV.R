@@ -12,7 +12,8 @@ options(warn = -1, error = traceback)
 optList <- list(
                 make_option("--outDir", default = NULL, type = "character", action = "store", help ="Output directory (required)"),
                 make_option("--useMPI", default = F, action = "store_true", help ="Use MPI [default %default]"),
-                make_option("--numThreads", default = 1, type = "integer", action = "store", help ="Number of threads [default %default]"))
+                make_option("--numThreads", default = 1, type = "integer", action = "store", help ="Number of threads [default %default]"),
+                make_option("--readLen", default = 75, type = "integer", action = "store", help ="Number of threads [default %default]"))
 
 parser <- OptionParser(usage = "%prog [options] tumorGatkCoverageFile normalGatkCoverageFile", option_list = optList);
 arguments <- parse_args(parser, positional_arguments = T);
@@ -57,7 +58,7 @@ logR <- calculate.logR(normal, tumor)
 # Call CNV for each exon individually
 cnv <- foreach(i = 1:length(chrs), .combine = rbind) %dopar% {
     idx <- (normal$chr == chrs[i]);
-    classify.eCNV(normal = normal[idx,], tumor = tumor[idx,], logR = logR[idx], min.spec = 0.9999, min.sens = 0.9999, option="spec", c = 0.5, l = 70);
+    classify.eCNV(normal = normal[idx,], tumor = tumor[idx,], logR = logR[idx], min.spec = 0.9999, min.sens = 0.9999, option="spec", c = 0.5, l = opt$readLen);
 }
 
 # Combine exonic CNV into segments using Circular Binary Segmentation (CBS)

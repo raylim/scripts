@@ -8,7 +8,7 @@ suppressPackageStartupMessages(library("GenomeGraphs"));
 suppressPackageStartupMessages(library("BSgenome"));
 suppressPackageStartupMessages(library("BSgenome.Hsapiens.UCSC.hg19"));
 
-options(warn = -1, error = traceback)
+options(warn = -1, error = quote({ traceback(); q('no', status = 1) }))
 
 optList <- list(
                 make_option("--offset", default = 100, help ="target offset [default %default]"),

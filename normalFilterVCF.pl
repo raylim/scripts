@@ -18,17 +18,20 @@ while (<IN>) {
 	my @F = split /\t/;
 	my $chr = $F[0];
 	my $posn = $F[1];
+    my $alt = $F[3];
 	$varPosn->{$chr} = {} unless exists $varPosn->{$chr};
-	$varPosn->{$chr}{$posn} = 1;
+	$varPosn->{$chr}{$posn} = {} unless exists $varPosn->{$chr}{$posn};
+	$varPosn->{$chr}{$posn}{$alt} = 1;
 }
 close IN;
 
 open IN, $tumorVCF or die("Unable to open " . $tumorVCF . "\n");
 while (<IN>) {
-	print if /^#/;
+	print and next if /^#/;
 	my @F = split /\t/;
 	my $chr = $F[0];
 	my $posn = $F[1];
-	print unless exists $varPosn->{$chr}{$posn};
+    my $alt = $F[3];
+	print unless (exists $varPosn->{$chr}{$posn}{$alt});
 }
 close IN;

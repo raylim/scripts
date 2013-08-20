@@ -4,7 +4,7 @@
 suppressPackageStartupMessages(library("optparse"));
 suppressPackageStartupMessages(library("ExomeCNV"));
 
-options(warn = -1, error = traceback)
+options(warn = -1, error = quote({ traceback(); q('no', status = 1) }))
 
 optList <- list(
                 make_option("--outDir", default = NULL, type = "character", action = "store", help ="Output directory (required)"),

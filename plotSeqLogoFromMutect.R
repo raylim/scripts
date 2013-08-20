@@ -4,7 +4,7 @@
 suppressPackageStartupMessages(library("optparse"));
 suppressPackageStartupMessages(library("berrylogo"));
 
-options(warn = -1, error = traceback)
+options(warn = -1, error = quote({ traceback(); q('no', status = 1) }))
 
 optList <- list(
                 make_option("--out", default = NULL, type = "character", action = "store", help = "Output .png (required)"))

@@ -1,6 +1,6 @@
 #!/usr/bin/env Rscript
 
-options(error=traceback);
+options(warn = -1, error = quote({ traceback(); q('no', status = 1) }))
 
 suppressPackageStartupMessages(library("optparse"));
 
@@ -19,7 +19,7 @@ summ[summ == "FAIL"] <- 2;
 summ[summ == "WARN"] <- 3;
 class(summ) <- 'numeric';
 
-png(opt$outFile, width = opt$width, height = opt$height);
+png(opt$outFile, width = opt$width, height = opt$height, type = 'cairo-png');
 heatmap(t(summ), col = c("black", "red", "yellow"), margins = c(10, 20), scale = 'none');
 legend('topleft', legend = c("pass", "fail", "warn"), fill = c('black', 'red', 'yellow'));
 null <- dev.off();

@@ -1,5 +1,5 @@
 #!/usr/bin/env Rscript
-# generates amplicon coverage report (hg19)
+# generates interval-bam coverage report (hg19)
 
 suppressPackageStartupMessages(library("optparse"));
 suppressPackageStartupMessages(library("beeswarm"));
@@ -12,7 +12,7 @@ suppressPackageStartupMessages(library("GenomeGraphs"));
 suppressPackageStartupMessages(library("BSgenome"));
 suppressPackageStartupMessages(library("BSgenome.Hsapiens.UCSC.hg19"));
 
-options(warn = -1, error = traceback)
+options(warn = -1, error = quote({ traceback(); q('no', status = 1) }))
 
 optList <- list(
                 make_option("--covThreshold", default = NULL, help = "coverage hist threshold [default %default]"),
@@ -68,16 +68,16 @@ pg <- openPage("index.html", dirname = opt$outDir)
 ### COVERAGE PLOTS ###
 cat("Generating coverage histogram ... ")
 gfn <- paste(opt$outDir, '/coverageHist.png', sep = '')
-png(gfn, height = 600, width = 600)
+png(gfn, height = 600, width = 600, type = 'cairo-png')
 hist(avgcov, xlab = 'Average Coverage', main = "Average Bait Coverage Distribution")
 null <- dev.off()
-hwriteImage(basename(gfn, pg, br = T)
-
+hwriteImage(basename(gfn), pg, br = T)
+cat(" done\n")
 
 
 cat("Generating coverage uniformity plots ... ")
 gfn <- paste(opt$outDir, '/coverageUniformity.png', sep = '')
-png(gfn, height = 1200, width = 1200)
+png(gfn, height = 1200, width = 1200, type = 'cairo-png')
 n <- ceiling(length(Coverages) / 8)
 ltys <- as.integer(gl(n, 8))
 cols <- rep(1:8, n)
@@ -131,7 +131,7 @@ bcn <- bcn[oo, ]
 baitGcContent <- baitGcContent[oo]
 bclist <- lapply(apply(bcn, 1, list), unlist)
 gfn <- paste(opt$outDir, '/baitcov.png', sep = '')
-png(gfn, height = 1000, width = 30 * nrow(bcn))
+png(gfn, height = 1000, width = 30 * nrow(bcn), type = 'cairo-png')
 par(mar = c(15,5,5,5))
 beeswarm(bclist, horizontal = F, las = 2, ylab = "Normalized Coverage", pch = 1, ylim = c(0, quantile(bcn,0.95)))
 par(new = T)
@@ -149,7 +149,7 @@ tcn <- tcn[oo, ]
 targetGcContent <- targetGcContent[oo]
 tclist <- lapply(apply(tcn, 1, list), unlist)
 gfn <- paste(opt$outDir, '/targetcov.png', sep = '')
-png(gfn, height = 1000, width = 30 * nrow(tcn))
+png(gfn, height = 1000, width = 30 * nrow(tcn), type = 'cairo-png')
 par(mar = c(15,5,5,5))
 beeswarm(tclist, horizontal = F, las = 2, ylab = 'Normalized Coverage', ylim = c(0, quantile(tcn, 0.95)))
 par(new = T)
@@ -170,7 +170,7 @@ hwriteImage(basename(gfn), pg, br = T)
 cat("\tper sample ...\n")
 bclist2 <- lapply(apply(bcn, 2, list), unlist)
 gfn <- paste(opt$outDir, '/samplebaitcov.png', sep = '')
-png(gfn, height = 100 * ncol(bcn), width = 1000)
+png(gfn, height = 100 * ncol(bcn), width = 1000, type = 'cairo-png')
 par(mar = c(5,15,5,5))
 boxplot(bclist2, horizontal = T, outline = F, las = 2, col = 'red')
 beeswarm(bclist2, horizontal = T, add = T)
@@ -182,7 +182,7 @@ cat('done\n')
 cat("Plotting coverage vs GC ... ")
 
 gfn <- paste(opt$outDir, '/baitGCcontent.png', sep = '')
-png(gfn, height = 800, width = 800)
+png(gfn, height = 800, width = 800, type = 'cairo-png')
 plot(baitGcContent, bcn[,1], xlab = "GC Content", ylab = "Normalized Coverage", pch = 19, ylim = c(0, max(bcn)))
 for (i in 2:ncol(bcn)) {
     points(baitGcContent, bcn[,i], pch = 19)
@@ -198,7 +198,7 @@ cat("Plotting GC correlation ")
 
 gcCor <- apply(bcn, 2, function(x) cor(x, baitGcContent, method = 'spear'))
 gfn <- paste(opt$outDir, '/gcCorBarplot.png', sep = '')
-png(gfn, height = 1200, width = 1200)
+png(gfn, height = 1200, width = 1200, type = 'cairo-png')
 par(oma = c(5,15,5,5))
 barplot(gcCor, horiz = T, las = 1, xlab = "Spearman Correlation Coefficient", main = "GC Content Correlation")
 null <- dev.off()
@@ -209,7 +209,7 @@ cat(" done\n")
 cat("Plotting coverage correlation heatmap ... ")
 
 gfn <- paste(opt$outDir, '/covCorHeatmap.png', sep = '')
-png(gfn, height = 1200, width = 1200)
+png(gfn, height = 1200, width = 1200, type = 'cairo-png')
 cols <- brewer.pal(9, 'Blues')
 heatmap.2(cor(bcn), trace = 'none', scale = 'none', mar = c(10, 10), col = cols, main = "Sample Coverage Correlation")
 null <- dev.off()
@@ -220,7 +220,7 @@ cat(" done\n")
 cat("Generating coverage histograms and GC correlation plots ")
 for (n in names(Coverages)) {
     gfn <- paste(opt$outDir, '/', n, '.covHist.png', sep = '')
-    png(gfn, height = 800, width = 800)
+    png(gfn, height = 800, width = 800, type = 'cairo-png')
     if (!is.null(opt$covThreshold)) {
         coverage.hist(Coverages[[n]]$coverageTarget, covthreshold = opt$covThreshold, main = n)
     } else {
@@ -230,7 +230,7 @@ for (n in names(Coverages)) {
     hwriteImage(basename(gfn), pg)
 
     gfn <- paste(opt$outDir, '/', n, '.baitGCcontent.png', sep = '')
-    png(gfn, height = 800, width = 800)
+    png(gfn, height = 800, width = 800, type = 'cairo-png')
     plot(baitGcContent, bcn[,n], xlab = "GC Content", ylab = "Normalized Coverage", pch = 19, ylim = c(0, max(bcn)), main = n)
     lines(lowess(baitGcContent, bcn[, n]))
     null <- dev.off()

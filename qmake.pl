@@ -38,6 +38,9 @@ $logparent = $opt{l} if defined $opt{l};
 my $qmake = shift @ARGV; 
 
 my $args = join " ", @ARGV;
+
+# makefile processing
+=pod
 my $orig_args = $args;
 
 $args =~ s;-f (\S+);"-f " . dirname($1) . "/." . basename($1) . ".tmp";e;
@@ -56,6 +59,7 @@ if (defined $optf) {
 }
 
 
+
 do {
     my $makefile = glob(shift(@makefiles));
     
@@ -70,6 +74,7 @@ do {
         print OUT $_;
     }
 } until (scalar @makefiles == 0);
+=cut
 
 my $n = 0;
 my $retcode;
@@ -88,7 +93,7 @@ do {
         #print "$qmake $args &> $logfile\n";
         exec "$qmake $args LOGDIR=$logdir &> $logfile";
     } else {
-        my $mail_msg = "Command: $qmake $orig_args\n";
+        my $mail_msg = "Command: $qmake $args\n";
         $mail_msg .=  "Attempt #: " . ($n + 1) . " of $attempts\n";
         $mail_msg .=  "Hostname: " . $ENV{HOSTNAME}. "\n";
         $mail_msg .=  "PID: $pid\n";
@@ -115,3 +120,4 @@ do {
         }
     }
 } while ($retcode && ++$n < $attempts);
+exit($retcode);

@@ -6,7 +6,7 @@ suppressPackageStartupMessages(library("hwriter"));
 suppressPackageStartupMessages(library("maptools"));
 suppressPackageStartupMessages(library("corrgram"));
 
-options(error = traceback)
+options(warn = -1, error = quote(traceback(); q('no', status = 1)))
 
 optList <- list(
                 make_option("--width", default = 1000, action = 'store', help = "Plot width [default %default]"),

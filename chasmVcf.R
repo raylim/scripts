@@ -7,6 +7,7 @@ suppressPackageStartupMessages(library("VariantAnnotation"));
 options(warn = -1, error = quote({ traceback(); q('no', status = 1) }))
 
 optList <- list(
+                make_option("--genome", default = 'hg19', help = "genome build [default %default]"),
                 make_option("--chasmDir", default = NULL, help = "CHASM dir"),
                 make_option("--classifier", default = 'Breast', help = "CHASM classifier [default %default]"),
                 make_option("--outFile", default = stdout(), help = "vcf output file [default %default]"))

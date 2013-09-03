@@ -57,7 +57,7 @@ if (length(tables) == 0) {
 
 fields <- unique(unlist(headers))
 
-for (f in files) {
+for (f in names(tables)) {
     miss <- setdiff(fields, colnames(tables[[f]]));
     tables[[f]][,miss] <- NA;
     tables[[f]] <- tables[[f]][, fields];

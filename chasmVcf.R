@@ -11,8 +11,8 @@ optList <- list(
                 make_option("--classifier", default = 'Breast', help = "CHASM classifier [default %default]"),
                 make_option("--outFile", default = stdout(), help = "vcf output file [default %default]"))
 
-parser <- OptionParser(usage = "%prog vcf.file");
-arguments <- parse_args(parser, positional_arguments = T, option_list = optList);
+parser <- OptionParser(usage = "%prog vcf.file", option_list = optList);
+arguments <- parse_args(parser, positional_arguments = T);
 opt <- arguments$options;
 
 if (is.null(opt$chasmDir)) {

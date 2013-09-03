@@ -21,7 +21,9 @@ if (is.null(opt$chasmDir)) {
     stop();
 } else if (length(arguments$args) != 1) {
     cat("Reading from stdin...\n");
-    vcf <- readVcf(stdin(), genome = opt$genome)
+    tmp <- tempfile()
+    write(stdin(), file = tmp) 
+    vcf <- readVcf(tmp, genome = opt$genome)
 } else {
     fn <- arguments$args[1];
     vcf <- readVcf(fn, genome = opt$genome)

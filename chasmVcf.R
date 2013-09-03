@@ -23,7 +23,7 @@ if (is.null(opt$chasmDir)) {
 } else if (length(arguments$args) != 1) {
     cat("Reading from stdin...\n");
     tmp <- tempfile()
-    write(stdin(), file = tmp) 
+    write(file('stdin'), file = tmp) 
     vcf <- readVcf(tmp, genome = opt$genome)
 } else {
     fn <- arguments$args[1];
@@ -35,7 +35,7 @@ X <- cbind(seq = as.character(seqnames(rowData(vcf))), start = start(rowData(vcf
 setwd(opt$chasmDir)
 tmp <- tempfile()
 write.table(X, file = tmp, quote = F, sep = '\t', row.names = F, col.names = F)
-cmd <- paste("./RunChasm ", opt$classifier, ' ', tmp, ' -g' ,sep = '')
+cmd <- paste("CHASMDIR=", opt$chasmDir, " ./RunChasm ", opt$classifier, ' ', tmp, ' -g' ,sep = '')
 system(cmd)
 results <- read.table(file = paste(tmp, '.output', sep = ''), sep = '\t', header = T, as.is = T)
 

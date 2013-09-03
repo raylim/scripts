@@ -35,7 +35,7 @@ X <- cbind(seq = as.character(seqnames(rowData(vcf))), start = start(rowData(vcf
 setwd(opt$chasmDir)
 tmp <- tempfile()
 write.table(X, file = tmp, quote = F, sep = '\t', row.names = F, col.names = F)
-cmd <- paste("./RunChasm ", opt$classifier, ' -g' ,sep = '')
+cmd <- paste("./RunChasm ", opt$classifier, ' ', tmp, ' -g' ,sep = '')
 system(cmd)
 results <- read.table(file = paste(tmp, '.output', sep = ''), sep = '\t', header = T, as.is = T)
 

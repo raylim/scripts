@@ -20,8 +20,8 @@ optList <- list(
                 make_option("--outFile", default = stdout(), help = "vcf output file [default %default]"),
                 make_option("--python", default = 'python', help = "python executable [default %default]")
                 )
-parser <- OptionParser(usage = "%prog vcf.file");
-arguments <- parse_args(parser, positional_arguments = T, option_list = optList);
+parser <- OptionParser(usage = "%prog vcf.file", option_list = optList);
+arguments <- parse_args(parser, positional_arguments = T);
 opt <- arguments$options;
 
 if (is.null(opt$fathmmDir)) {
@@ -32,7 +32,7 @@ if (is.null(opt$fathmmDir)) {
     cat("Need vcf file\n");
     print_help(parser);
     stop();
-} else if (opt$ref) {
+} else if (is.null(opt$ref)) {
     cat("Need reference fasta file\n");
     print_help(parser);
     stop();
@@ -80,7 +80,7 @@ setwd(paste(opt$fathmmDir, '/cgi-bin', sep = ''))
 tmp1 <- tempfile()
 tmp2 <- tempfile()
 write.table(subset(X, ensembl_peptide_id != "", select = c('ensembl_peptide_id', 'aa')), file = tmp1, quote = F, sep = ' ', row.names = F, col.names = F)
-cmd <- paste(opt$python, 'fathmm.py -w', opt$fathmmAlg, '-p', opt$fathmmOnt, tmp1, tmp2)
+cmd <- paste(opt$python, 'fathmm.py -w', opt$fathmmAlg, '-p', opt$fathmmOnt, tmp1, tmp2, '> dev/null')
 #cmd <- paste('python fathmm.py -w Cancer', tmp1, tmp2)
 system(cmd)
 results <- read.table(tmp2, sep = '\t', header = T, comment.char = '', row.names = 1)

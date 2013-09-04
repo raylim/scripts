@@ -20,17 +20,25 @@ if (is.null(opt$chasmDir)) {
     cat("Need CHASM dir\n");
     print_help(parser);
     stop();
-} else if (length(arguments$args) != 1) {
+} else if (length(arguments$args) < 1) {
     cat("Reading from stdin...\n");
     tmp <- tempfile()
-    write(file('stdin'), file = tmp) 
+    f <- file('stdin')
+    open(f)
+    x <- readLines(f)
+    close(f)
+    write(x, file = 'x.vcf') 
+    cat("wrote temp file to ", tmp, "\n");
     vcf <- readVcf(tmp, genome = opt$genome)
 } else {
     fn <- arguments$args[1];
     vcf <- readVcf(fn, genome = opt$genome)
 }
 
-X <- cbind(seq = as.character(seqnames(rowData(vcf))), start = start(rowData(vcf)), end = start(rowData(vcf)) + width(rowData(vcf)), strand = '+', ref = as.character(rowData(vcf)$REF), alt = as.character(unlist(rowData(vcf)$ALT)))
+al <- sapply(rowData(vcf)$ALT, length)
+X <- cbind(seq = as.character(seqnames(rowData(vcf))), start = start(rowData(vcf)), end = start(rowData(vcf)) + width(rowData(vcf)), strand = rep('+', nrow(vcf)), ref = as.character(rowData(vcf)$REF))
+XX <- apply(X, 2, rep, times = al)
+X <- cbind(XX, alt = as.character(unlist(rowData(vcf)$ALT)))
 
 setwd(opt$chasmDir)
 tmp <- tempfile()

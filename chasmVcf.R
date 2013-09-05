@@ -48,6 +48,7 @@ X <- subset(X, sapply(alt, nchar) == 1 & sapply(ref, nchar) == 1 & filt == "PASS
 X <- X[,-which(colnames(X) == 'filt')]
 X$seq <- sub('^', 'chr', X$seq)
 
+oldwd <- getwd()
 setwd(opt$chasmDir)
 tmp <- tempfile()
 write.table(X, file = tmp, quote = F, sep = '\t', row.names = F, col.names = F)
@@ -78,4 +79,5 @@ if (nrow(results) > 1) {
     info(vcf) <- infoprime
 }
 
+setwd(oldwd)
 writeVcf(vcf, opt$outFile)

@@ -89,6 +89,7 @@ ids <- cbind(aa, ids[rownames(aa), ])
 
 #X <- cbind(aa, enspIds[names(aa), ])
 cat("Calling fathmm: ")
+oldwd <- getwd()
 setwd(paste(opt$fathmmDir, '/cgi-bin', sep = ''))
 tmp1 <- tempfile()
 tmp2 <- tempfile()
@@ -120,6 +121,7 @@ if (nrow(results) > 0) {
 }
 
 cat("Writing vcf to", opt$outFile, "... ")
+setwd(oldwd)
 writeVcf(vcf, opt$outFile)
 cat("done\n")
 

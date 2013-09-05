@@ -74,11 +74,11 @@ rownames(ids) <- names(enstIds)[match(ids$ensembl_transcript_id, enstIds)]
 #ids <- cbind(enst = enstIds, esnp = enspIds[names(enstIds), "ensembl_peptide_id"])
 ids <- cbind(aa, ids[rownames(aa), ])
 
-X <- cbind(aa, enspIds[names(aa), ])
+#X <- cbind(aa, enspIds[names(aa), ])
 setwd(paste(opt$fathmmDir, '/cgi-bin', sep = ''))
 tmp1 <- tempfile()
 tmp2 <- tempfile()
-write.table(subset(X, ensembl_peptide_id != "", select = c('ensembl_peptide_id', 'aa')), file = tmp1, quote = F, sep = ' ', row.names = F, col.names = F)
+write.table(subset(ids, ensembl_peptide_id != "", select = c('ensembl_peptide_id', 'aa')), file = tmp1, quote = F, sep = ' ', row.names = F, col.names = F)
 cmd <- paste(opt$python, 'fathmm.py -w', opt$fathmmAlg, '-p', opt$fathmmOnt, tmp1, tmp2)
 #cmd <- paste('python fathmm.py -w Cancer', tmp1, tmp2)
 system(cmd)

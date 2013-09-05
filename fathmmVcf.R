@@ -56,7 +56,7 @@ ensembl = useDataset("hsapiens_gene_ensembl", mart = ensembl)
 
 #txByGene <- transcriptsBy(txdb, 'gene')
 
-vcf <- vcf[rowData(vcf)$FILTER == "PASS", ]
+#vcf <- vcf[rowData(vcf)$FILTER == "PASS", ]
 #ref = FaFile('/home/limr/share/reference/GATK_bundle/2.3/human_g1k_v37.fasta')
 ref = FaFile(opt$ref)
 predCod <- predictCoding(vcf, txdb, ref)

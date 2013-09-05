@@ -89,7 +89,7 @@ hinfoprime <- apply(as.data.frame(info(header(vcf))), 2, as.character)
 rownames(hinfoprime) <- rownames(info(header(vcf)))
 hinfoprime <- rbind(hinfoprime, fathmm = c("A", "String", "fathmm prediction"))
 hinfoprime <- rbind(hinfoprime, fathmm_score = c("A", "Float", "fathmm score"))
-hinfoprime <- DataFrame(hinfoprime)
+hinfoprime <- DataFrame(hinfoprime, row.names = rownames(hinfoprime))
 hlist <- header(exptData(vcf)$header)
 hlist$INFO <- hinfoprime
 exptData(vcf)$header <- new("VCFHeader", samples = header(vcf)@samples, header = hlist)

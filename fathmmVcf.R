@@ -62,7 +62,6 @@ ref = FaFile(opt$ref)
 predCod <- predictCoding(vcf, txdb, ref)
 predCod <- subset(predCod, CONSEQUENCE == "nonsynonymous")
 
-
 x <- transcripts(txdb, vals = list(tx_id = predCod$TXID), columns = c('tx_id', 'tx_name'))
 enstIds <- x$tx_name
 names(enstIds) <- x$tx_id
@@ -90,15 +89,17 @@ hinfoprime <- apply(as.data.frame(info(header(vcf))), 2, as.character)
 rownames(hinfoprime) <- rownames(info(header(vcf)))
 hinfoprime <- rbind(hinfoprime, fathmm = c("A", "String", "fathmm prediction"))
 hinfoprime <- rbind(hinfoprime, fathmm_score = c("A", "Float", "fathmm score"))
-hinfoprime <- DataFrame(hinfoprime)
+hinfoprime <- DataFrame(hinfoprime, row.names = rownames(hinfoprime))
 hlist <- header(exptData(vcf)$header)
 hlist$INFO <- hinfoprime
 exptData(vcf)$header <- new("VCFHeader", samples = header(vcf)@samples, header = hlist)
 
-infoprime <- info(vcf)
-infoprime[as.integer(results$queryId),"fathmm"] <- as.character(results$Prediction)
-infoprime[as.integer(results$queryId),"fathmm_score"] <- results$Score
-info(vcf) <- infoprime
+if (nrow(results) > 0) {
+    infoprime <- info(vcf)
+    infoprime[as.integer(results$queryId),"fathmm"] <- as.character(results$Prediction)
+    infoprime[as.integer(results$queryId),"fathmm_score"] <- results$Score
+    info(vcf) <- infoprime
+}
 
 writeVcf(vcf, opt$outFile)
 

@@ -21,7 +21,7 @@ optList <- list(
                 make_option("--python", default = 'python', help = "python executable [default %default]")
                 )
 parser <- OptionParser(usage = "%prog vcf.file", option_list = optList);
-arguments <- parse_args(parser, positional_arguments = T)
+arguments <- parse_args(parser, positional_arguments = T);
 opt <- arguments$options;
 
 if (is.null(opt$fathmmDir)) {
@@ -36,7 +36,7 @@ if (is.null(opt$fathmmDir)) {
     cat("Need vcf file\n");
     print_help(parser);
     stop();
-} else if (opt$ref) {
+} else if (is.null(opt$ref)) {
     cat("Need reference fasta file\n");
     print_help(parser);
     stop();

@@ -41,7 +41,9 @@ if (is.null(opt$fathmmDir)) {
 
 fn <- arguments$args[1];
 
+cat('Reading vcf ... ')
 vcf <- readVcf(fn, genome = opt$genome)
+cat('done\n')
 
 if (is.null(opt$ensemblTxdb)) {
     txdb <- makeTranscriptDbFromBiomart(biomart = 'ensembl', dataset = 'hsapiens_gene_ensembl')
@@ -49,8 +51,10 @@ if (is.null(opt$ensemblTxdb)) {
     txdb <- loadDb(opt$ensemblTxdb)
 }
 
+cat('Connecting to ensembl ... ')
 ensembl = useMart("ensembl")
 ensembl = useDataset("hsapiens_gene_ensembl", mart = ensembl)
+cat('done\n')
 
 #saveDb(txdb, file = 'ensembl_biomart.sqlite')
 
@@ -58,9 +62,12 @@ ensembl = useDataset("hsapiens_gene_ensembl", mart = ensembl)
 
 #vcf <- vcf[rowData(vcf)$FILTER == "PASS", ]
 #ref = FaFile('/home/limr/share/reference/GATK_bundle/2.3/human_g1k_v37.fasta')
+cat("Predicting coding from reference ...")
 ref = FaFile(opt$ref)
 predCod <- predictCoding(vcf, txdb, ref)
 predCod <- subset(predCod, CONSEQUENCE == "nonsynonymous")
+cat(" done\n")
+
 
 x <- transcripts(txdb, vals = list(tx_id = predCod$TXID), columns = c('tx_id', 'tx_name'))
 enstIds <- x$tx_name
@@ -68,13 +75,16 @@ names(enstIds) <- x$tx_id
 aa = cbind(queryId = predCod$QUERYID, aa = paste(as.character(predCod$REFAA), predCod$PROTEINLOC, as.character(predCod$VARAA), sep = ''))
 rownames(aa) <- predCod$TXID
 
+cat("Looking up ensembl peptide IDs ... ")
 ids <- getBM(filters = 'ensembl_transcript_id', attributes = c('ensembl_transcript_id', 'ensembl_peptide_id'), values = enstIds, mart = ensembl)
 rownames(ids) <- names(enstIds)[match(ids$ensembl_transcript_id, enstIds)]
+cat("done\n")
 
 #ids <- cbind(enst = enstIds, esnp = enspIds[names(enstIds), "ensembl_peptide_id"])
 ids <- cbind(aa, ids[rownames(aa), ])
 
 #X <- cbind(aa, enspIds[names(aa), ])
+cat("Calling fathmm: ")
 setwd(paste(opt$fathmmDir, '/cgi-bin', sep = ''))
 tmp1 <- tempfile()
 tmp2 <- tempfile()
@@ -95,13 +105,19 @@ hlist$INFO <- hinfoprime
 exptData(vcf)$header <- new("VCFHeader", samples = header(vcf)@samples, header = hlist)
 
 if (nrow(results) > 0) {
+    cat("Merging fathmm results ... ")
     infoprime <- info(vcf)
     infoprime[as.integer(results$queryId),"fathmm"] <- as.character(results$Prediction)
     infoprime[as.integer(results$queryId),"fathmm_score"] <- results$Score
     info(vcf) <- infoprime
+    cat("done\n")
+} else {
+    cat("No results from fathmm\n")
 }
 
+cat("Writing vcf ... ")
 writeVcf(vcf, opt$outFile)
+cat("done\n")
 
 
 

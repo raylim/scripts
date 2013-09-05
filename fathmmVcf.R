@@ -17,7 +17,7 @@ optList <- list(
                 make_option("--fathmmOnt", default = 'DO', help = "fathmm ontology [default %default]"),
                 make_option("--ensemblTxdb", default = NULL, help = "Ensembl TxDb SQLite"),
                 make_option("--ref", default = NULL, help = "Reference fasta file"),
-                make_option("--outFile", default = stdout(), help = "vcf output file [default %default]"),
+                make_option("--outFile", default = NULL, help = "vcf output file [default %default]"),
                 make_option("--python", default = 'python', help = "python executable [default %default]")
                 )
 parser <- OptionParser(usage = "%prog vcf.file", option_list = optList);
@@ -26,6 +26,10 @@ opt <- arguments$options;
 
 if (is.null(opt$fathmmDir)) {
     cat("Need fathmm dir\n");
+    print_help(parser);
+    stop();
+} else if (is.null(opt$outFile)) {
+    cat("Need output file\n");
     print_help(parser);
     stop();
 } else if (length(arguments$args) != 1) {
@@ -115,7 +119,7 @@ if (nrow(results) > 0) {
     cat("No results from fathmm\n")
 }
 
-cat("Writing vcf ... ")
+cat("Writing vcf to", opt$outFile, "... ")
 writeVcf(vcf, opt$outFile)
 cat("done\n")
 

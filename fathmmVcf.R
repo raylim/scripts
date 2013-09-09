@@ -43,6 +43,10 @@ if (is.null(opt$fathmmDir)) {
 }
 
 
+fn <- 'vcf/T1NA_T1N.museq.dp_ft.dbsnp.nsfp.vcf'
+opt$ref <- '/home/limr/share/reference/GATK_bundle/2.3/human_g1k_v37.fasta'
+opt$ensemblTxdb <- '~/share/reference/ensembl_biomart.sqlite'
+opt$fathmmDir <- '~/share/usr/fathmm/'
 fn <- arguments$args[1];
 
 cat('Reading vcf ... ')
@@ -56,7 +60,7 @@ if (is.null(opt$ensemblTxdb)) {
 }
 
 cat('Connecting to ensembl ... ')
-ensembl = useMart("ensembl")
+ensembl = useMart("ensembl") #, host = 'localhost', port = 9000)
 ensembl = useDataset("hsapiens_gene_ensembl", mart = ensembl)
 cat('done\n')
 
@@ -99,10 +103,14 @@ cmd <- paste(opt$python, 'fathmm.py -w', opt$fathmmAlg, '-p', opt$fathmmOnt, tmp
 system(cmd)
 results <- read.table(tmp2, sep = '\t', header = T, comment.char = '', row.names = 1)
 results <- merge(ids, results, by.x = c('aa', 'ensembl_peptide_id'), by.y = c('Substitution', 'Protein.ID'))
+split.results <- split(results, factor(results$queryId))
+
+results <- do.call('rbind', lapply(split.results, function(x) x[which.min(x$Score), ]))
 
 hinfoprime <- apply(as.data.frame(info(header(vcf))), 2, as.character)
 rownames(hinfoprime) <- rownames(info(header(vcf)))
-hinfoprime <- rbind(hinfoprime, fathmm = c("A", "String", "fathmm prediction"))
+hinfoprime <- rbind(hinfoprime, fathmm_query = c("A", "String", "fathmm query"))
+hinfoprime <- rbind(hinfoprime, fathmm_pred = c("A", "String", "fathmm prediction"))
 hinfoprime <- rbind(hinfoprime, fathmm_score = c("A", "Float", "fathmm score"))
 hinfoprime <- DataFrame(hinfoprime, row.names = rownames(hinfoprime))
 hlist <- header(exptData(vcf)$header)
@@ -112,8 +120,9 @@ exptData(vcf)$header <- new("VCFHeader", samples = header(vcf)@samples, header =
 if (nrow(results) > 0) {
     cat("Merging fathmm results ... ")
     infoprime <- info(vcf)
-    infoprime[as.integer(results$queryId),"fathmm"] <- as.character(results$Prediction)
-    infoprime[as.integer(results$queryId),"fathmm_score"] <- results$Score
+    infoprime[as.integer(as.character(results$queryId)),"fathmm_query"] <- with(results, paste(ensembl_peptide_id, aa))
+    infoprime[as.integer(as.character(results$queryId)),"fathmm_pred"] <- as.character(results$Prediction)
+    infoprime[as.integer(as.character(results$queryId)),"fathmm_score"] <- results$Score
     info(vcf) <- infoprime
     cat("done\n")
 } else {

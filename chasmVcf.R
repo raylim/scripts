@@ -70,11 +70,11 @@ exptData(vcf)$header <- new("VCFHeader", samples = header(vcf)@samples, header =
 
 if (nrow(results) > 1) {
     infoprime <- info(vcf)
-    infoprime[as.integer(results$MutationID),"chasm_mut"] <- as.character(results$Mutation)
-    infoprime[as.integer(results$MutationID),"chasm_score"] <- results$CHASM
-    infoprime[as.integer(results$MutationID),"chasm_pval"] <- results$PValue
+    infoprime[as.integer(as.character(results$MutationID)),"chasm_mut"] <- as.character(results$Mutation)
+    infoprime[as.integer(as.character(results$MutationID)),"chasm_score"] <- results$CHASM
+    infoprime[as.integer(as.character(results$MutationID)),"chasm_pval"] <- results$PValue
     if (nrow(results) > 10) {
-        infoprime[as.integer(results$MutationID),"chasm_fdr"] <- results$BHFDR
+        infoprime[as.integer(as.character(results$MutationID)),"chasm_fdr"] <- results$BHFDR
     }
     info(vcf) <- infoprime
 }

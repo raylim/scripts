@@ -4,18 +4,38 @@
 suppressPackageStartupMessages(library("GenomicRanges"));
 suppressPackageStartupMessages(library("RColorBrewer"));
 suppressPackageStartupMessages(library("org.Hs.eg.db"));
+suppressPackageStartupMessages(library("optparse"));
 
-options(warn = -1, error = quote({ traceback(); q('no', status = 1) }))
+options(warn = -1, error = quote({ traceback(2); q('no', status = 1) }))
 
-arguments <- commandArgs(T);
+optList <- list(
+        make_option("--ensemblTxdb", default = NULL, help = "Ensembl TxDb SQLite"),
+        make_option("--outDir", default = NULL, help = "output dir")
+        )
+parser <- OptionParser(usage = "%prog [CNV files]", option_list = optList);
+arguments <- parse_args(parser, positional_arguments = T);
+opt <- arguments$options;
 
-arguments <- paste(samples, '.bam_CNVs', sep = '')
+if (is.null(opt$outDir)) {
+    cat("Need output directory\n");
+    print_help(parser);
+    stop();
+} else if (is.null(opt$ensemblTxdb)) {
+    cat("Need ensembl txdb sqlite file\n");
+    print_help(parser);
+    stop();
+}
+
+#arguments <- paste(samples, '.bam_CNVs', sep = '')
+# files <- list.files(pattern = "*_CNVs")
+files <- arguments$args
 
 grs <- list()
 tables <- list()
 samples <- c()
-for (arg in arguments) {
+for (arg in files) {
     s <- sub('\\..*', '', arg)
+    s <- sub('.*/', '', s)
     samples <- c(samples, s)
     d <- read.table(file = arg, sep = '\t', header = F, as.is = T, comment.char = '');
     tables[[s]] <- d
@@ -54,7 +74,10 @@ X[X > 3] <- 3
 #chrstart <- seqnames(gr)
 
 #txdb <- makeTranscriptDbFromUCSC('hg19', tablename = 'knownGene')
-txdb <- makeTranscriptDbFromBiomart('ensembl', 'hsapiens_gene_ensembl')
+
+# annotate positions with genes
+#txdb <- makeTranscriptDbFromBiomart('ensembl', 'hsapiens_gene_ensembl')
+txdb <- loadDb(opt$ensemblTxdb)
 txs <- transcriptsBy(txdb, by = "gene")
 overlaps <- findOverlaps(gr, txs)
 ensids <- names(txs[subjectHits(overlaps)])
@@ -70,10 +93,12 @@ x <- tapply(ensids, queryHits(overlaps), function(x) {
 mcols(gr)$Genes <- rep("", length(gr))
 mcols(gr)[unique(queryHits(overlaps)), 'Genes'] <- x
 
-d <- as.data.frame(gr)[,-9]
-x <- rowSums(d[,c("AdCC10T", "AdCC1T", "AdCC2T", "AdCCPCT")] != 2) > 1
-write.table(d[x,], file = "adcc_cnv_genes_sans9.txt", sep = "\t", row.names = F, quote = F)
-
+# recurrent CNVs by genomic ranges
+# positions not diploid in more than one sample
+d <- as.data.frame(gr)
+x <- rowSums(d[,samples] != 2) > 1
+fn <- paste(opt$outDir, '/recurrent_cnv.txt', sep = '')
+write.table(d[x,], file = fn, sep = "\t", row.names = F, quote = F)
 
 genes <- unique(unlist(sapply(mcols(gr)$Genes, strsplit, '\\|')))
 geneCN <- matrix(2, nrow = length(genes), ncol = length(samples), dimnames = list(Gene = genes, Sample = samples))
@@ -87,89 +112,20 @@ for (i in 1:length(gr)) {
     }
 }
 
-geneCN <- geneCN[, -4]
-
+# recurrent CNVs by gene
+# genes not diploid in more than one sample
 x <- rowSums(geneCN != 2) > 1
 geneRecurrentCNV <- geneCN[x, ]
-write.table(geneRecurrentCNV, file = "gene_recurrent_cnv.txt", sep = "\t", quote = F)
+fn <- paste(opt$outDir, '/gene_recurrent_cnv.txt', sep = '')
+write.table(geneRecurrentCNV, file = fn, sep = "\t", quote = F)
 
 x <- rowSums(geneCN > 2) > 1
 geneRecurrentGainCNV <- geneCN[x, ]
-write.table(geneRecurrentGainCNV, file = "gene_recurrent_gain_cnv.txt", sep = "\t", quote = F)
+fn <- paste(opt$outDir, '/gene_recurrent_cnv_gain.txt', sep = '')
+write.table(geneRecurrentGainCNV, file = fn, sep = "\t", quote = F)
 
 x <- rowSums(geneCN < 2) > 1
 geneRecurrentLossCNV <- geneCN[x, ]
-write.table(geneRecurrentLossCNV, file = "gene_recurrent_loss_cnv.txt", sep = "\t", quote = F)
-
-
-arguments <- paste(samples, '.bam_ratio.txt', sep = '')
-
-grs <- list()
-tables <- list()
-samples <- c()
-for (arg in arguments) {
-    s <- sub('\\..*', '', arg)
-    samples <- c(samples, s)
-    d <- read.table(file = arg, sep = '\t', header = T, as.is = T, comment.char = '');
-    tables[[s]] <- d
-    grs[[s]] <- GRanges(seqnames = d[, 1], ranges = IRanges(d[, 2], width = 50000), medianratio = d[,4], copynum = d[,5])
-}
-
-posns <- do.call('rbind', lapply(tables, function(x) x[,1:3]))
-colnames(posns) <- c("chr", "start" )
-rownames(posns) <- NULL
-
-gr <- GRanges(seqnames = posns$chr, ranges = IRanges(posns$start, width = 50000))
-gr <- disjoin(gr)
-gr <- gr[width(gr) > 1]
-gr <- gr[seqnames(gr) != "Y"]
-x <- as.vector(seqnames(gr))
-x[x == "X"] <- 23
-#x[x == "MT"] <- 25
-x <- as.integer(x)
-oo <- order(x, start(gr))
-gr <- gr[oo, ]
-for (s in samples) {
-    mcols(gr)[, s] <- rep(2, length(gr))
-}
-
-for (s in samples) {
-    overlaps <- findOverlaps(grs[[s]], gr)
-    mcols(gr[subjectHits(overlaps), ])[[s]] <- mcols(grs[[s]][queryHits(overlaps), ])$copynum
-}
-
-centromerePosns <- subset(read.table('../centromere_posns.txt', sep = '\t'), V8 == "centromere", as.is = T)
-centromerePosns <- centromerePosns[, 2:4]
-centromerePosns[, 1] <- sub('chr', '', centromerePosns[, 1])
-centromerePosns[centromerePosns[,1] == "X", 1] <- 23
-centromerePosns <- centromerePosns[-which(centromerePosns[,1] == "Y"), ]
-oo <- order(as.integer(centromerePosns[,1]))
-centromerePosns <- centromerePosns[oo, ]
-centromerePosns[centromerePosns[,1] == 23, 1] <- "X"
-centromereGR <- GRanges(seqnames = centromerePosns[, 1], ranges = IRanges(centromerePosns[, 2], end = centromerePosns[, 3]))
-
-cmPos <- nearest(centromereGR, gr)
-cmPos <- (cmPos - 1) / (length(gr) - 1)
-
-chrPos <- (start(seqnames(gr)) - 1) / (length(gr) - 1)
-
-X <- as.matrix(mcols(gr))
-X[X > 3] <- 3
-X <- X[,-4]
-#x <- round(width(gr) / 50000)
-#Z <- apply(X, 2, rep, times = x)
-#sn <- rep(as.vector(seqnames(gr)), times = x)
-#chrstart <- seqnames(gr)
-
-
-cols <- c('black', 'blue', 'white', 'red')
-png("adcc_copynum.png", height = 1000, width = 30000)
-image(X, col = cols, axes = F)
-axis(1, at = chrPos, labels = as.character(runValue(seqnames(gr))))
-abline(v = chrPos, col = 'grey')
-abline(v = cmPos, lty = 2, col = 'grey')
-axis(2, at = 0:(ncol(X) - 1) / (ncol(X) - 1), labels = colnames(X))
-box()
-#legend('top', legend = c("deletion", "loss", "neutral", "gain"), fill = cols, horiz = T)
-null <- dev.off()
+fn <- paste(opt$outDir, '/gene_recurrent_cnv_loss.txt', sep = '')
+write.table(geneRecurrentLossCNV, file = fn, sep = "\t", quote = F)
 

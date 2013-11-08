@@ -7,6 +7,8 @@ optList <- list(
                 make_option(c("-b", "--byCommon"), action = "store_true", default = F, help ="join on common columns"),
                 make_option(c("-y", "--byY"), default = NULL, help ="common column in y"),
                 make_option(c("-x", "--byX"), default = NULL, help ="common column in x"),
+                make_option("--byColY", default = NULL, help ="common column y"),
+                make_option("--byColX", default = NULL, help ="common column x"),
                 make_option(c("-X", "--allX"), action = "store_true", default = F, help = "outer join on x"),
                 make_option(c("-Y", "--allY"), action = "store_true", default = F, help = "outer join on y"),
                 make_option(c("-i", "--incomparables"), default = NA, help = "Values which cannot be matched [default %default]"),
@@ -48,6 +50,13 @@ if (is.null(opt$byX)) {
     opt$byX <- opt$by;
 }
 
+if (!is.null(opt$byColY)) {
+    opt$byY <- as.integer(opt$byColY);
+}
+
+if (!is.null(opt$byColX)) {
+    opt$byX <- as.integer(opt$byColX);
+}
 m <- merge(X, Y, by = opt$by, by.x = opt$byX, by.y = opt$byY, all = opt$all, all.x = opt$allX, all.y = opt$allY, incomparables = opt$incomparables);
 
 write.table(m, sep = opt$sep, quote = F, row.names = F);

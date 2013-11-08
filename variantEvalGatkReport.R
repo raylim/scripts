@@ -6,7 +6,7 @@ suppressPackageStartupMessages(library("hwriter"));
 suppressPackageStartupMessages(library("maptools"));
 suppressPackageStartupMessages(library("corrgram"));
 
-options(warn = -1, error = quote(traceback(); q('no', status = 1)))
+options(warn = -1, error = quote({ traceback(); q('no', status = 1) }));
 
 optList <- list(
                 make_option("--width", default = 1000, action = 'store', help = "Plot width [default %default]"),
@@ -44,9 +44,11 @@ metricsData <- read.table(opt$metrics, header = T, row.names = 1, as.is = T, sep
 
 # comp overlap
 # dbsnp known
-compOverlap <- subset(report[["CompOverlap"]], Novelty != "all" & IntervalStratification == "overlaps.intervals" & Filter == 'called')
+#compOverlap <- subset(report[["CompOverlap"]], Novelty != "all" & IntervalStratification == "overlaps.intervals" & Filter == 'called')
+#compOverlap$Novelty <- factor(compOverlap$Novelty)
+#compOverlap$IntervalStratification <- factor(compOverlap$IntervalStratification)
+compOverlap <- subset(report[["CompOverlap"]], Novelty != "all" & Filter == 'called')
 compOverlap$Novelty <- factor(compOverlap$Novelty)
-compOverlap$IntervalStratification <- factor(compOverlap$IntervalStratification)
 
 #barchart(nEvalVariants ~ EvalRod | IntervalStratification, group = Novelty, data = compOverlap, scales = list(x = list(rot = 90)), origin = 0, auto.key = list(space = 'top', rectangles = T))
 
@@ -59,9 +61,11 @@ print(bc)
 null <- dev.off()
 hwriteImage(basename(gfn), pg, br = T)
 
-countVariants <- subset(report[["CountVariants"]], Novelty != 'all' & IntervalStratification == 'overlaps.intervals' & Filter == 'called')
-countVariants$IntervalStratification <- factor(countVariants$IntervalStratification)
+#countVariants <- subset(report[["CountVariants"]], Novelty != 'all' & IntervalStratification == 'overlaps.intervals' & Filter == 'called')
+#countVariants$IntervalStratification <- factor(countVariants$IntervalStratification)
+countVariants <- subset(report[["CountVariants"]], Novelty != 'all' & Filter == 'called')
 countVariants$Novelty <- factor(countVariants$Novelty)
+
 
 
 gfn <- paste(opt$outDir, "/knownConcordancyVsNumVar.png", sep = "")
@@ -102,8 +106,7 @@ for (metric in colnames(countVariants)[9:ncol(countVariants)]) {
 }
 
 ## TiTv ##
-TiTv <- subset(report[["TiTvVariantEvaluator"]], Novelty != 'all' & IntervalStratification == 'overlaps.intervals' & Filter == 'called')
-TiTv$IntervalStratification <- factor(TiTv$IntervalStratification)
+TiTv <- subset(report[["TiTvVariantEvaluator"]], Novelty != 'all' & Filter == 'called')
 TiTv$Novelty <- factor(TiTv$Novelty)
 metrics <- c("nTi", "nTv", "tiTvRatio")
 for (metric in metrics) {
@@ -118,7 +121,7 @@ for (metric in metrics) {
 
 ## Indel length hists ##
 gfn <- paste(opt$outDir, "/indelLengthHists.png", sep = '')
-indelLength <- subset(report[["IndelLengthHistogram"]], IntervalStratification == 'overlaps.intervals' & Novelty == 'all' & Filter == 'called')
+indelLength <- subset(report[["IndelLengthHistogram"]], Novelty == 'all' & Filter == 'called')
 n <- ceiling(sqrt(nlevels(indelLength$EvalRod)))
 trellis.device(device = "png", filename = gfn, height = opt$height * n, width = opt$width * n)
 xyp <- xyplot(Freq ~ Length | EvalRod, data = indelLength, type = 'b')
@@ -127,8 +130,7 @@ null <- dev.off()
 hwriteImage(basename(gfn), pg, br = T)
 
 ## Indel summary ##
-indelSummary <- subset(report[["IndelSummary"]], Novelty != 'all' & IntervalStratification == 'overlaps.intervals' & Filter == 'called')
-indelSummary$IntervalStratification <- factor(indelSummary$IntervalStratification)
+indelSummary <- subset(report[["IndelSummary"]], Novelty != 'all' & Filter == 'called')
 indelSummary$Novelty <- factor(indelSummary$Novelty)
 metrics <- c("n_indels", "n_singleton_indels", "SNP_to_indel_ratio", "SNP_to_indel_ratio_for_singletons", "n_insertions", "n_deletions", "insertion_to_deletion_ratio") 
 for (metric in metrics) {

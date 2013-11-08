@@ -3,6 +3,29 @@
 use strict;
 use warnings;
 
+use Getopt::Std;
+
+my %opt;
+getopts('t:', \%opt);
+
+my $usage = <<ENDL;
+Usage: extractCoordsFromDefuse.pl -t [tissue type] defuse_results
+-t [tissue type]: either EPI, HEM, MES or AVG
+ENDL
+
+my $tissueType;
+unless ($opt{t}) {
+    $tissueType = "EPI";
+} else {
+    $tissueType = $opt{t};
+}
+
+sub HELP_MESSAGE {
+    print STDERR $usage;
+    exit(1);
+}
+
+
 my @header;
 while (my $line = <>) {
     chomp $line;
@@ -18,11 +41,11 @@ while (my $line = <>) {
     my $upstream = ($F{upstream_gene} eq $F{gene_name1})? 1 : 2;
     my $downstream = ($F{downstream_gene} eq $F{gene_name1})? 1 : 2;
 
-    my $upstreamChr = $F{"gene_chromosome" . $upstream };
-    my $downstreamChr = $F{"gene_chromosome" . $downstream };
+    my $upstreamChr = "chr" . $F{"gene_chromosome" . $upstream };
+    my $downstreamChr = "chr" . $F{"gene_chromosome" . $downstream };
 
     my $upstreamPosn = $F{"genomic_break_pos" . $upstream };
     my $downstreamPosn = $F{"genomic_break_pos" . $downstream };
 
-    print join("\t", ($upstreamChr, $upstreamPosn, $downstreamChr, $downstreamPosn)) . "\n";
+    print join("\t", ($upstreamChr, $upstreamPosn, $downstreamChr, $downstreamPosn, $tissueType)) . "\n";
 }

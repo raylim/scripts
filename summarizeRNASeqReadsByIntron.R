@@ -8,22 +8,34 @@ library('optparse')
 optionList <- list(
 	make_option(c('-a', '--addChr'), action='store_true', default = FALSE, help = 'Set the flag to add chr as a prefix to each seqlevel [%default]'),
 	make_option(c('-i', '--intronListFile'), action='store', default = NULL, help = 'Set a file containing intronIDs to include in the summarization [%default]'),
+	make_option(c('-d', '--txdb'), action='store', default = NULL, help = 'ensembl transcript database'),
+	make_option(c('-o', '--outFile'), action='store', default = NULL, help = 'output file'),
 	make_option(c('-w', '--intronWindow'), action='store', type = 'integer', default = NULL, help = 'Set the intronic window to be first x bases from the start [%default]')
 	)
-posArgs <- c('txdbFile', 'bamFile', 'outFile')
+posArgs <- c('bamFile')
 parser <- OptionParser(usage = paste('%prog [options]', paste(posArgs, collapse=' ')),  option_list=optionList)
 arguments <- parse_args(parser, positional_arguments = TRUE)
+opt <- arguments$options
 
 if (length(arguments$args) != length(posArgs)) {
 	print_help(parser)
 	print(arguments$args)
 	stop('Incorrect number of required positional arguments')
+} else if (is.null(opt$outFile)) {
+    cat("Need output file\n");
+    print_help(parser);
+    stop();
+} else if (is.null(opt$txdb)) {
+    cat("Need ensembl transcript database\n");
+    print_help(parser);
+    stop();
 } else {
 	cmdArgs <- arguments$args
 	for (i in 1:length(cmdArgs)){
 		assign(posArgs[i], cmdArgs[i])
 	}
-	opt <- arguments$options
+    txdbFile <- opt$txdb
+    outFile <- opt$outFile
 }
 
 #For debugging

@@ -6,11 +6,13 @@ use warnings;
 use Cwd;
 
 my $cwd = getcwd;
-my $email_addrs = "qmake\@raylim.mm.st";
+my $fin_email_addrs = "qmake.finished\@raylim.mm.st";
+my $err_email_addrs = "qmake.error\@raylim.mm.st";
+my $start_email_addrs = "qmake.start\@raylim.mm.st";
 
 sub HELP_MESSAGE {
     print "Usage: qmake.pl -n [name] -m -r [numAttempts]\n";
-    print "-m: e-mails notifications to $email_addrs\n";
+    print "-m: e-mails notifications\n";
     print "-r: number of attempts (default: 1)\n";
     print "-l: parent log dir (default: log)\n";
     print "-n: job name\n";
@@ -104,16 +106,17 @@ do {
         if ($opt{m}) {
             my $mail_subject = "$name: job started ($cwd)";
             $mail_subject .= " Attempt " . ($n + 1) if $n > 0; 
-            open(MAIL, "| mail -s '$mail_subject' $email_addrs");
+            open(MAIL, "| mail -s '$mail_subject' $start_email_addrs");
             print MAIL "$mail_msg";
             close MAIL;
         }
         waitpid(-1, 0);
         $retcode = $? >> 8; # shift bits to get the real return code
         if ($opt{m}) {
-            my $mail_subject = "$name: job finished [$retcode] ($cwd)";
+            my $addrs = ($retcode > 0)? $err_email_addrs : $fin_email_addrs;
+            my $mail_subject = "[$retcode] $name: job finished ($cwd)";
             $mail_subject .= " Attempt " . ($n + 1) if $n > 0; 
-            open(MAIL, "| mail -s '$mail_subject' $email_addrs");
+            open(MAIL, "| mail -s '$mail_subject' $addrs");
             print MAIL "Return code: $retcode\n";
             print MAIL "$mail_msg";
             close MAIL;

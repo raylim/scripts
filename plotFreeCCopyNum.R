@@ -1,5 +1,5 @@
 #!/usr/bin/env Rscript
-# rbinds together tab-delimited tables and outputs to STDOUT
+# plots control freec 
 
 suppressPackageStartupMessages(library("optparse"));
 suppressPackageStartupMessages(library("GenomicRanges"));
@@ -18,8 +18,6 @@ parser <- OptionParser(usage = "%prog [options] [list of ratio.txt files]", opti
 arguments <- parse_args(parser, positional_arguments = T);
 opt <- arguments$options;
 
-arguments <- commandArgs(T);
-
 if (length(arguments$args) < 1) {
     cat("Need input controlFreeC ratio.txt files\n");
     print_help(parser);
@@ -34,6 +32,7 @@ tables <- list()
 samples <- c()
 for (f in files) {
     s <- sub('\\..*', '', f)
+    s <- sub('.*/', '', s)
     samples <- c(samples, s)
     d <- read.table(file = f, sep = '\t', header = T, as.is = T, comment.char = '');
     tables[[s]] <- d
@@ -90,7 +89,7 @@ chrPos <- (start(seqnames(gr)) - 1) / (length(gr) - 1)
 
 X <- as.matrix(mcols(gr))
 X[X > 3] <- 3
-X <- X[,-4]
+#X <- X[,-4]
 #x <- round(width(gr) / 50000)
 #Z <- apply(X, 2, rep, times = x)
 #sn <- rep(as.vector(seqnames(gr)), times = x)

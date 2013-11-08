@@ -2,30 +2,38 @@
 # Description: This script is used to generate sum reads over 1) the entire gene, 2) only the exons on a gene, 3) only the introns of a gene. It will also calculate a gene RPM/RPKM based on the exon and introns.
 # Description: This script is used to generate sum reads over a gene returning the raw read count across the whole gene and also across only the exons in the gene. Also RPKM values are generated.
 # Authors: Raymond Lim and Fong Chun Chan <fongchunchan@gmail.com>
-library("GenomicFeatures")
-library("Rsamtools")
-library("optparse")
+suppressPackageStartupMessages(library(optparse));
+suppressPackageStartupMessages(library(GenomicFeatures));
+suppressPackageStartupMessages(library(Rsamtools));
+suppressPackageStartupMessages(library(TxDb.Hsapiens.UCSC.hg19.knownGene));
+suppressPackageStartupMessages(library(org.Hs.eg.db))
 
 optionList <- list(
-	make_option(c('-a', '--addChr'), action='store_true', default = FALSE, help = 'Set the flag to add chr as a prefix to each seqlevel. Necessarily when the bamFile has read containing the chr prefix and the txdbFile does not [%default]'),
+	make_option(c('-a', '--addChr'), action='store_true', default = TRUE, help = 'Set the flag to add chr as a prefix to each seqlevel. Necessarily when the bamFile has read containing the chr prefix and the txdbFile does not [%default]'),
 	make_option(c('-i', '--intronListFile'), action='store', default = NULL, help = 'Set a file containing intronIDs to include in the summarization [%default]'),
+	make_option(c('-o', '--outFile'), action='store', default = NULL, help = 'output file'),
 	make_option(c('-w', '--intronWindow'), action='store', type = 'integer', default = NULL, help = 'Set the intronic window to be first x bases from the start [%default]')
 	)
-posArgs <- c('txdbFile', 'bamFile', 'outFile')
+posArgs <- c('bamFile')
 parser <- OptionParser(usage = paste('%prog [options]', paste(posArgs, collapse=' ')),  option_list=optionList)
 arguments <- parse_args(parser, positional_arguments = TRUE)
+opt <- arguments$options
 
 if (length(arguments$args) != length(posArgs)) {
 	print_help(parser)
 	print(arguments$args)
 	stop('Incorrect number of required positional arguments')
+} else if (is.null(opt$outFile)) {
+    cat("Need output file\n");
+    print_help(parser);
+    stop();
 } else {
 	cmdArgs <- arguments$args
 	for (i in 1:length(cmdArgs)){
 		assign(posArgs[i], cmdArgs[i])
 	}
-	opt <- arguments$options
 }
+
 
 #For debugging
 if (FALSE){
@@ -68,8 +76,8 @@ getExprs <- function( features, featureCounts, feature = 'gene' ){
 	return( list( 'rpm' = rpm, 'rpkm' = rpkm) )
 }
 
-cat("Loading", txdbFile, " ... ")
-txdb <- loadDb( txdbFile )
+print("Loading txdb ")
+txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
 print('... Done')
 
 print('Getting transcripts by gene')
@@ -84,21 +92,19 @@ intronsByTx <- intronsByTranscript(txdb, use.names = TRUE )
 introns <- unlist(intronsByTx)
 introns <- introns[ !duplicated(introns) ]
 
-if ( opt$addChr ){
-	print('Prefixing chr to chromosome names')
-	newSeqNames <- paste('chr', seqlevels(txByGene), sep = '')
-	names(newSeqNames) <- seqlevels(txByGene)
-	txByGene <- renameSeqlevels( txByGene, newSeqNames )
+print('Removing chr from chromosome names')
+newSeqNames <- sub('chr', '', seqlevels(txByGene))
+names(newSeqNames) <- seqlevels(txByGene)
+txByGene <- renameSeqlevels( txByGene, newSeqNames )
 
-	newSeqNames <- paste('chr', seqlevels(exonsByGene), sep = '')
-	names(newSeqNames) <- seqlevels(exonsByGene)
-	exonsByGene <- renameSeqlevels( exonsByGene, newSeqNames )
+newSeqNames <- sub('chr', '', seqlevels(exonsByGene))
+names(newSeqNames) <- seqlevels(exonsByGene)
+exonsByGene <- renameSeqlevels( exonsByGene, newSeqNames )
 
-	newSeqNames <- paste('chr', seqlevels(introns), sep = '')
-	names(newSeqNames) <- seqlevels(introns)
-	introns <- renameSeqlevels( introns, newSeqNames )
-	print('... Done')
-}
+newSeqNames <- sub('chr', '', seqlevels(introns))
+names(newSeqNames) <- seqlevels(introns)
+introns <- renameSeqlevels( introns, newSeqNames )
+print('... Done')
 
 if ( !is.null(opt$intronWindow) ){
 	print(paste('Restricting the intronic window from intron start +', opt$intronWindow))
@@ -147,7 +153,9 @@ print('... for introns ...')
 intronExprsVals <- getExprs( intronsByGene, countsForIntrons )
 print('... Done')
 
-print( paste('Saving results to', outFile) )
-summarizedReads <- data.frame(geneID = genes, countsByGene = countsForGenes[genes], countsByExon = countsForExons[genes], countsByIntron = countsForIntrons[genes], exonRPM = exonExprsVals[['rpm']][genes], exonRPKM = exonExprsVals[['rpkm']][genes], intronRPM = intronExprsVals[['rpm']][genes], intronRPKM = intronExprsVals[['rpkm']][genes])
-write.table(summarizedReads, file = outFile, sep = '\t', quote = F, row.names=F)
+geneSymbols <- sapply(mget(genes, org.Hs.egSYMBOL, ifnotfound = NA), function (x) x[1])
+
+print( paste('Saving results to', opt$outFile) )
+summarizedReads <- data.frame(geneID = genes, gene = geneSymbols, countsByGene = countsForGenes[genes], countsByExon = countsForExons[genes], countsByIntron = countsForIntrons[genes], exonRPM = exonExprsVals[['rpm']][genes], exonRPKM = exonExprsVals[['rpkm']][genes], intronRPM = intronExprsVals[['rpm']][genes], intronRPKM = intronExprsVals[['rpkm']][genes])
+write.table(summarizedReads, file = opt$outFile, sep = '\t', quote = F, row.names=F)
 print('... Done')

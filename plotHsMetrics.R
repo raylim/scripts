@@ -14,8 +14,6 @@ parser <- OptionParser(usage = "%prog [options] [hs_metrics.txt]", option_list =
 arguments <- parse_args(parser, positional_arguments = T);
 opt <- arguments$options;
 
-arguments <- commandArgs(T);
-
 if (length(arguments$args) < 1) {
     cat("Need input hs metrics file\n");
     print_help(parser);

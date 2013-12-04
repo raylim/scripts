@@ -4,6 +4,7 @@
 suppressPackageStartupMessages(library("optparse"));
 suppressPackageStartupMessages(library("DNAcopy"));
 suppressPackageStartupMessages(library("SMAP"));
+suppressPackageStartupMessages(library("CGHcall"));
 
 options(warn = -1, error = quote({ traceback(); q('no', status = 1) }))
 
@@ -107,3 +108,4 @@ cat("done\n")
 
 
 cat("Finished\n")
+

@@ -47,14 +47,10 @@ oldwd <- getwd()
 if (sum(rowData(vcf)$FILTER == "PASS") > 0) {
     # convert vcf to chasm input
     al <- sapply(rowData(vcf)$ALT, length)
-    X <- data.frame(id = 1:nrow(vcf), seq = as.character(seqnames(rowData(vcf))), zero = start(rowData(vcf)) - 1, one = start(rowData(vcf)) + 1, strand = rep('+', nrow(vcf)), ref = as.character(rowData(vcf)$REF), filt = rowData(vcf)$FILTER)
-    if (nrow(X) == 1) {
-        XX <- t(apply(X, 2, rep, times = al))
-    } else {
-        XX <- apply(X, 2, rep, times = al)
-    }
-    X <- cbind(XX, alt = as.character(unlist(rowData(vcf)$ALT)))
-    X <- as.data.frame(X, stringsAsFactors = F)
+    X <- data.frame(id = 1:nrow(vcf), seq = as.character(seqnames(rowData(vcf))), zero = as.integer(start(rowData(vcf)) - 1), one = as.integer(start(rowData(vcf))), strand = rep('+', nrow(vcf)), ref = as.character(rowData(vcf)$REF), filt = rowData(vcf)$FILTER, stringsAsFactors = F)
+    re <- rep.int(X$id, times = al)
+    X <- X[re, ,drop = F]
+    X$alt <- as.character(unlist(rowData(vcf)$ALT))
     X <- subset(X, sapply(alt, nchar) == 1 & sapply(ref, nchar) == 1 & filt == "PASS")
     X <- X[,-which(colnames(X) == 'filt')]
     X$seq <- sub('^', 'chr', X$seq)

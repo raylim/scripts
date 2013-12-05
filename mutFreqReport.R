@@ -44,16 +44,19 @@ pg <- openPage('index.html', dirname = opt$outDir)
 # mosaic plots for each conteingcy table
 cols <- c("blue", "red", "green", "yellow")
 
+cat("Plotting complete mosaic plot\n")
 conTable <- table(ref = dd$ref_allele, alt = dd$alt_allele)
 fn <- paste(opt$outDir, '/all.mosaicplot.png', sep = '')
 png(fn, height = 500, width = 500, type = 'cairo-png')
 null <- mosaicplot(conTable, main = "All", col = cols)
 dev.off()
 hwriteImage(basename(fn), pg)
+
 x <- as.matrix(conTable)
 class(x) <- 'matrix'
 hwrite(x, pg, br = T)
 
+cat("Calculating contingency tables per sample")
 conTables <- lapply(d, function(x) table(ref = x$ref_allele, alt = x$alt_allele))
 dfs <- lapply(conTables, as.data.frame)
 df <- dfs[[1]][, c(1, 2)]
@@ -63,10 +66,12 @@ for (sp in names(dfs)) {
     df <- merge(df, x, by = c("ref", "alt"))
 }
 hwrite(df, pg, br = T)
+cat("Writing contingency tables")
 fn <- paste(opt$outDir, '/refvarCount.txt', sep = '')
 write.table(df, file = fn, sep = '\t', quote = F)
 
 
+cat("Plotting mosaic plots per sample\n")
 for (sp in names(conTables)) {
     tab <- conTables[[sp]]
     fn <- paste(opt$outDir, '/', sp, '.mosaicplot.png', sep = '')

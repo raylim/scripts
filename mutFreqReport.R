@@ -31,8 +31,11 @@ for (mutectFile in mutectFiles) {
     cat("Reading", mutectFile, "\n")
     sp <- sub('.*/', '', mutectFile)
     sp <- sub('\\..*', '', sp)
-    d[[sp]] <- read.table(mutectFile, header=T, as.is = T, sep = '\t');
-    d[[sp]] <- subset(d[[sp]], judgement == "KEEP")
+    dat <- read.table(mutectFile, header=T, as.is = T, sep = '\t');
+    dat <- subset(dat, judgement == "KEEP")
+    if (!is.null(dat) &&  nrow(dat) > 0) {
+        d[[sp]] <- dat
+    }
 }
 dd <- do.call('rbind', d)
 

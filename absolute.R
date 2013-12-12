@@ -1,9 +1,9 @@
 disease <- "breastcancer"
 platform <- "SNP_6.0"
-#seg.dat.fn
-#tumour <- ""
-#normal <- ""
-#results.dir <- ""
+seg.dat.fn <- ""
+tumour <- ""
+normal <- ""
+results.dir <- ""
 
 args <- (commandArgs(TRUE))
 
@@ -16,6 +16,10 @@ if (length(args) == 0) {
     }
 }
 
+if (seg.dat.fn == "") {
+	print("Need hapseg file\n")
+    exit(1)
+}
 if (tumour == "") {
 	print("Need tumour sample name\n")
     exit(1)

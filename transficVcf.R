@@ -9,7 +9,7 @@ suppressPackageStartupMessages(library(TxDb.Hsapiens.UCSC.hg19.knownGene));
 suppressPackageStartupMessages(library(BSgenome.Hsapiens.UCSC.hg19))
 suppressPackageStartupMessages(library(org.Hs.eg.db))
 
-options(warn = -1, error = quote({ traceback(); q('no', status = 1) }))
+options(warn = -1, error = quote({ traceback(2); q('no', status = 1) }))
 
 optList <- list(
         make_option("--genome", default = 'hg19', help = "genome build [default %default]"),

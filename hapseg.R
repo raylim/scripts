@@ -8,9 +8,9 @@ clusters.fn <- "apt/birdseed-v1.snp-models.txt"
 genome.build <- "hg19"
 disease <- "breastcancer"
 platform <- "SNP_6.0"
-#tumour <- ""
-#normal <- ""
-#results.dir <- ""
+tumour <- ""
+normal <- ""
+results.dir <- ""
 
 args <- (commandArgs(TRUE))
 

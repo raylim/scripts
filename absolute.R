@@ -1,44 +1,45 @@
-disease <- "breastcancer"
-platform <- "SNP_6.0"
-seg.dat.fn <- ""
-tumour <- ""
-normal <- ""
-results.dir <- ""
+#!/usr/bin/env Rscript
+# Run absolute
 
-args <- (commandArgs(TRUE))
+suppressPackageStartupMessages(library("optparse"));
+suppressPackageStartupMessages(library(ABSOLUTE));
 
-if (length(args) == 0) {
-	print("No arguments supplied.\n")
-    exit(1)
-} else {
-	for (i in 1:length(args)) {
-    eval(parse(text = args[[i]]))
-    }
+options(warn = -1, error = quote({ traceback(2); q('no', status = 1) }))
+
+optList <- list(
+        make_option("--disease", default = 'breastcancer', help = "disease [default %default]"),
+        make_option("--platform", default = "SNP_6.0", help = "platform [default %default]"),
+        make_option("--tumour", default = NULL, help = "tumour sample name"),
+        make_option("--mafFile", default = NULL, help = "MAF file"),
+        make_option("--resultsDir", default = NULL, help = "results directory"),
+        make_option("--outPrefix", default = NULL, help = "output prefix")
+        )
+parser <- OptionParser(usage = "%prog segDat.Rdata", option_list = optList);
+arguments <- parse_args(parser, positional_arguments = T);
+opt <- arguments$options;
+
+if (is.null(opt$resultsDir)) {
+    cat("Need results dir\n");
+    print_help(parser);
+    stop();
+} else if (is.null(opt$tumour)) {
+    cat("Need tumour sample name\n");
+    print_help(parser);
+    stop();
+} else if (length(arguments$args) != 1) {
+    cat("Need hapseg data file\n");
+    print_help(parser);
+    stop();
 }
 
-if (seg.dat.fn == "") {
-	print("Need hapseg file\n")
-    exit(1)
-}
-if (tumour == "") {
-	print("Need tumour sample name\n")
-    exit(1)
-}
-if (results.dir == "") {
-	print("Need results directory\n")
-    exit(1)
-}
-if (out.file == "") {
-	print("Need output file\n")
-    exit(1)
-}
 
-library(ABSOLUTE)
-RunAbsolute(seg.dat.fn = seg.data.fn, out.file = out.file,
+fn <- arguments$args[1];
+RunAbsolute(seg.dat.fn = fn, output.fn.base = opt$outPrefix,
     sigma.p=0, max.sigma.h=0.02,
-    min.ploidy=0.95, max.ploidy=10, primary.disease=disease,
-    platform=platform, sample.name=tumour,
-    results.dir=results.dir,
+    min.ploidy=0.95, max.ploidy=10, primary.disease=opt$disease,
+    platform=opt$platform, sample.name=opt$tumour,
+    results.dir=opt$resultsDir,
+    maf.fn = opt$mafFile,
     max.as.seg.count=1500, copy_num_type="allelic",
     max.neg.genome=0, max.non.clonal=0,
     verbose=TRUE)

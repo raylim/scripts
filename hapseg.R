@@ -42,7 +42,7 @@ if (normal != "") {
 }
 
 library(HAPSEG)
-RunHapSeg(out.file = out.file, array.name = tumour, seg.fn = NULL, 
+RunHapSeg(out.file = out.file, plate.name = plate.name, array.name = tumour, seg.fn = NULL, 
 	snp.fn = snp.fn, 
 	genome.build = genome.build, results.dir = results.dir,
 	platform = platform, use.pop = "CEPH", impute.gt = TRUE, plot.segfit = TRUE, 

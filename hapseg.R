@@ -26,7 +26,7 @@ if (is.null(opt$outFile)) {
     cat("Need output file\n");
     print_help(parser);
     stop();
-if (is.null(opt$resultsDir)) {
+} else  if (is.null(opt$resultsDir)) {
     cat("Need results dir\n");
     print_help(parser);
     stop();

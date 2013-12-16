@@ -71,7 +71,7 @@ RunHapSeg(out.file = opt$outFile, plate.name = opt$plate, array.name = tumour, s
 	drop.x = FALSE, drop.y = TRUE, calls.fn = calls.fn , 
 	calibrate.data = TRUE, use.normal = useNormal,
     mn.sample = normal, 
-	clusters.fn = clusters.fn, 
+	clusters.fn = opt$clustersFile,
 	snp.file.parser = AptSnpFileParser, clusters.file.parser = BirdseedClustersFileParser, 
 	verbose = TRUE, adj.atten = 0)
 

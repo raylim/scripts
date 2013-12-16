@@ -53,8 +53,8 @@ if (is.null(opt$outFile)) {
 }
 
 tumour <- arguments$args[1]
-if (length(argument$args) > 1) {
-    normal <- argument$args[2]
+if (length(arguments$args) > 1) {
+    normal <- arguments$args[2]
     useNormal <- T
 } else {
     useNormal <- F

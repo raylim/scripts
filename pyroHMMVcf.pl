@@ -64,6 +64,7 @@ while (<>) {
         close(SAMTOOLS);
         for $alt (@alts) {
             $alt = $ref . $alt;
+            $alt =~ s/-//;
         }
     }
     my @nonRefAlts;

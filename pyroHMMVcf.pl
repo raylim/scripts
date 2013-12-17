@@ -67,7 +67,7 @@ while (<>) {
             $alt =~ s/-//;
         }
     }
-    if ($alt eq "-") {
+    if (scalar(@alts) == 1 && $alts[0] eq "-") {
         $pos--;
         #print STDERR "querying $chrom:$pos-$pos\n";
         open(SAMTOOLS, "samtools faidx $opt{f} $chrom:$pos-$pos |");

@@ -42,7 +42,7 @@ for my $contig (@contigs) {
     my @F = split /\t/, $contig;
     $vcfHeader .= "##contig=<ID=$F[0],length=$F[1]>\n";
 }
-$vcfHeader .= "#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	$sample\n";
+$vcfHeader .= "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\t$sample\n";
 print $vcfHeader;
 
 my $format = "GT:WMQ:WBQ";
@@ -53,7 +53,7 @@ while (<>) {
     my ($chrom, $pos, $call, $ref, $alt, $prob, $qual, $winMQ, $winBQ) = @F;
     my @alts = split /,/, $alt;
     @alts = uniq(@alts);
-    if ($ref eq "-") {
+    if ($ref eq "-" || $alt eq "-") {
         $pos--;
         #print STDERR "querying $chrom:$pos-$pos\n";
         open(SAMTOOLS, "samtools faidx $opt{f} $chrom:$pos-$pos |");

@@ -84,6 +84,6 @@ while (<>) {
     $GT = "0/1" if ($call eq "ins" && scalar(@alts) == 2);
     $GT = "1/1" if ($call eq "ins" && scalar(@alts) == 1);
     my $sampleFormat = "$GT:$winMQ:$winBQ";
-    print "$chrom\t$pos\t.\t$ref\t$alts\t$qual\t.\t$format\t$sampleFormat\n";
+    print "$chrom\t$pos\t.\t$ref\t$alts\t$qual\tPASS\t.\t$format\t$sampleFormat\n";
 }
 

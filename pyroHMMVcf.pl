@@ -74,15 +74,17 @@ while (<>) {
 
     my $alts = join ',', @nonRefAlts;
     $alts =~ s/-/./;
-    my $GT = "";
+
+    my $GT;
     $GT = "0/1" if ($call eq "het" && scalar(@nonRefAlts) == 1);
     $GT = "1/2" if ($call eq "het" && scalar(@nonRefAlts) == 2);
     $GT = "0/0" if ($call eq "hom" && $ref eq $alts);
     $GT = "1/1" if ($call eq "hom" && $ref ne $alts);
     $GT = "0/1" if ($call eq "del" && scalar(@alts) == 2);
     $GT = "1/1" if ($call eq "del" && scalar(@alts) == 1);
-    $GT = "0/1" if ($call eq "ins" && scalar(@alts) == 2);
+    $GT = "0/1" if ($call eq "ins" && scalar(@alts) == 2 && grep /^$ref$/, @alts);
     $GT = "1/1" if ($call eq "ins" && scalar(@alts) == 1);
+    $GT = "1/2" if ($call eq "mix" && scalar(@alts) == 2 && !grep /^$ref$/, @alts);
     my $sampleFormat = "$GT:$winMQ:$winBQ";
     print "$chrom\t$pos\t.\t$ref\t$alts\t$qual\tPASS\t.\t$format\t$sampleFormat\n";
 }

@@ -67,20 +67,6 @@ while (<>) {
             $alt =~ s/-//;
         }
     }
-    if (scalar(@alts) == 1 && $alts[0] eq "-") {
-        $pos--;
-        #print STDERR "querying $chrom:$pos-$pos\n";
-        open(SAMTOOLS, "samtools faidx $opt{f} $chrom:$pos-$pos |");
-        <SAMTOOLS>;
-        my $seq = <SAMTOOLS>;
-        chomp $seq;
-        $ref = $seq . $ref;
-        close(SAMTOOLS);
-        for $alt (@alts) {
-            $alt = $seq . $alt;
-            $alt =~ s/-//;
-        }
-    }
     my @nonRefAlts;
     for my $i (@alts) {
         push @nonRefAlts, $i if ($i ne $ref);
@@ -88,6 +74,18 @@ while (<>) {
 
     my $alts = join ',', @nonRefAlts;
     $alts =~ s/-/./;
+
+    if ($alts eq ".") {
+        $pos--;
+        #print STDERR "querying $chrom:$pos-$pos\n";
+        open(SAMTOOLS, "samtools faidx $opt{f} $chrom:$pos-$pos |");
+        <SAMTOOLS>;
+        my $seq = <SAMTOOLS>;
+        chomp $seq;
+        close(SAMTOOLS);
+        $ref = $seq . $ref;
+        $alts = $seq;
+    }
 
     my $GT;
     $GT = "0/1" if ($call eq "het" && scalar(@nonRefAlts) == 1);

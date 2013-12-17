@@ -68,7 +68,7 @@ RunHapSeg(out.file = opt$outFile, plate.name = opt$plate, array.name = tumour, s
 	platform = opt$platform, use.pop = "CEPH", impute.gt = TRUE, plot.segfit = TRUE, 
 	merge.small = TRUE, merge.close = TRUE, min.seg.size = 3, normal = FALSE, out.p = 0.05, 
 	seg.merge.thresh = 0.0001, phased.bgl.dir = phased.bgl, 
-	drop.x = FALSE, drop.y = TRUE, calls.fn = calls.fn , 
+	drop.x = FALSE, drop.y = TRUE, calls.fn = opt$callsFile , 
 	calibrate.data = TRUE, use.normal = useNormal,
     mn.sample = normal, 
 	clusters.fn = opt$clustersFile,

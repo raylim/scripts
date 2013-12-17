@@ -6,6 +6,7 @@ use warnings;
 
 use Getopt::Std;
 use List::MoreUtils qw(uniq);
+
 my %opt;
 getopts('hf:n:', \%opt);
 
@@ -26,6 +27,8 @@ my $now = localtime;
 my $sample = $opt{n};
 
 open REF, $opt{f} . ".fai" or die "Unable to open reference index file\n";
+
+
 my @contigs = <REF>;
 
 my $vcfHeader = <<ENDL;
@@ -49,7 +52,20 @@ while (<>) {
     my @F = split / /;
     my ($chrom, $pos, $call, $ref, $alt, $prob, $qual, $winMQ, $winBQ) = @F;
     my @alts = split /,/, $alt;
-    my @alts = uniq(@alts);
+    @alts = uniq(@alts);
+    if ($ref eq "-") {
+        $pos--;
+        #print STDERR "querying $chrom:$pos-$pos\n";
+        open(SAMTOOLS, "samtools faidx $opt{f} $chrom:$pos-$pos |");
+        <SAMTOOLS>;
+        my $seq = <SAMTOOLS>;
+        chomp $seq;
+        $ref = $seq;
+        close(SAMTOOLS);
+        for $alt (@alts) {
+            $alt = $ref . $alt;
+        }
+    }
     my @nonRefAlts;
     for my $i (@alts) {
         push @nonRefAlts, $i if ($i ne $ref);
@@ -64,6 +80,8 @@ while (<>) {
     $GT = "1/1" if ($call eq "hom" && $ref ne $alts);
     $GT = "0/1" if ($call eq "del" && scalar(@alts) == 2);
     $GT = "1/1" if ($call eq "del" && scalar(@alts) == 1);
+    $GT = "0/1" if ($call eq "ins" && scalar(@alts) == 2);
+    $GT = "1/1" if ($call eq "ins" && scalar(@alts) == 1);
     my $sampleFormat = "$GT:$winMQ:$winBQ";
     print "$chrom\t$pos\t.\t$ref\t$alts\t$qual\t.\t$format\t$sampleFormat\n";
 }

@@ -53,7 +53,7 @@ while (<>) {
     my ($chrom, $pos, $call, $ref, $alt, $prob, $qual, $winMQ, $winBQ) = @F;
     my @alts = split /,/, $alt;
     @alts = uniq(@alts);
-    if ($ref eq "-" || $alt eq "-") {
+    if ($ref eq "-") {
         $pos--;
         #print STDERR "querying $chrom:$pos-$pos\n";
         open(SAMTOOLS, "samtools faidx $opt{f} $chrom:$pos-$pos |");
@@ -64,6 +64,20 @@ while (<>) {
         close(SAMTOOLS);
         for $alt (@alts) {
             $alt = $ref . $alt;
+            $alt =~ s/-//;
+        }
+    }
+    if ($alt eq "-") {
+        $pos--;
+        #print STDERR "querying $chrom:$pos-$pos\n";
+        open(SAMTOOLS, "samtools faidx $opt{f} $chrom:$pos-$pos |");
+        <SAMTOOLS>;
+        my $seq = <SAMTOOLS>;
+        chomp $seq;
+        $ref = $seq . $ref;
+        close(SAMTOOLS);
+        for $alt (@alts) {
+            $alt = $seq . $alt;
             $alt =~ s/-//;
         }
     }

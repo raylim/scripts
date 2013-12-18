@@ -19,7 +19,7 @@ sub HELP_MESSAGE {
 HELP_MESSAGE if $opt{h};
 
 my @bases = qw/A T C G/;
-my $freqThreshold = 0.01;
+my $freqThreshold = 0.001;
 my $binSize = $opt{b}? $opt{b} : 0.05;
 my $minDepth = $opt{d}? $opt{d} : 10;
 my $lastBin = 1 / $binSize;

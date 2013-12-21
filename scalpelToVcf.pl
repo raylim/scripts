@@ -16,16 +16,6 @@ sub HELP_MESSAGE {
    exit(1);
 }
 
-sub getRefSeq {
-    my ($chrom, $pos) = @_;
-    open(SAMTOOLS, "samtools faidx $opt{f} $chrom:$pos-$pos |");
-    <SAMTOOLS>;
-    my $seq = <SAMTOOLS>;
-    chomp $seq;
-    close(SAMTOOLS);
-    $seq;
-}
-
 
 HELP_MESSAGE if $opt{h};
 
@@ -35,6 +25,15 @@ my $tumor = $opt{t};
 
 open REF, $opt{f} . ".fai" or die "Unable to open reference index file\n";
 
+sub getRefSeq {
+    my ($chrom, $pos) = @_;
+    open(SAMTOOLS, "samtools faidx $opt{f} $chrom:$pos-$pos |");
+    <SAMTOOLS>;
+    my $seq = <SAMTOOLS>;
+    chomp $seq;
+    close(SAMTOOLS);
+    $seq;
+}
 
 my @contigs = <REF>;
 

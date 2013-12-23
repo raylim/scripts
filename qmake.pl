@@ -6,9 +6,9 @@ use warnings;
 use Cwd;
 
 my $cwd = getcwd;
-my $fin_email_addrs = "qmake.finished\@raylim.mm.st";
-my $err_email_addrs = "qmake.error\@raylim.mm.st";
-my $start_email_addrs = "qmake.start\@raylim.mm.st";
+my $fin_email_addrs = "qmake.finished\@raylim.mm.st charlottekyng+qmake.finished\@gmail.com";
+my $err_email_addrs = "qmake.error\@raylim.mm.st charlottekyng+qmake.error\@gmail.com";
+my $start_email_addrs = "qmake.start\@raylim.mm.st charlottekyng+qmake.start\@gmail.com";
 
 sub HELP_MESSAGE {
     print "Usage: qmake.pl -n [name] -m -r [numAttempts]\n";

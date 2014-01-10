@@ -76,15 +76,16 @@ for (mutectFile in mutectFiles) {
         contextSplit <- t(sapply(context, function(x) unlist(strsplit(x, ''))))
 
         for (rnge in rnges) {
+            rngName <- paste(rnge, collapse = ",")
+            #cat("tabulating", rngName, "\n")
             tab <- table(as.factor(apply(contextSplit[,rnge], 1, paste, collapse = "")))
-            if (any(tab > length(tab) / 4)) {
-                bpfn <- paste(opt$outDir, "/", sn, "_", m,  "_barplot_", rnge, ".png", sep = "")
+            if (any(tab > length(tab) / 3)) {
+                bpfn <- paste(opt$outDir, "/", sn, "_", m,  "_barplot_", rngName, ".png", sep = "")
                 cat("plotting", bpfn, "\n")
                 png(bpfn, height = 800, width = 800, type = 'cairo-png')
                 barplot(tab, horiz = T, las = 2)
                 dev.off()
-                rngName <- paste(rnge, collapse = ",")
-                results[[mut]][[sn]][[rngName]] <- append(results[[mut]][[sn]], bpfn)
+                results[[mut]][[sn]][[rngName]] <- bpfn
             }
         }
     }

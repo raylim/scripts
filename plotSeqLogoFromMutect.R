@@ -116,9 +116,9 @@ for (mut in names(results)) {
 
         # barplots
         if (length(results[[mut]][[sn]]) >= 3) {
-            for (i in 3:length(results[[mut]][[sn]])) {
-                capt <- paste(sn, " ", i, " barplot (n = ", results[[mut]][[sn]]$n, ")", sep = "")
-                img <- hwriteImage(basename(results[[mut]][[sn]][[x]]))
+            for (name in names(results[[mut]][[sn]])[3:length(results[[mut]][[sn]])]) {
+                capt <- paste(sn, " ", name, " barplot (n = ", results[[mut]][[sn]]$n, ")", sep = "")
+                img <- hwriteImage(basename(results[[mut]][[sn]][[name]]))
                 hwrite(c(img, caption = capt), pg, br = T, dim = c(2, 1), row.style = list(caption='text-align:center;background-color:#fac'), row.names = F)
             }
         }

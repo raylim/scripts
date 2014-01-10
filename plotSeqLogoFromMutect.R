@@ -31,7 +31,7 @@ if (length(arguments$args) < 1) {
 }
 
 pset <- powerset(1:7)
-rnges <- pset[sapply(pset, function(x) length(x) > 2 & 4 %in% x)]
+rnges <- pset[sapply(pset, function(x) length(x) >= 2 & 4 %in% x)]
 
 contexts <- list()
 results <- list()

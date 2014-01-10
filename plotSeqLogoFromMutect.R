@@ -81,7 +81,6 @@ for (mutectFile in mutectFiles) {
                 bpfn <- paste(opt$outDir, "/", sn, "_", m,  "_barplot_", rnge, ".png", sep = "")
                 cat("plotting", bpfn, "\n")
                 png(bpfn, height = 800, width = 800, type = 'cairo-png')
-                rnge <- c((4-i):3, 4:(i+4))
                 barplot(tab, horiz = T, las = 2)
                 dev.off()
                 rngName <- paste(rnge, collapse = ",")

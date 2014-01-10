@@ -5,6 +5,7 @@ suppressPackageStartupMessages(library("optparse"));
 suppressPackageStartupMessages(library("berrylogo"));
 suppressPackageStartupMessages(library("ggplot2"));
 suppressPackageStartupMessages(library("hwriter"));
+suppressPackageStartupMessages(library(HapEstXXR));
 
 options(warn = -1, error = quote({ traceback(); q('no', status = 1) }))
 
@@ -28,6 +29,9 @@ if (length(arguments$args) < 1) {
 } else {
     mutectFiles <- arguments$args;
 }
+
+pset <- powerset(1:7)
+rnges <- pset[sapply(pset, function(x) length(x) > 2 & 4 %in% x)]
 
 contexts <- list()
 results <- list()
@@ -71,14 +75,18 @@ for (mutectFile in mutectFiles) {
         context <- splitd[[mut]]$context
         contextSplit <- t(sapply(context, function(x) unlist(strsplit(x, ''))))
 
-        for (i in 1:3) {
-            bpfn <- paste(opt$outDir, "/", sn, "_", m,  "_barplot", i, "1.png", sep = "")
-            cat("plotting", bpfn, "\n")
-            png(bpfn, height = 800, width = 800, type = 'cairo-png')
-            rnge <- c((4-i):3, 4:(i+4))
-            barplot(table(as.factor(apply(contextSplit[,rnge], 1, paste, collapse = ""))), horiz = T, las = 2)
-            dev.off()
-            results[[mut]][[sn]] <- append(results[[mut]][[sn]], bpfn)
+        for (rnge in rnges) {
+            tab <- table(as.factor(apply(contextSplit[,rnge], 1, paste, collapse = "")))
+            if (any(tab > length(tab) / 4)) {
+                bpfn <- paste(opt$outDir, "/", sn, "_", m,  "_barplot_", rnge, ".png", sep = "")
+                cat("plotting", bpfn, "\n")
+                png(bpfn, height = 800, width = 800, type = 'cairo-png')
+                rnge <- c((4-i):3, 4:(i+4))
+                barplot(tab, horiz = T, las = 2)
+                dev.off()
+                rngName <- paste(rnge, collapse = ",")
+                results[[mut]][[sn]][[rngName]] <- append(results[[mut]][[sn]], bpfn)
+            }
         }
     }
 }
@@ -107,11 +115,12 @@ for (mut in names(results)) {
         hwrite(c(img, caption = capt), pg, br = T, dim = c(2, 1), row.style = list(caption='text-align:center;background-color:#fac'), row.names = F)
 
         # barplots
-        for (i in 1:3) {
-            x <- 2 + i
-            capt <- paste(sn, " -", i, " to ", i, " barplot (n = ", results[[mut]][[sn]]$n, ")", sep = "")
-            img <- hwriteImage(basename(results[[mut]][[sn]][[x]]))
-            hwrite(c(img, caption = capt), pg, br = T, dim = c(2, 1), row.style = list(caption='text-align:center;background-color:#fac'), row.names = F)
+        if (length(results[[mut]][[sn]]) >= 3) {
+            for (i in 3:length(results[[mut]][[sn]])) {
+                capt <- paste(sn, " ", i, " barplot (n = ", results[[mut]][[sn]]$n, ")", sep = "")
+                img <- hwriteImage(basename(results[[mut]][[sn]][[x]]))
+                hwrite(c(img, caption = capt), pg, br = T, dim = c(2, 1), row.style = list(caption='text-align:center;background-color:#fac'), row.names = F)
+            }
         }
     }
     closePage(pg)

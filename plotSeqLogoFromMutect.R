@@ -55,32 +55,6 @@ for (mutectFile in mutectFiles) {
         m <- sub('>', "to", mut)
 
         context <- splitd[[mut]]$context
-        contextSplit <- t(sapply(context, function(x) unlist(strsplit(x, ''))))
-
-        bpfn <- paste(opt$outDir, "/", sn, "_", m,  "_barplot1.png", sep = "")
-        cat("plotting", bpfn, "\n")
-        png(bpfn, height = 800, width = 800, type = 'cairo-png')
-        barplot(table(as.factor(apply(contextSplit[,3:5], 1, paste, collapse = ""))), horiz = T, las = 2)
-        dev.off()
-
-        bp2fn <- paste(opt$outDir, "/", sn, "_", m,  "_barplot2.png", sep = "")
-        cat("plotting", bp2fn, "\n")
-        png(bp2fn, height = 800, width = 800, type = 'cairo-png')
-        barplot(table(as.factor(apply(contextSplit[,3:6], 1, paste, collapse = ""))), horiz = T, las = 2)
-        dev.off()
-        
-        bp3fn <- paste(opt$outDir, "/", sn, "_", m,  "_barplot3.png", sep = "")
-        cat("plotting", bp3fn, "\n")
-        png(bp3fn, height = 800, width = 800, type = 'cairo-png')
-        barplot(table(as.factor(apply(contextSplit[,3:7], 1, paste, collapse = ""))), horiz = T, las = 2)
-        dev.off()
-
-        bp4fn <- paste(opt$outDir, "/", sn, "_", m,  "_barplot4.png", sep = "")
-        cat("plotting", bp4fn, "\n")
-        png(bp4fn, height = 800, width = 800, type = 'cairo-png')
-        barplot(table(as.factor(apply(contextSplit[,c(3,4,5,7)], 1, paste, collapse = ""))), horiz = T, las = 2)
-        dev.off()
-
         context <- sub("x", '', context)
         contexts[[mut]] <- c(contexts[[mut]], context)
         contextSplit <- t(sapply(context, function(x) unlist(strsplit(x, ''))))
@@ -92,7 +66,20 @@ for (mutectFile in mutectFiles) {
         png(fn, height = 800, width = 800, type = 'cairo-png')
         print(berrylogo(pwm))
         dev.off()
-        results[[mut]][[sn]] <- list(plotFn = fn, bpFn1 = bpfn, bpFn2 = bp2fn, bpFn3 = bp3fn, bpFn4 = bp4fn, n = length(context))
+        results[[mut]][[sn]] <- list(plotFn = fn, n = length(context))
+
+        context <- splitd[[mut]]$context
+        contextSplit <- t(sapply(context, function(x) unlist(strsplit(x, ''))))
+
+        for (i in 1:3) {
+            bpfn <- paste(opt$outDir, "/", sn, "_", m,  "_barplot", i, "1.png", sep = "")
+            cat("plotting", bpfn, "\n")
+            png(bpfn, height = 800, width = 800, type = 'cairo-png')
+            rnge <- c((4-i):3, 4:(i+4))
+            barplot(table(as.factor(apply(contextSplit[,rnge], 1, paste, collapse = ""))), horiz = T, las = 2)
+            dev.off()
+            results[[mut]][[sn]] <- append(results[[mut]][[sn]], bpfn)
+        }
     }
 }
 
@@ -114,25 +101,18 @@ for (mut in names(results)) {
     hwrite(c(img, caption = "All"), pg, br = T, dim = c(2, 1), row.style = list(caption='text-align:center;background-color:#fac'), row.names = F)
 
     for (sn in names(results[[mut]])) {
+        # seq logo
         capt <- paste(sn, " logo (n = ", results[[mut]][[sn]]$n, ")", sep = "")
         img <- hwriteImage(basename(results[[mut]][[sn]]$plotFn))
         hwrite(c(img, caption = capt), pg, br = T, dim = c(2, 1), row.style = list(caption='text-align:center;background-color:#fac'), row.names = F)
 
-        capt <- paste(sn, " -1 to 1 barplot (n = ", results[[mut]][[sn]]$n, ")", sep = "")
-        img <- hwriteImage(basename(results[[mut]][[sn]]$bpFn1))
-        hwrite(c(img, caption = capt), pg, br = T, dim = c(2, 1), row.style = list(caption='text-align:center;background-color:#fac'), row.names = F)
-
-        capt <- paste(sn, " -1 to 2 barplot (n = ", results[[mut]][[sn]]$n, ")", sep = "")
-        img <- hwriteImage(basename(results[[mut]][[sn]]$bpFn2))
-        hwrite(c(img, caption = capt), pg, br = T, dim = c(2, 1), row.style = list(caption='text-align:center;background-color:#fac'), row.names = F)
-
-        capt <- paste(sn, " -1 to 3 barplot (n = ", results[[mut]][[sn]]$n, ")", sep = "")
-        img <- hwriteImage(basename(results[[mut]][[sn]]$bpFn3))
-        hwrite(c(img, caption = capt), pg, br = T, dim = c(2, 1), row.style = list(caption='text-align:center;background-color:#fac'), row.names = F)
-
-        capt <- paste(sn, " -1,1,3 barplot (n = ", results[[mut]][[sn]]$n, ")", sep = "")
-        img <- hwriteImage(basename(results[[mut]][[sn]]$bpFn4))
-        hwrite(c(img, caption = capt), pg, br = T, dim = c(2, 1), row.style = list(caption='text-align:center;background-color:#fac'), row.names = F)
+        # barplots
+        for (i in 1:3) {
+            x <- 2 + i
+            capt <- paste(sn, " -", i, " to ", i, " barplot (n = ", results[[mut]][[sn]]$n, ")", sep = "")
+            img <- hwriteImage(basename(results[[mut]][[sn]][[x]]))
+            hwrite(c(img, caption = capt), pg, br = T, dim = c(2, 1), row.style = list(caption='text-align:center;background-color:#fac'), row.names = F)
+        }
     }
     closePage(pg)
 }

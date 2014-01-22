@@ -66,7 +66,7 @@ if (sum(predCod$CONSEQUENCE == "nonsynonymous") == 0) {
     x <- transcripts(txdb, vals = list(tx_id = predCod$TXID), columns = c('tx_id', 'tx_name'))
     enstIds <- x$tx_name
     names(enstIds) <- x$tx_id
-    aa = cbind(queryId = predCod$QUERYID, aa = paste(as.character(predCod$REFAA), predCod$PROTEINLOC, as.character(predCod$VARAA), sep = ''))
+    aa = cbind(queryId = predCod$QUERYID, aa = paste(as.character(predCod$REFAA), lapply(predCod$PROTEINLOC, function(x) x[1]), as.character(predCod$VARAA), sep = ''))
     rownames(aa) <- predCod$TXID
 
     cat("Looking up ensembl peptide IDs ... ")

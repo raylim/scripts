@@ -46,7 +46,6 @@ hinfoprime <- rbind(hinfoprime, chasm_pval = c("A", "Float", "CHASM p-value"))
 hinfoprime <- rbind(hinfoprime, chasm_score = c("A", "Float", "CHASM score"))
 hinfoprime <- rbind(hinfoprime, chasm_fdr = c("A", "Float", "CHASM B-H FDR"))
 hinfoprime <- DataFrame(hinfoprime, row.names = rownames(hinfoprime))
-info(vcfHeader) <- hinfoprime
 hlist <- header(vcfHeader)
 hlist$INFO <- hinfoprime
 newVcfHeader <- new("VCFHeader", samples = vcfHeader@samples, header = hlist)

@@ -99,69 +99,71 @@ while(nrow(vcf <- readVcf(tab, genome = opt$genome))) {
     exptData(vcf)$header <- newVcfHeader
 
     cat(paste('Chunk', i, "\n"))
+    i <- i + 1
     passIds <- which(rowData(vcf)$FILTER == "PASS")
     if (length(passIds) == 0) {
         cat("No unfiltered variants\n")
-        next()
-    }
-
-    cat("Predicting coding from reference...\n")
-    predCod <- predictCoding(vcf[passIds, ], txdb, ref)
-    cat(" done\n")
-
-    if (sum(predCod$CONSEQUENCE == "nonsynonymous") == 0) {
-        cat("No non-syn variants\n")
-        next()
-    }
-
-    predCod <- subset(predCod, CONSEQUENCE == "nonsynonymous")
-
-    # retrieve transcript ids
-    x <- transcripts(txdb, vals = list(tx_id = predCod$TXID), columns = c('tx_id', 'tx_name'))
-    enstIds <- x$tx_name
-    names(enstIds) <- x$tx_id
-    aa = cbind(queryId = predCod$QUERYID, aa = paste(as.character(predCod$REFAA), lapply(predCod$PROTEINLOC, function(x) x[1]), as.character(predCod$VARAA), sep = ''))
-    rownames(aa) <- predCod$TXID
-
-    cat("Looking up ensembl peptide IDs ... ")
-    ids <- getBM(filters = 'ensembl_transcript_id', attributes = c('ensembl_transcript_id', 'ensembl_peptide_id'), values = enstIds, mart = ensembl)
-    rownames(ids) <- names(enstIds)[match(ids$ensembl_transcript_id, enstIds)]
-    cat("done\n")
-
-    ids <- cbind(aa, ids[rownames(aa), ])
-    fathmmInput <- subset(ids, ensembl_peptide_id != "", select = c('ensembl_peptide_id', 'aa'))
-
-    cat("Calling fathmm: ")
-    oldwd <- getwd()
-    tmp1 <- tempfile()
-    tmp2 <- tempfile()
-    setwd(paste(opt$fathmmDir, '/cgi-bin', sep = ''))
-    cmd <- paste(opt$python, 'fathmm.py -w', opt$fathmmAlg, '-p', opt$fathmmOnt, tmp1, tmp2)
-    write.table(subset(ids, ensembl_peptide_id != "", select = c('ensembl_peptide_id', 'aa')), file = tmp1, quote = F, sep = ' ', row.names = F, col.names = F)
-    #cmd <- paste('python fathmm.py -w Cancer', tmp1, tmp2)
-    system(cmd)
-    cat("\ndone\n")
-
-    cat("Reading results ... ")
-    results <- read.table(tmp2, sep = '\t', header = T, comment.char = '', row.names = 1, quote = '')
-    cat("done\n")
-    results <- merge(ids, results, by.x = c('aa', 'ensembl_peptide_id'), by.y = c('Substitution', 'Protein.ID'))
-
-    split.results <- split(results, factor(results$queryId))
-    cat("Selecting minimum scores ... ")
-    results <- rbindlist(lapply(split.results, function(x) x[which.min(x$Score), ]))
-    cat("done\n")
-
-    if (!is.null(results) && nrow(results) > 0) {
-        cat("Merging fathmm results ... ")
-        infodprime <- info(vcf[passIds, ])
-        infodprime[as.integer(as.character(results$queryId)),"fathmm_query"] <- with(results, paste(ensembl_peptide_id, aa, sep = "_"))
-        infodprime[as.integer(as.character(results$queryId)),"fathmm_pred"] <- as.character(results$Prediction)
-        infodprime[as.integer(as.character(results$queryId)),"fathmm_score"] <- results$Score
-        info(vcf)[passIds, ] <- infodprime
-        cat("done\n")
     } else {
-        cat("No results from fathmm\n")
+        cat(length(passIds), "variants pass\n")
+
+        cat("Predicting coding from reference...\n")
+        predCod <- predictCoding(vcf[passIds, ], txdb, ref)
+        cat(" done\n")
+
+        if (sum(predCod$CONSEQUENCE == "nonsynonymous") == 0) {
+            cat("No non-syn variants\n")
+        } else {
+            cat(sum(predCod$CONSEQUENCE == "nonsynonymous"), "non-syn variants\n")
+
+            predCod <- subset(predCod, CONSEQUENCE == "nonsynonymous")
+
+            # retrieve transcript ids
+            x <- transcripts(txdb, vals = list(tx_id = predCod$TXID), columns = c('tx_id', 'tx_name'))
+            enstIds <- x$tx_name
+            names(enstIds) <- x$tx_id
+            aa = cbind(queryId = predCod$QUERYID, aa = paste(as.character(predCod$REFAA), lapply(predCod$PROTEINLOC, function(x) x[1]), as.character(predCod$VARAA), sep = ''))
+            rownames(aa) <- predCod$TXID
+
+            cat("Looking up ensembl peptide IDs ... ")
+            ids <- getBM(filters = 'ensembl_transcript_id', attributes = c('ensembl_transcript_id', 'ensembl_peptide_id'), values = enstIds, mart = ensembl)
+            rownames(ids) <- names(enstIds)[match(ids$ensembl_transcript_id, enstIds)]
+            cat("done\n")
+
+            ids <- cbind(aa, ids[rownames(aa), ])
+            fathmmInput <- subset(ids, ensembl_peptide_id != "", select = c('ensembl_peptide_id', 'aa'))
+
+            cat("Calling fathmm: ")
+            oldwd <- getwd()
+            tmp1 <- tempfile()
+            tmp2 <- tempfile()
+            setwd(paste(opt$fathmmDir, '/cgi-bin', sep = ''))
+            cmd <- paste(opt$python, 'fathmm.py -w', opt$fathmmAlg, '-p', opt$fathmmOnt, tmp1, tmp2)
+            write.table(subset(ids, ensembl_peptide_id != "", select = c('ensembl_peptide_id', 'aa')), file = tmp1, quote = F, sep = ' ', row.names = F, col.names = F)
+            #cmd <- paste('python fathmm.py -w Cancer', tmp1, tmp2)
+            system(cmd)
+            cat("\ndone\n")
+
+            cat("Reading results ... ")
+            results <- read.table(tmp2, sep = '\t', header = T, comment.char = '', row.names = 1, quote = '')
+            cat("done\n")
+            results <- merge(ids, results, by.x = c('aa', 'ensembl_peptide_id'), by.y = c('Substitution', 'Protein.ID'))
+
+            split.results <- split(results, factor(results$queryId))
+            cat("Selecting minimum scores ... ")
+            results <- rbindlist(lapply(split.results, function(x) x[which.min(x$Score), ]))
+            cat("done\n")
+            if (!is.null(results) && nrow(results) > 0) {
+                cat("Merging fathmm results ... ")
+                infodprime <- info(vcf[passIds, ])
+                infodprime[as.integer(as.character(results$queryId)),"fathmm_query"] <- with(results, paste(ensembl_peptide_id, aa, sep = "_"))
+                infodprime[as.integer(as.character(results$queryId)),"fathmm_pred"] <- as.character(results$Prediction)
+                infodprime[as.integer(as.character(results$queryId)),"fathmm_score"] <- results$Score
+                info(vcf)[passIds, ] <- infodprime
+                cat("done\n")
+            } else {
+                cat("No results from fathmm\n")
+            }
+        }
     }
 
     #fix sample genotype order
@@ -173,8 +175,6 @@ while(nrow(vcf <- readVcf(tab, genome = opt$genome))) {
     setwd(oldwd)
     writeVcf(vcf, out)
     cat("done\n")
-
-    i <- i + 1
 }
 
 close(tab)

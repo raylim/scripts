@@ -77,7 +77,6 @@ hinfoprime <- rbind(hinfoprime, fathmm_query = c("A", "String", "fathmm query"))
 hinfoprime <- rbind(hinfoprime, fathmm_pred = c("A", "String", "fathmm prediction"))
 hinfoprime <- rbind(hinfoprime, fathmm_score = c("A", "Float", "fathmm score"))
 hinfoprime <- DataFrame(hinfoprime, row.names = rownames(hinfoprime))
-info(vcfHeader) <- hinfoprime
 hlist <- header(vcfHeader)
 hlist$INFO <- hinfoprime
 newVcfHeader <- new("VCFHeader", samples = vcfHeader@samples, header = hlist)

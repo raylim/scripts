@@ -35,6 +35,7 @@ if (is.null(opt$chasmDir)) {
 
 fn <- arguments$args[1];
 outfn <- opt$outFile
+null <- suppressWarnings(file.remove(outfn))
 out <- file(outfn, open = 'a')
 
 # create new header

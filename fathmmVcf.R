@@ -158,7 +158,7 @@ while(nrow(vcf <- readVcf(tab, genome = opt$genome))) {
                 infodprime[as.integer(as.character(results$queryId)),"fathmm_query"] <- with(results, paste(ensembl_peptide_id, aa, sep = "_"))
                 infodprime[as.integer(as.character(results$queryId)),"fathmm_pred"] <- as.character(results$Prediction)
                 infodprime[as.integer(as.character(results$queryId)),"fathmm_score"] <- results$Score
-                info(vcf)[passIds, ] <- infodprime
+                info(vcf[passIds, ]) <- infodprime
                 cat("done\n")
             } else {
                 cat("No results from fathmm\n")

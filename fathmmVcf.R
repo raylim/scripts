@@ -96,8 +96,14 @@ open(tab)
 cat('Processing vcf by chunk\n')
 i <- 1
 while(nrow(vcf <- readVcf(tab, genome = opt$genome))) {
-
+    # replace header
     exptData(vcf)$header <- newVcfHeader
+    # pre-populate new info fields with NAs
+    infodprime <- info(vcf)
+    infodprime[,"fathmm_query"] <- rep(NA, nrow(infodprime))
+    infodprime[,"fathmm_pred"] <- rep(NA, nrow(infodprime))
+    infodprime[,"fathmm_score"] <- rep(NA, nrow(infodprime))
+    info(vcf) <- infodprime
 
     cat(paste('Chunk', i, "\n"))
     i <- i + 1
@@ -122,15 +128,15 @@ while(nrow(vcf <- readVcf(tab, genome = opt$genome))) {
             x <- transcripts(txdb, vals = list(tx_id = predCod$TXID), columns = c('tx_id', 'tx_name'))
             enstIds <- x$tx_name
             names(enstIds) <- x$tx_id
-            aa = cbind(queryId = predCod$QUERYID, aa = paste(as.character(predCod$REFAA), lapply(predCod$PROTEINLOC, function(x) x[1]), as.character(predCod$VARAA), sep = ''))
+            aa = cbind(queryId = passIds[predCod$QUERYID], aa = paste(as.character(predCod$REFAA), lapply(predCod$PROTEINLOC, function(x) x[1]), as.character(predCod$VARAA), sep = ''))
             rownames(aa) <- predCod$TXID
 
             cat("Looking up ensembl peptide IDs ... ")
             ids <- getBM(filters = 'ensembl_transcript_id', attributes = c('ensembl_transcript_id', 'ensembl_peptide_id'), values = enstIds, mart = ensembl)
             rownames(ids) <- names(enstIds)[match(ids$ensembl_transcript_id, enstIds)]
+            ids <- cbind(aa, ids[rownames(aa), ])
             cat("done\n")
 
-            ids <- cbind(aa, ids[rownames(aa), ])
             fathmmInput <- subset(ids, ensembl_peptide_id != "", select = c('ensembl_peptide_id', 'aa'))
 
             cat("Calling fathmm: ")
@@ -155,11 +161,11 @@ while(nrow(vcf <- readVcf(tab, genome = opt$genome))) {
             cat("done\n")
             if (!is.null(results) && nrow(results) > 0) {
                 cat("Merging fathmm results ... ")
-                infodprime <- info(vcf[passIds, ])
+                infodprime <- info(vcf)
                 infodprime[as.integer(as.character(results$queryId)),"fathmm_query"] <- with(results, paste(ensembl_peptide_id, aa, sep = "_"))
                 infodprime[as.integer(as.character(results$queryId)),"fathmm_pred"] <- as.character(results$Prediction)
                 infodprime[as.integer(as.character(results$queryId)),"fathmm_score"] <- results$Score
-                info(vcf[passIds, ]) <- infodprime
+                info(vcf) <- infodprime
                 cat("done\n")
             } else {
                 cat("No results from fathmm\n")

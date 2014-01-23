@@ -67,6 +67,7 @@ cat('done\n')
 #opt$fathmmDir <- '~/share/usr/fathmm/'
 #opt$genome <- 'hg19'
 fn <- arguments$args[1];
+null <- suppressWarnings(file.remove(fn))
 
 cat('Reading vcf header ... ')
 # create new header

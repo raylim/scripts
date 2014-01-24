@@ -45,6 +45,7 @@ if (is.null(opt$fathmmDir)) {
 
 fn <- arguments$args[1];
 outfn <- opt$outFile
+null <- suppressWarnings(file.remove(outfn))
 out <- file(outfn, open = 'a')
 
 cat('Loading transcriptdb ... ')
@@ -67,7 +68,6 @@ cat('done\n')
 #opt$fathmmDir <- '~/share/usr/fathmm/'
 #opt$genome <- 'hg19'
 fn <- arguments$args[1];
-null <- suppressWarnings(file.remove(fn))
 
 cat('Reading vcf header ... ')
 # create new header

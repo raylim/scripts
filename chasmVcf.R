@@ -58,6 +58,8 @@ idx <- indexTabix(temp, "vcf")
 tab <- TabixFile(zipped, idx, yieldSize = 4000)
 open(tab)
 while(nrow(vcf <- readVcf(tab, genome = opt$genome))) {
+    exptData(vcf)$header <- newVcfHeader
+
     oldwd <- getwd()
 
     if (sum(rowData(vcf)$FILTER == "PASS") > 0) {
@@ -78,19 +80,16 @@ while(nrow(vcf <- readVcf(tab, genome = opt$genome))) {
         #cat(cmd)
         system(cmd, ignore.stdout = T)
         results <- read.table(file = paste(tmp, opt$classifier, '.output', sep = ''), sep = '\t', header = T, as.is = T)
-    }
-
-    exptData(vcf)$header <- newVcfHeader
-
-    if (nrow(results) > 1) {
-        infoprime <- info(vcf)
-        infoprime[as.integer(as.character(results$MutationID)),"chasm_mut"] <- as.character(results$Mutation)
-        infoprime[as.integer(as.character(results$MutationID)),"chasm_score"] <- results$CHASM
-        infoprime[as.integer(as.character(results$MutationID)),"chasm_pval"] <- results$PValue
-        if (nrow(results) > 10) {
-            infoprime[as.integer(as.character(results$MutationID)),"chasm_fdr"] <- results$BHFDR
+        if (nrow(results) > 1) {
+            infoprime <- info(vcf)
+            infoprime[as.integer(as.character(results$MutationID)),"chasm_mut"] <- as.character(results$Mutation)
+            infoprime[as.integer(as.character(results$MutationID)),"chasm_score"] <- results$CHASM
+            infoprime[as.integer(as.character(results$MutationID)),"chasm_pval"] <- results$PValue
+            if (nrow(results) > 10) {
+                infoprime[as.integer(as.character(results$MutationID)),"chasm_fdr"] <- results$BHFDR
+            }
+            info(vcf) <- infoprime
         }
-        info(vcf) <- infoprime
     }
 
     # fix sample genotype order

@@ -55,7 +55,7 @@ newVcfHeader <- new("VCFHeader", samples = vcfHeader@samples, header = hlist)
 temp <- tempfile()
 zipped <- bgzip(fn, temp)
 idx <- indexTabix(temp, "vcf")
-tab <- TabixFile(zipped, idx, yieldSize = 4000)
+tab <- TabixFile(zipped, idx, yieldSize = 8000)
 open(tab)
 while(nrow(vcf <- readVcf(tab, genome = opt$genome))) {
     exptData(vcf)$header <- newVcfHeader

@@ -96,6 +96,7 @@ open(tab)
 cat('Processing vcf by chunk\n')
 i <- 1
 while(nrow(vcf <- readVcf(tab, genome = opt$genome))) {
+    oldwd <- getwd()
     # replace header
     exptData(vcf)$header <- newVcfHeader
     # pre-populate new info fields with NAs
@@ -140,7 +141,6 @@ while(nrow(vcf <- readVcf(tab, genome = opt$genome))) {
             fathmmInput <- subset(ids, ensembl_peptide_id != "", select = c('ensembl_peptide_id', 'aa'))
 
             cat("Calling fathmm: ")
-            oldwd <- getwd()
             tmp1 <- tempfile()
             tmp2 <- tempfile()
             setwd(paste(opt$fathmmDir, '/cgi-bin', sep = ''))

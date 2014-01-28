@@ -63,7 +63,7 @@ pdf(paste(opt$prefix,".CBS.pdf", sep=""), height=5, width=18)
 plot(as.numeric(towrite[,4]), pch=20, xlab='n', ylab="Copy number", xaxt='n',col=colours, ylim=ylim)
 abline(v=cumsum(rle(towrite$Chr)$lengths), col="red", lty=3)
 
-if (opt$centromereFile) {
+if (!is.null(opt$centromereFile)) {
     for (j in unique(cen[,1])) {
         pos <- cen[which(cen[,1]==j)[1],3]
         index <- towrite[which(towrite$Chromosome==j & towrite$Start > pos)[1],1]

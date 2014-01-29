@@ -11,7 +11,7 @@ suppressPackageStartupMessages(library(org.Hs.eg.db))
 options(warn = -1, error = quote({ traceback(); q('no', status = 1) }))
 
 optionList <- list(
-	make_option(c('-c', '--rmChr'), action='store_true', default = FALSE, help = 'Set the flag to remove chr as a prefix from each seqlevel. Necessarily when the bamFile has the chr prefix the [%default]'),
+	make_option(c('-r', '--rmChr'), action='store_true', default = FALSE, help = 'Set the flag to remove chr as a prefix from each seqlevel. Necessarily when the bamFile has the chr prefix the [%default]'),
 	make_option(c('-i', '--intronListFile'), action='store', default = NULL, help = 'Set a file containing intronIDs to include in the summarization [%default]'),
 	make_option(c('-o', '--outFile'), action='store', default = NULL, help = 'output file'),
 	make_option(c('-w', '--intronWindow'), action='store', type = 'integer', default = NULL, help = 'Set the intronic window to be first x bases from the start [%default]')

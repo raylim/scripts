@@ -8,8 +8,10 @@ suppressPackageStartupMessages(library(Rsamtools));
 suppressPackageStartupMessages(library(TxDb.Hsapiens.UCSC.hg19.knownGene));
 suppressPackageStartupMessages(library(org.Hs.eg.db))
 
+options(warn = -1, error = quote({ traceback(); q('no', status = 1) }))
+
 optionList <- list(
-	make_option(c('-a', '--addChr'), action='store_true', default = TRUE, help = 'Set the flag to add chr as a prefix to each seqlevel. Necessarily when the bamFile has read containing the chr prefix and the txdbFile does not [%default]'),
+	make_option(c('-c', '--rmChr'), action='store_true', default = FALSE, help = 'Set the flag to remove chr as a prefix from each seqlevel. Necessarily when the bamFile has the chr prefix the [%default]'),
 	make_option(c('-i', '--intronListFile'), action='store', default = NULL, help = 'Set a file containing intronIDs to include in the summarization [%default]'),
 	make_option(c('-o', '--outFile'), action='store', default = NULL, help = 'output file'),
 	make_option(c('-w', '--intronWindow'), action='store', type = 'integer', default = NULL, help = 'Set the intronic window to be first x bases from the start [%default]')
@@ -38,7 +40,7 @@ if (length(arguments$args) != length(posArgs)) {
 #For debugging
 if (FALSE){
 #	opt <- list( 'addChr' = TRUE, 'intronListFile' = '~/dlbcl_snp6/paper.analysis.code/references/introns/introns.non.overlapping.with.exons.txt', 'intronWindow' = 50 )
-	opt <- list( 'addChr' = TRUE, 'countMethod' = 'summarizeOverlaps', 'intronListFile' = NULL, 'intronWindow' = NULL )
+	opt <- list( 'rmChr' = TRUE, 'countMethod' = 'summarizeOverlaps', 'intronListFile' = NULL, 'intronWindow' = NULL )
 	txdbFile <- '~/ensg69.biomart.13012013.sqlite'
 #	txdbFile <- '~/hg19_ensGene.06022012.sqlite'
 	bamFile <- '~/share/data/DLBCL/WTSS/tophat/bam/HS0751.bam'
@@ -92,19 +94,21 @@ intronsByTx <- intronsByTranscript(txdb, use.names = TRUE )
 introns <- unlist(intronsByTx)
 introns <- introns[ !duplicated(introns) ]
 
-print('Removing chr from chromosome names')
-newSeqNames <- sub('chr', '', seqlevels(txByGene))
-names(newSeqNames) <- seqlevels(txByGene)
-txByGene <- renameSeqlevels( txByGene, newSeqNames )
+if (opt$rmChr) {
+    print('Removing chr from chromosome names')
+    newSeqNames <- sub('chr', '', seqlevels(txByGene))
+    names(newSeqNames) <- seqlevels(txByGene)
+    txByGene <- renameSeqlevels( txByGene, newSeqNames )
 
-newSeqNames <- sub('chr', '', seqlevels(exonsByGene))
-names(newSeqNames) <- seqlevels(exonsByGene)
-exonsByGene <- renameSeqlevels( exonsByGene, newSeqNames )
+    newSeqNames <- sub('chr', '', seqlevels(exonsByGene))
+    names(newSeqNames) <- seqlevels(exonsByGene)
+    exonsByGene <- renameSeqlevels( exonsByGene, newSeqNames )
 
-newSeqNames <- sub('chr', '', seqlevels(introns))
-names(newSeqNames) <- seqlevels(introns)
-introns <- renameSeqlevels( introns, newSeqNames )
-print('... Done')
+    newSeqNames <- sub('chr', '', seqlevels(introns))
+    names(newSeqNames) <- seqlevels(introns)
+    introns <- renameSeqlevels( introns, newSeqNames )
+    print('... Done')
+}
 
 if ( !is.null(opt$intronWindow) ){
 	print(paste('Restricting the intronic window from intron start +', opt$intronWindow))

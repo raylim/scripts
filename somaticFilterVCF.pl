@@ -54,27 +54,30 @@ while (my $line = <IN>) {
             #    print "normal af: " . $normalAF . "\n";
         }
     }
-    # check for variant genotype that isnt homozygous ref
-    my $nvarGT = 0;
+    # check for variant genotype that isnt homozygous re
+    my $nvarGT = 0; # among non-normals
     for my $sample (@samples) {
         $nvarGT++ if ($sample ne $opt{n} && ($gtMap->{$sample}->{GT} ne "0" || $gtMap->{$sample}->{GT} ne "0/0"));
     }
+
+
     # check for homozygous ref among non-normal samples
     my $nrefGT = 0;
     for my $sample (@samples) {
         $nrefGT++ if ($sample ne $opt{n} && ($gtMap->{$sample}->{GT} ne "1/1"));
     }
     my $filter = 0;
-    if ($gtMap->{$opt{n}}->{GT} eq "./.") {
-        # filter unknown normal genotypes
+    if ($gtMap->{$opt{n}}->{GT} eq "./." || $gtMap->{$opt{n}}->{GT} ne "0/0") {
+        # filter unknown normal genotypes or homo ref normals
         $filter++;
     } elsif ($nvarGT && $normalAF > $opt{f}) {
         # filter above threshold heterozygous
         $filter++;
-    } elsif (!$nrefGT && $normalAF < 1 - $opt{f}) {
-        # loss of heterozygosity, i.e. no ref genotypes among non-normal samples and homozygous ref normal with few variant reads
-        $filter++;
     }
+    #} elsif (!$nrefGT && $normalAF < 1 - $opt{f}) {
+        # loss of heterozygosity, i.e. no ref genotypes among non-normal samples and homozygous ref normal with few variant reads
+        #$filter++;
+        #}
     if ($filter) {
         $F{"FILTER"} =~ s/:normalAD//;
         $F{"FILTER"} =~ s/normalAD//;

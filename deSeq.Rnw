@@ -42,11 +42,11 @@ includeGraphics <- function(filenames, width = 1, caption) {
 
 
 <<libs, echo = F, results = hide>>=
-library("optparse")
-library("DESeq")
-library("GenomicFeatures")
-library("Rsamtools")
-library("xtable")
+suppressPackageStartupMessages(library("optparse"))
+suppressPackageStartupMessages(library("DESeq"))
+suppressPackageStartupMessages(library("GenomicFeatures"))
+suppressPackageStartupMessages(library("Rsamtools"))
+suppressPackageStartupMessages(library("xtable"))
 #library(multicore)
 @
 
@@ -58,7 +58,7 @@ optList <- list(
 
 parser <- OptionParser(usage = "%prog [options] [counts file] [pheno file]", option_list = optList);
 
-arguments <- parse_args(parser, positional_arguments = T, args = arguments);
+arguments <- parse_args(parser, positional_arguments = T, arg = arguments);
 opt <- arguments$options;
 
 if (length(arguments$args) != 2) {
@@ -74,7 +74,11 @@ countsFile <- arguments$args[1];
 
 pheno <- read.table(phenoFile, header = T, sep = '\t', row.names = 1);
 pheno[, opt$condition] <- relevel(pheno[, opt$condition], opt$refCondition);
-counts <- read.table(countsFile, header = T, sep = '\t', row.names = 1);
+
+counts <- read.table(countsFile, header = T, sep = '\t');
+counts <- counts[!duplicated(counts[,1]), ]
+rownames(counts) <- counts[,1]
+counts <- counts[-1]
 
 if (!all(colnames(counts) %in% rownames(pheno))) {
     cat("Design does not match data");

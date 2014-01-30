@@ -9,7 +9,7 @@ suppressPackageStartupMessages(library("org.Hs.eg.db"));
 options(warn = -1, error = quote({ traceback(); q('no', status = 1) }))
 
 optList <- list(
-                make_option("--outFile", default = NULL, help = "Output file"),
+                make_option("--outPrefix", default = NULL, help = "Output file prefix"),
                 make_option("--includeChrY", action = 'store_true', default = F, help = "include Y-chromosome"),
                 make_option("--centromereTable", help = "Centromere position table"));
 
@@ -97,7 +97,8 @@ X[X > 3] <- 3
 
 
 cols <- c('black', 'blue', 'white', 'red')
-png(opt$outFile, height = 1000, width = 30000)
+fn <- paste(opt$outPrefix, ".large.png")
+png(opt$outFile, height = 1000, width = 30000, type = 'cairo-png')
 image(X, col = cols, axes = F)
 axis(1, at = chrPos, labels = as.character(runValue(seqnames(gr))))
 abline(v = chrPos, col = 'grey')
@@ -108,4 +109,18 @@ axis(2, at = 0:(ncol(X) - 1) / (ncol(X) - 1), labels = colnames(X))
 box()
 #legend('top', legend = c("deletion", "loss", "neutral", "gain"), fill = cols, horiz = T)
 null <- dev.off()
+
+fn <- paste(opt$outPrefix, ".png")
+png(opt$outFile, height = 1000, width = 3000, type = 'cairo-png')
+image(X, col = cols, axes = F)
+axis(1, at = chrPos, labels = as.character(runValue(seqnames(gr))))
+abline(v = chrPos, col = 'grey')
+if (!is.null(opt$centromereTable)) {
+    abline(v = cmPos, lty = 2, col = 'grey')
+}
+axis(2, at = 0:(ncol(X) - 1) / (ncol(X) - 1), labels = colnames(X))
+box()
+#legend('top', legend = c("deletion", "loss", "neutral", "gain"), fill = cols, horiz = T)
+null <- dev.off()
+
 

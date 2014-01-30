@@ -16,6 +16,7 @@
 
 
 <<init, echo = F, cache = F, results = hide>>=
+dir.create('graphics', showWarnings = F)
 options(width = 100)
 
 includeGraphic <- function(filename, caption = NULL, width = 1) {

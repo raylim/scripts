@@ -97,7 +97,7 @@ X[X > 3] <- 3
 
 
 cols <- c('black', 'blue', 'white', 'red')
-fn <- paste(opt$outPrefix, ".large.png")
+fn <- paste(opt$outPrefix, ".large.png", sep = '')
 png(fn, height = 1000, width = 30000, type = 'cairo-png')
 image(X, col = cols, axes = F)
 axis(1, at = chrPos, labels = as.character(runValue(seqnames(gr))))
@@ -110,7 +110,7 @@ box()
 #legend('top', legend = c("deletion", "loss", "neutral", "gain"), fill = cols, horiz = T)
 null <- dev.off()
 
-fn <- paste(opt$outPrefix, ".png")
+fn <- paste(opt$outPrefix, ".png", sep = '')
 png(fn, height = 1000, width = 3000, type = 'cairo-png')
 image(X, col = cols, axes = F)
 axis(1, at = chrPos, labels = as.character(runValue(seqnames(gr))))

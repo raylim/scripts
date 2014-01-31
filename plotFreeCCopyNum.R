@@ -98,7 +98,7 @@ X[X > 3] <- 3
 
 cols <- c('black', 'blue', 'white', 'red')
 fn <- paste(opt$outPrefix, ".large.png")
-png(opt$outFile, height = 1000, width = 30000, type = 'cairo-png')
+png(fn, height = 1000, width = 30000, type = 'cairo-png')
 image(X, col = cols, axes = F)
 axis(1, at = chrPos, labels = as.character(runValue(seqnames(gr))))
 abline(v = chrPos, col = 'grey')
@@ -111,7 +111,7 @@ box()
 null <- dev.off()
 
 fn <- paste(opt$outPrefix, ".png")
-png(opt$outFile, height = 1000, width = 3000, type = 'cairo-png')
+png(fn, height = 1000, width = 3000, type = 'cairo-png')
 image(X, col = cols, axes = F)
 axis(1, at = chrPos, labels = as.character(runValue(seqnames(gr))))
 abline(v = chrPos, col = 'grey')

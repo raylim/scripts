@@ -113,7 +113,7 @@ null <- dev.off()
 
 fn <- paste(opt$outPrefix, ".png", sep = '')
 png(fn, height = 1000, width = 3000, type = 'cairo-png')
-par(mar = c(5,10,5,5)
+par(mar = c(5,10,5,5))
 image(X, col = cols, axes = F)
 axis(1, at = chrPos, labels = as.character(runValue(seqnames(gr))), las = 2, cex = 1.5)
 abline(v = chrPos, col = 'grey')

@@ -106,7 +106,11 @@ abline(v = chrPos, col = 'grey')
 if (!is.null(opt$centromereTable)) {
     abline(v = cmPos, lty = 2, col = 'grey')
 }
-axis(2, at = 0:(ncol(X) - 1) / (ncol(X) - 1), labels = colnames(X), cex.axis = 1.5, las = 2)
+if (ncol(X) == 1) {
+    axis(2, at = 0, labels = colnames(X), cex.axis = 1.5, las = 2)
+} else {
+    axis(2, at = 0:(ncol(X) - 1) / (ncol(X) - 1), labels = colnames(X), cex.axis = 1.5, las = 2)
+}
 box()
 #legend('top', legend = c("deletion", "loss", "neutral", "gain"), fill = cols, horiz = T)
 null <- dev.off()
@@ -120,7 +124,11 @@ abline(v = chrPos, col = 'grey')
 if (!is.null(opt$centromereTable)) {
     abline(v = cmPos, lty = 2, col = 'grey')
 }
-axis(2, at = 0:(ncol(X) - 1) / (ncol(X) - 1), labels = colnames(X), las = 2, cex.axis = 2)
+if (ncol(X) == 1) {
+    axis(2, at = 0, labels = colnames(X), cex.axis = 2, las = 2)
+} else {
+    axis(2, at = 0:(ncol(X) - 1) / (ncol(X) - 1), labels = colnames(X), las = 2, cex.axis = 2)
+}
 box()
 #legend('top', legend = c("deletion", "loss", "neutral", "gain"), fill = cols, horiz = T)
 null <- dev.off()

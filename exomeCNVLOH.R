@@ -14,7 +14,7 @@ optList <- list(
                 make_option("--cbsLohMethod", default = "variance.f", type = "character", action = "store", help ="CBS LoH calling method (default: %default)"),
                 make_option("--alpha", default = 0.05, action = "store", help ="LoH alpha (default: %default)"))
 
-parser <- OptionParser(usage = "%prog [options] tumorBAF normalBAF", option_list = optList);
+parser <- OptionParser(usage = "%prog [options] ", option_list = optList);
 arguments <- parse_args(parser, positional_arguments = T);
 opt <- arguments$options;
 

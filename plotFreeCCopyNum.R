@@ -97,6 +97,8 @@ X[X > 3] <- 3
 
 
 cols <- c('black', 'blue', 'white', 'red')
+rng <- range(X)
+cols <- cols[(rng[1]:rng[2])+1]
 fn <- paste(opt$outPrefix, ".large.png", sep = '')
 png(fn, height = 1000, width = 30000, type = 'cairo-png')
 par(mar = c(5,10,5,5))

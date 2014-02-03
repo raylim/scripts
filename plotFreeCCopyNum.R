@@ -46,7 +46,7 @@ rownames(posns) <- NULL
 gr <- GRanges(seqnames = posns$chr, ranges = IRanges(posns$start, width = 50000))
 gr <- disjoin(gr)
 gr <- gr[width(gr) > 1]
-if (opt$includeChrY) {
+if (!opt$includeChrY) {
     gr <- gr[seqnames(gr) != "Y"]
 }
 x <- as.vector(seqnames(gr))

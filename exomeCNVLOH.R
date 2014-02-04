@@ -32,16 +32,16 @@ tumorName <- sub('\\..*', '', sub('.*/', '', opt$tumor))
 
 if (!is.null(opt$normal)) {
     normalName <- sub('\\..*', '', sub('.*/', '', opt$normal))
-    cat("Reading", normalName, ":", normalFile, "\n")
-    normal <- read.delim(normalFile, header = T)
+    cat("Reading", normalName, ":", opt$normal, "\n")
+    normal <- read.delim(opt$normal, header = T)
 } else {
     normal <- NULL
     opt$lohMethod <- "only.tumor"
     opt$cbsLohMethod <- "only.tumor"
 }
 
-cat("Reading", tumorName, ":", tumorFile, "\n")
-tumor <- read.delim(tumorFile, header = T)
+cat("Reading", tumorName, ":", opt$tumor, "\n")
+tumor <- read.delim(opt$tumor, header = T)
 
 
 if (!any(grepl('chr', normal$chr))) {

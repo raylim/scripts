@@ -61,7 +61,7 @@ tumor <- tumor[!x, ]
 
 cat("Analyzing LOH using", opt$lohMethod, "\n")
 cat("alpha:", opt$alpha, "\n")
-eLOH = LOH.analyze(tumor = normal, tumor = tumor, alpha = opt$alpha, method = opt$lohMethod)
+eLOH = LOH.analyze(normal = normal, tumor = tumor, alpha = opt$alpha, method = opt$lohMethod)
 
 cat("Merging segments\n")
 loh = multi.LOH.analyze(normal = normal, tumor = tumor, all.loh.ls = list(eLOH), test.alpha = 0.001, method = opt$cbsLohMethod, sdundo = c(0,0), alpha = c(0.05,0.01))

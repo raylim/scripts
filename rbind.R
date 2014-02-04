@@ -57,7 +57,7 @@ for (f in files) {
         normal <- sub('.*_', '', sname)
         normFields <- grep(paste(normal, ".", sep = ""), h, fixed = T, value = T)
         fields <- sub('.*\\.', '', normFields)
-        x <- grep(paste(".", fields[1], "$", sep = ""), h, perl = T, value = T)
+        x <- grep(paste("\\.", fields[1], "$", sep = ""), h, perl = T, value = T)
         samples <- sub('\\..*', '', x)
         tumorSamples <- samples[-which(samples == normal)]
         for (i in 1:length(tumorSamples)) {
@@ -65,7 +65,7 @@ for (f in files) {
             hh <- h
             XX <- X
             for (otherTumor in tumorSamples[-i]) {
-                x <- grep(paste(otherTumor, ".", sep = ""), hh, perl = T)
+                x <- grep(paste("^", otherTumor, "\\.", sep = ""), hh, perl = T)
                 hh <- hh[-x]
                 XX <- XX[, -x]
             }

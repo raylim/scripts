@@ -4,7 +4,7 @@
 prename 's/-//' fastq/*.fastq.gz
 prename 's/(.+)_([ATGC]{6})_L([^_])+_R([12])_([0-9]+)/$1-$2$3$5.$4/' fastq/*.fastq.gz
 
-prename 's/([^_]+)_[^_]+_L([^_])+_R([12])_([0-9]+)/$1_$2$4.$3/' fastq/*.fastq.gz
+#prename 's/([^_]+)_[^_]+_L([^_])+_R([12])_([0-9]+)/$1_$2$4.$3/' fastq/*.fastq.gz
 prename 's/_//' fastq/*.fastq.gz
 prename 's/-/_/' fastq/*.fastq.gz
 

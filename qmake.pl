@@ -115,6 +115,7 @@ do {
         if ($opt{m}) {
             my $addrs = ($retcode > 0)? $err_email_addrs : $fin_email_addrs;
             my $mail_subject = "[$retcode] $name: job finished ($cwd)";
+            $mail_subject = "**FINAL** $mail_subject" if ($n + 1 == $attempts);
             $mail_subject .= " Attempt " . ($n + 1) if $n > 0; 
             open(MAIL, "| mail -s '$mail_subject' $addrs");
             print MAIL "Return code: $retcode\n";

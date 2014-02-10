@@ -104,7 +104,7 @@ fn <- paste(opt$outPrefix, ".large.png", sep = '')
 png(fn, height = 1000, width = 30000, type = 'cairo-png')
 par(mar = c(5,10,5,5))
 image(X, col = cols, axes = F)
-legend('topright', legend = c("Del", "Loss", "Neutral", "Gain", "Amp"), fill = cols)
+legend('top', legend = c("Del", "Loss", "Neutral", "Gain", "Amp"), fill = cols, horiz = T)
 axis(1, at = chrPos, labels = as.character(runValue(seqnames(gr))), cex.axis = 1.5)
 abline(v = chrPos, col = 'grey')
 if (!is.null(opt$centromereTable)) {
@@ -134,6 +134,7 @@ if (ncol(X) == 1) {
     axis(2, at = 0:(ncol(X) - 1) / (ncol(X) - 1), labels = colnames(X), las = 2, cex.axis = 2)
 }
 box()
+legend('top', legend = c("Del", "Loss", "Neutral", "Gain", "Amp"), fill = cols, horiz = T)
 #legend('top', legend = c("deletion", "loss", "neutral", "gain"), fill = cols, horiz = T)
 null <- dev.off()
 

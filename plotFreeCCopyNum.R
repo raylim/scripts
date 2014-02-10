@@ -88,7 +88,8 @@ if (!is.null(opt$centromereTable)) {
 chrPos <- (start(seqnames(gr)) - 1) / (length(gr) - 1)
 
 X <- as.matrix(mcols(gr))
-X[X > 3] <- 3
+X[X == 4] <- 3
+X[X > 4] <- 4
 #X <- X[,-4]
 #x <- round(width(gr) / 50000)
 #Z <- apply(X, 2, rep, times = x)
@@ -96,13 +97,14 @@ X[X > 3] <- 3
 #chrstart <- seqnames(gr)
 
 
-cols <- c('black', 'blue', 'white', 'red')
+cols <- c('black', 'blue', 'white', 'red', 'green')
 rng <- range(X)
 cols <- cols[(rng[1]:rng[2])+1]
 fn <- paste(opt$outPrefix, ".large.png", sep = '')
 png(fn, height = 1000, width = 30000, type = 'cairo-png')
 par(mar = c(5,10,5,5))
 image(X, col = cols, axes = F)
+legend('topright', legend = c("Del", "Loss", "Neutral", "Gain", "Amp"), fill = cols)
 axis(1, at = chrPos, labels = as.character(runValue(seqnames(gr))), cex.axis = 1.5)
 abline(v = chrPos, col = 'grey')
 if (!is.null(opt$centromereTable)) {

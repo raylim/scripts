@@ -35,6 +35,7 @@ fn <- arguments$args[1];
 Data <- read.table(fn, sep = '\t', header = T, quote = '', comment.char = '', stringsAsFactors = F)
 
 sData <- Data[,c(opt$sampleCol, opt$geneCol1, opt$geneCol2)]
+sData <- t(apply(sData, 1, function(x) c(x[1], sort(c(x[2], x[3])))))
 sData <- sData[!duplicated(sData), ]
 
 genes <- list()

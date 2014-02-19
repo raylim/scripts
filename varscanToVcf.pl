@@ -102,8 +102,8 @@ while (<>) {
         my @normalGTs;
         my @tumorGTs;
 
-        push @normalGTs, "0" if $F{normal_gt} =~ /\*/;
-        push @tumorGTs, "0" if $F{tumor_gt} =~ /\*/;
+        push @normalGTs, "0" if $F{normal_gt} =~ /\*/ || $F{normal_gt} eq $F{ref};
+        push @tumorGTs, "0" if $F{tumor_gt} =~ /\*/ || $F{tumor_gt} eq $F{ref};
         my $i = 0;
         for my $alt (sort { length $b <=> length $a } (split /\//, $F{var})) {
             $i++;

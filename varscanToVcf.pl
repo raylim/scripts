@@ -65,8 +65,8 @@ my $vcfHeader = <<ENDL;
 ##INFO=<ID=VARPVAL,Number=1,Type=Float,Description="variant p-value">
 ##INFO=<ID=SOMPVAL,Number=1,Type=Float,Description="somatic p-value">
 ##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
-##FORMAT=<ID=AD,Number=A,Type=String,Description="allelic depth">
-##FORMAT=<ID=DP,Number=1,Type=String,Description="sample depth">
+##FORMAT=<ID=AD,Number=A,Type=Integer,Description="allelic depth">
+##FORMAT=<ID=DP,Number=1,Type=Integer,Description="sample depth">
 ##FORMAT=<ID=VAF,Number=1,Type=Float,Description="variant freq">
 ##PEDIGREE=<Derived=$tumor,Original=$normal>
 ENDL

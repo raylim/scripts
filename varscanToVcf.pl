@@ -158,7 +158,7 @@ while (<>) {
     my $normalA = $F{normal_reads2};
     my $normalVAF = $F{normal_var_freq};
     $normalVAF =~ s/%//;
-    $normalVAF *= 100;
+    $normalVAF /= 100;
     my $normalDP = $normalR + $normalA;
     my $normalAD = "$normalR,$normalA";
 
@@ -166,7 +166,7 @@ while (<>) {
     my $tumorA = $F{tumor_reads2};
     my $tumorVAF = $F{tumor_var_freq};
     $tumorVAF =~ s/%//;
-    $tumorVAF *= 100;
+    $tumorVAF /= 100;
     my $tumorDP = $tumorR + $tumorA;
     my $tumorAD = "$tumorR,$tumorA";
 

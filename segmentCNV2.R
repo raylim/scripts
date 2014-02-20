@@ -31,12 +31,12 @@ if (!is.null(opt$centromereFile)) {
 }
 
 cn <- read.table(cnFile, header=T, as.is=T)
-rm <- which(cn[,1] %in% c("MT", "Y"))
-if (length(rm) > 0) { cn <- cn[-rm,]}
+keep <- which(cn[,1] %in% c(1:22, "X"))
+if (length(rm) > 0) { cn <- cn[keep,]}
 cn[which(cn[,1]=="X"),1] <- 23
 cn[,1] <- as.numeric(cn[,1])
 cn <- cn[order(cn[,1], cn[,2]),]
-cn <- cbind(paste(cn[,1], cn[,2], sep="_"), cn[,c(1:3,7)])
+cn <- cbind(name = paste(cn[,1], cn[,2], sep="_"), cn[,c(1:3,7)])
 
 cgh <- make_cghRaw(cn)
 normalized <- normalize(cgh)

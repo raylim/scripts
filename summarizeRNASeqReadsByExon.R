@@ -3,10 +3,11 @@
 # Authors: Fong Chun Chan <fongchunchan@gmail.com>
 suppressPackageStartupMessages(library(optparse));
 suppressPackageStartupMessages(library(GenomicFeatures));
+suppressPackageStartupMessages(library(Rsamtools));
 suppressPackageStartupMessages(library(TxDb.Hsapiens.UCSC.hg19.knownGene));
 
 optionList <- list(
-	make_option(c('-a', '--addChr'), action='store_true', default = FALSE, help = 'Set the flag to add chr as a prefix to each seqlevel [%default]'),
+	#make_option(c('-a', '--addChr'), action='store_true', default = FALSE, help = 'Set the flag to add chr as a prefix to each seqlevel [%default]'),
 	make_option(c('-d', '--txdb'), action='store', default = NULL, help = 'ensembl transcript database'),
 	make_option(c('-o', '--outFile'), action='store', default = NULL, help = 'output file'))
 posArgs <- c('bamFile')
@@ -22,16 +23,11 @@ if (length(arguments$args) != length(posArgs)) {
     cat("Need output file\n");
     print_help(parser);
     stop();
-} else if (is.null(opt$txdb)) {
-    cat("Need ensembl transcript database\n");
-    print_help(parser);
-    stop();
 } else {
 	cmdArgs <- arguments$args
 	for (i in 1:length(cmdArgs)){
 		assign(posArgs[i], cmdArgs[i])
 	}
-    txdbFile <- opt$txdb
     outFile <- opt$outFile
 }
 
@@ -43,20 +39,16 @@ if (FALSE){
 	outFile <- 'tmp.txt'
 }
 #txdb <- makeTranscriptDbFromBiomart( biomart = 'ensembl', dataset = 'hsapiens_gene_ensembl' )
-#saveFeatures(txdb, '~/ensg69.biomart.13012013.sqlite')
+#saveFeatures(txdb, '~/share/reference/ensg69.biomart.2014-02-21.sqlite')
 #txdb <- makeTranscriptDbFromUCSC(genome = 'hg19', tablename = 'ensGene')
 #
-cat("Loading", txdbFile, " ... ")
-txdb <- loadDb(txdbFile)
+txdb <- loadDb(opt$txdb)
 allExons <- exons(txdb, columns = c('gene_id', 'exon_id', 'exon_name'))
 
-if ( opt$addChr ){
-	print('Prefixing chr to the chromosome names ...')
-	newSeqNames <- paste('chr', seqlevels(allExons), sep = '')
-	names(newSeqNames) <- seqlevels(allExons)
-	allExons <- renameSeqlevels( allExons, newSeqNames )
-}
-cat("Finished\n")
+print('Removing chr from chromosome names')
+newSeqNames <- sub('chr', '', seqlevels(allExons))
+names(newSeqNames) <- seqlevels(allExons)
+allExons <- renameSeqlevels( allExons, newSeqNames )
 
 cat("Reading", bamFile, " ... ")
 si <- seqinfo(BamFile(bamFile));

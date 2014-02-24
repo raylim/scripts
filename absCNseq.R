@@ -7,6 +7,7 @@ options(warn = -1, error = quote({ traceback(); q('no', status = 1) }))
 
 optionList <- list(
 	make_option(c('-t', '--seqType'), action='store', default = "WES", help = 'sequence type (WES or WGS) [Default %default]'),
+	make_option(c('-n', '--tumorName'), action='store', default = NULL, help = 'name of the tumor sample. By default, derive from file name'),
 	make_option(c('-o', '--outPrefix'), action='store', default = NULL, help = 'output prefix'))
 posArgs <- c('varscanSegFile', 'snvTableFile')
 parser <- OptionParser(usage = paste('%prog [options]', paste(posArgs, collapse=' ')),  option_list=optionList)
@@ -42,7 +43,9 @@ normRatio <- tapply(segData$Segmented, segData$segId, function(x) x[1])
 
 absSegData <- data.frame(chrom = chrom, loc.start = start, loc.end = end, eff.seg.len = effSegLen, normalized.ratio = normRatio)
 
-tumor <- sub('.*/', '', sub('_.*', '', snvTableFile))
+if (!is.null(opt$tumorName)) {
+    tumor <- sub('.*/', '', sub('_.*', '', snvTableFile))
+}
 snvData <- read.table(snvTableFile, sep = '\t', header = T, comment.char = '', stringsAsFactors = F)
 absSnvData <- with(snvData, data.frame(chrom = X.CHROM, position = POS, tumor_var_freq = snvData[,paste(tumor, ".FA", sep = "")]))
 

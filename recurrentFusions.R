@@ -44,23 +44,7 @@ for (i in 1:nrow(sData)) {
 }
 allGenes <- unique(unlist(genes))
 
-geneGeneM <- matrix(0, nrow = length(allGenes), ncol = length(allGenes), dimnames = list(allGenes, allGenes))
-for (i in 1:nrow(sData)) {
-    gene1 <- sData[i,2]
-    gene2 <- sData[i,3]
-    geneGeneM[gene1, gene2] <- geneGeneM[gene1, gene2] + 1
-    geneGeneM[gene2, gene1] <- geneGeneM[gene2, gene1] + 1
-}
-
-x <- rowSums(geneGeneM) > 1
-if (sum(x) > 1) {
-    recurGeneGeneM <- geneGeneM[x, x]
-    oo <- order(rowSums(geneGeneM), decreasing = T)
-    recurGeneGeneM <- geneGeneM[oo, oo]
-    fn <- paste(opt$outDir, "/recurGeneGene.txt", sep = "")
-    write.table(recurGeneGeneM, file = fn, sep = '\t', quote = F, col.names = NA, row.names = T)
-}
-
+# recurrent gene matrix
 geneM <- sapply(genes, function (x) allGenes %in% x)
 rownames(geneM) <- allGenes
 
@@ -74,22 +58,43 @@ if (sum(rowSums(geneM) > 1) > 1) {
     write.table(recurGeneM, file = fn, sep = '\t', quote = F, col.names = NA, row.names = T)
 }
 
-genePairs <- list()
-for (i in 1:nrow(sData)) {
-    genePairs[[sData[i,1]]] <- append(genePairs[[sData[i, 1]]], paste(sort(c(sData[i, 2], sData[i,3])), collapse = '|'))
-}
-allGenePairs <- unique(unlist(genePairs))
-genePairM <- sapply(genePairs, function (x) allGenePairs %in% x)
-rownames(genePairM) <- allGenePairs
 
-if (sum(rowSums(genePairM) > 1) > 1) {
-    recurGenePairM <- genePairM[rowSums(genePairM) > 1, ]
-    oo <- order(rowSums(recurGenePairM), decreasing = T)
-    recurGenePairM <- recurGenePairM[oo, ]
-    recurGenePairM <- ifelse(recurGenePairM, 1, 0)
-    recurGenePairM <- transform(recurGenePairM, Sum = rowSums(recurGenePairM))
-    fn <- paste(opt$outDir, "/recurGenePairs.txt", sep = "")
-    write.table(recurGenePairM, file = fn, sep = '\t', quote = F, col.names = NA, row.names = T)
+recurGenes <- rownames(recurGeneM)
+
+# recurrent gene-gene matrix
+geneGeneM <- matrix(0, nrow = length(allGenes), ncol = length(allGenes), dimnames = list(allGenes, allGenes))
+for (i in 1:nrow(sData)) {
+    gene1 <- sData[i,2]
+    gene2 <- sData[i,3]
+    geneGeneM[gene1, gene2] <- geneGeneM[gene1, gene2] + 1
+    geneGeneM[gene2, gene1] <- geneGeneM[gene2, gene1] + 1
 }
+
+x <- rownames(geneGeneM) %in% recurGenes
+if (sum(x) > 1) {
+    recurGeneGeneM <- geneGeneM[x, x]
+    oo <- order(rowSums(geneGeneM), decreasing = T)
+    recurGeneGeneM <- geneGeneM[oo, oo]
+    fn <- paste(opt$outDir, "/recurGeneGene.txt", sep = "")
+    write.table(recurGeneGeneM, file = fn, sep = '\t', quote = F, col.names = NA, row.names = T)
+}
+
+x <- sData[,2] %in% recurGenes | sData[,3] %in% recurGenes
+recurData <- sData[x, ]
+recurGenePairs <- list()
+for (i in 1:nrow(recurData)) {
+    recurGenePairs[[recurData[i,1]]] <- append(recurGenePairs[[recurData[i, 1]]], paste(sort(c(recurData[i, 2], recurData[i,3])), collapse = '|'))
+}
+allGenePairs <- unique(unlist(recurGenePairs))
+recurGenePairM <- sapply(recurGenePairs, function (x) allGenePairs %in% x)
+rownames(recurGenePairM) <- allGenePairs
+
+#recurGenePairM <- genePairM[rowSums(genePairM) > 1, ]
+oo <- order(rowSums(recurGenePairM), decreasing = T)
+recurGenePairM <- recurGenePairM[oo, ]
+recurGenePairM <- ifelse(recurGenePairM, 1, 0)
+recurGenePairM <- transform(recurGenePairM, Sum = rowSums(recurGenePairM))
+fn <- paste(opt$outDir, "/recurGenePairs.txt", sep = "")
+write.table(recurGenePairM, file = fn, sep = '\t', quote = F, col.names = NA, row.names = T)
 
 

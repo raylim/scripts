@@ -11,6 +11,7 @@ options(error = quote(dump.frames("testdump", TRUE)))
 
 optList <- list(
                 make_option("--genome", default = 'hg19', help = "genome build [default %default]"),
+                make_option("--tumor", default = NULL, help = "tumor sample"),
                 make_option("--outFile", default = NULL, help = "output file [default %default]"))
 
 parser <- OptionParser(usage = "%prog vcf.files", option_list = optList);
@@ -30,12 +31,15 @@ if (is.null(opt$outFile)) {
 files <- arguments$args;
 
 vcfs <- list()
-
 for (f in files) {
-    vcfs <- append(vcfs, readVcf(f, genome = opt$genome))
+    vcf <- readVcf(f, genome = opt$genome)
+    tum <- ifelse(opt$tumor %in% colnames(geno(vcf)$GT), opt$tumor, "TUMOR")
+    gt <- geno(vcf)$GT[, tum]
+    vcf <- vcf[gt != "./." & gt != "0/0" & gt != "0", ]
+    vcfs <- append(vcfs, vcf)
 }
 
-all <- do.call('rbind', lapply(vcfs, function(x) as.data.frame(subset(rowData(vcf), FILTER == "PASS"))))
+all <- do.call('rbind', lapply(vcfs, function(x) as.data.frame(subset(rowData(x), FILTER == "PASS"))))
 all <- all[, c("seqnames", "start", "end")]
 cnt <- ddply(all, .(seqnames, start, end), nrow)
 

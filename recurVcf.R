@@ -2,6 +2,7 @@
 # output positions that occur in more than one vcf file
 
 suppressPackageStartupMessages(library("optparse"));
+suppressPackageStartupMessages(library("plyr"));
 suppressPackageStartupMessages(library("VariantAnnotation"));
 
 #options(warn = -1, error = quote({ traceback(2); q('no', status = 1) }))

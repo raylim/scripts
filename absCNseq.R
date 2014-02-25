@@ -1,38 +1,39 @@
 #!/usr/bin/env Rscript
-# applies absCNseq
+suppressPackageStartupMessages(library(optparse));
+suppressPackageStartupMessages(library(absCNseq));
 
-suppressPackageStartupMessages(library("optparse"));
-suppressPackageStartupMessages(library("absCNseq"));
 
 options(warn = -1, error = quote({ traceback(); q('no', status = 1) }))
 
-optList <- list(
-                make_option("--outPrefix", default = NULL, type = "character", action = "store", help ="Output prefix (required)"))
+optionList <- list(
+	make_option(c('-t', '--seqType'), action='store', default = "WES", help = 'sequence type (WES or WGS) [Default %default]'),
+	make_option(c('-n', '--tumorName'), action='store', default = NULL, help = 'name of the tumor sample. By default, derive from file name'),
+	make_option(c('-o', '--outPrefix'), action='store', default = NULL, help = 'output prefix'))
+posArgs <- c('varscanSegFile', 'snvTableFile')
+parser <- OptionParser(usage = paste('%prog [options]', paste(posArgs, collapse=' ')),  option_list=optionList)
+arguments <- parse_args(parser, positional_arguments = TRUE)
+opt <- arguments$options
 
-parser <- OptionParser(usage = "%prog [options] varscan.seg.file snv.table", option_list = optList);
-arguments <- parse_args(parser, positional_arguments = T);
-opt <- arguments$options;
-
-if (length(argumetns$args) != 2) {
-    cat("Need varscan seg file and SNV table\n\n");
-    print_help(parser);
-    stop();
+if (length(arguments$args) != length(posArgs)) {
+	print_help(parser)
+	print(arguments$args)
+	stop('Incorrect number of required positional arguments')
 } else if (is.null(opt$outPrefix)) {
-    cat("Need output prefix\n\n");
+    cat("Need output prefix\n");
     print_help(parser);
     stop();
+} else {
+	cmdArgs <- arguments$args
+	for (i in 1:length(cmdArgs)){
+		assign(posArgs[i], cmdArgs[i])
+	}
 }
 
-segFile <- arguments$args[1]
-snvFile <- arguments$args[2]
 
-tumorName <- sub('\\..*', '', sub('.*/', '', sub('_.*', '', segFile)))
-
-segData <- read.table(segFile, sep = '\t', header = T)
+segData <- read.table(varscanSegFile, sep = '\t', header = T, stringsAsFactors = F)
 segRle <- rle(segData$Segmented)
 segData <- transform(segData, segId = as.factor(rep(1:length(segRle$values), segRle$lengths)))
 segData <- transform(segData, length = End - Start)
-
 
 chrom <- tapply(segData$Chrom, segData$segId, function(x) x[1])
 start <- tapply(segData$Start, segData$segId, function(x) x[1])
@@ -42,7 +43,21 @@ normRatio <- tapply(segData$Segmented, segData$segId, function(x) x[1])
 
 absSegData <- data.frame(chrom = chrom, loc.start = start, loc.end = end, eff.seg.len = effSegLen, normalized.ratio = normRatio)
 
-snvData <- read.table(snvFile, sep = '\t', header = T, comment.char = '')
-af <- paste(tumorName
-absSnvData <- with(snvData, data.frame(chrom = X.CHROM, position = POS, tumor_var_freq = snvData[,af])
+if (!is.null(opt$tumorName)) {
+    tumor <- sub('.*/', '', sub('_.*', '', snvTableFile))
+}
+snvData <- read.table(snvTableFile, sep = '\t', header = T, comment.char = '', stringsAsFactors = F)
+absSnvData <- with(snvData, data.frame(chrom = X.CHROM, position = POS, tumor_var_freq = snvData[,paste(tumor, ".FA", sep = "")]))
 
+if (opt$seqType == "WES") {
+    min.seg.len <- 200
+else if (opt$seqType == "WGS") {
+    min.seg.len <- 3000
+}
+res <- grid.search.alpha(absSegData, absSnvData, min.seg.len = min.seg.len)
+
+fn <- paste(opt$outPrefix, ".absCN.txt", sep = "")
+write.table(res$absCN, file = fn, sep = '\t', quote = F)
+
+fn <- paste(opt$outPrefix, ".absSNV.txt", sep = "")
+write.table(res$absSNV, file = fn, sep = '\t', quote = F)

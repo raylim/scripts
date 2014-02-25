@@ -1,5 +1,5 @@
 #!/usr/bin/env Rscript
-# output positions that occur in more than one vcf file
+# output positions that occur in more than one vcf file in bed format
 
 suppressPackageStartupMessages(library("optparse"));
 suppressPackageStartupMessages(library("plyr"));
@@ -45,4 +45,4 @@ cnt <- ddply(all, .(seqnames, start, end), nrow)
 
 cnt <- subset(cnt, V1 > 1)
 
-write.table(cnt, file = opt$outFile, sep = '\t', quote = F)
+write.table(cnt[,c(1:3), file = opt$outFile, sep = '\t', quote = F, row.names = F, col.names = F)

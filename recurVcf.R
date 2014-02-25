@@ -45,4 +45,7 @@ cnt <- ddply(all, .(seqnames, start, end), nrow)
 
 cnt <- subset(cnt, V1 > 1)
 
-write.table(cnt[,c(1:3), file = opt$outFile, sep = '\t', quote = F, row.names = F, col.names = F)
+cnt[,2] <- cnt[,2] - 1
+cnt[,3] <- cnt[,3] - 1
+
+write.table(cnt[,c(1:3)], file = opt$outFile, sep = '\t', quote = F, row.names = F, col.names = F)

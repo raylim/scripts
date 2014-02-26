@@ -5,7 +5,7 @@ suppressPackageStartupMessages(library(absCNseq));
 suppressPackageStartupMessages(library(VariantAnnotation));
 
 
-options(warn = -1, error = quote({ traceback(2); q('no', status = 1) }))
+#options(warn = -1, error = quote({ traceback(2); q('no', status = 1) }))
 
 optionList <- list(
 	make_option(c('-t', '--seqType'), action='store', default = "WES", help = 'sequence type (WES or WGS) [Default %default]'),
@@ -48,6 +48,8 @@ absSegData <- data.frame(chrom = chrom, loc.start = start, loc.end = end, eff.se
 
 if (!is.null(opt$tumorName)) {
     tumor <- sub('.*/', '', sub('_.*', '', snvFile))
+} else {
+    tumor <- opt$tumorName
 }
 if (grepl('\\.txt$', snvFile, perl = T)) {
     snvData <- read.table(snvFile, sep = '\t', header = T, comment.char = '', stringsAsFactors = F)

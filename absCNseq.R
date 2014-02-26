@@ -46,7 +46,7 @@ normRatio <- tapply(segData$Segmented, segData$segId, function(x) x[1])
 
 absSegData <- data.frame(chrom = chrom, loc.start = start, loc.end = end, eff.seg.len = effSegLen, normalized.ratio = normRatio)
 
-if (!is.null(opt$tumorName)) {
+if (is.null(opt$tumorName)) {
     tumor <- sub('.*/', '', sub('_.*', '', snvFile))
 } else {
     tumor <- opt$tumorName

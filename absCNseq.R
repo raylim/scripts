@@ -5,7 +5,7 @@ suppressPackageStartupMessages(library(absCNseq));
 suppressPackageStartupMessages(library(VariantAnnotation));
 
 
-options(warn = -1, error = quote({ traceback(); q('no', status = 1) }))
+options(warn = -1, error = quote({ traceback(2); q('no', status = 1) }))
 
 optionList <- list(
 	make_option(c('-t', '--seqType'), action='store', default = "WES", help = 'sequence type (WES or WGS) [Default %default]'),
@@ -65,7 +65,7 @@ if (grepl('\\.txt$', snvFile, perl = T)) {
 
 if (opt$seqType == "WES") {
     min.seg.len <- 100
-else if (opt$seqType == "WGS") {
+} else if (opt$seqType == "WGS") {
     min.seg.len <- 3000
 }
 res <- grid.search.alpha(absSegData, absSnvData, min.seg.len = min.seg.len)

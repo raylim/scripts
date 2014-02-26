@@ -44,5 +44,5 @@ all <- all[, c("seqnames", "start", "end")]
 cnt <- ddply(all, .(seqnames, start, end), nrow)
 
 cnt <- subset(cnt, V1 > 1)
-
-write.table(cnt[,c(1:3)], file = opt$outFile, sep = '\t', quote = F, row.names = F, col.names = F)
+write(paste(cnt[,1], ":", cnt[,2], "-", cnt[,3], sep = ''), file = opt$outFile)
+#write.table(cnt[,c(1:3)], file = opt$outFile, sep = '\t', quote = F, row.names = F, col.names = F)

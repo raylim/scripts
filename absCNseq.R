@@ -56,6 +56,7 @@ if (grepl('\\.txt$', snvFile, perl = T)) {
     vcf <- readVcf(snvFile, opt$genome)
     vaf <- sapply(geno(vcf)$AD[,tumor], function (x) x[2] / sum(x))
     absSnvData <- data.frame(chrom = as.vector(seqnames(vcf)), position = start(rowData(vcf)), tumor_var_freq = vaf)
+    absSnvData <- subset(absSnvData, !is.na(tumor_var_freq))
 } else {
     cat("snv format unreadable\n")
     q(save = 'no', status = 1)
@@ -63,7 +64,7 @@ if (grepl('\\.txt$', snvFile, perl = T)) {
 
 
 if (opt$seqType == "WES") {
-    min.seg.len <- 200
+    min.seg.len <- 100
 else if (opt$seqType == "WGS") {
     min.seg.len <- 3000
 }

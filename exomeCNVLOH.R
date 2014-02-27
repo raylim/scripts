@@ -68,7 +68,8 @@ loh = multi.LOH.analyze(normal = normal, tumor = tumor, all.loh.ls = list(eLOH),
 
 prefix <- paste(opt$outPrefix, sep = "")
 cat("Writing output (prefix: ", opt$outPrefix, ")\n", sep = "")
-write.loh.output(loh, opt$outPrefix)
+fn <- paste(opt$outPrefix, '.loh.txt', sep = '')
+write.table(loh, file = fn, quote = F, sep = '\t', row.names = F, col.names = T)
 
 fn <- paste(opt$outPrefix, ".loh.png", sep = "")
 cat("Plotting to", fn, "\n")

@@ -30,7 +30,7 @@ my %breakpoints;
 open IN, $ARGV[0];
 while (my $line = <IN>) {
     chomp $line;
-    if ($line =~ /^cluster_id/) {
+    if ($line =~ /^Sample/) {
         @header = split /\t/, $line;
         next;
     }

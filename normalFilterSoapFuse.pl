@@ -67,6 +67,6 @@ while (my $line = <IN>) {
             last;
         }
     }
-    print STDERR "Filtered " . $F{"up_chr"} . ":" . $F{"up_Genome_pos"} . "|" $F{"dw_chr"} . ":" . $F{"dw_Genome_pos"} . "\n" if $filter && $opt{v};
+    print STDERR "Filtered " . $F{"up_chr"} . ":" . $F{"up_Genome_pos"} . "|" . $F{"dw_chr"} . ":" . $F{"dw_Genome_pos"} . "\n" if $filter && $opt{v};
     print "$line\n" unless $filter;
 }

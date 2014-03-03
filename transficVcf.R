@@ -39,7 +39,7 @@ cat("done\n")
 cols <- c("dbNSFP_Ensembl_geneid", "dbNSFP_SIFT_score", "dbNSFP_Polyphen2_HVAR_score", "dbNSFP_MutationAssessor_score")
 passIds <- which(rowSums(is.na(as.data.frame(info(vcf)[,cols]))) == 0)
 
-if (length(passIds) > 0)
+if (length(passIds) > 0) {
     tmp1 <- tempfile()
     tmp2 <- tempfile()
     X <- as.data.frame(info(vcf)[passIds, cols])

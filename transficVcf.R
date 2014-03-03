@@ -98,7 +98,6 @@ ord <- c(x, (1:length(geno(vcf)))[-x])
 geno(vcf) <- geno(vcf)[ord]
 
 cat("Writing vcf to", opt$outFile, "... ")
-setwd(oldwd)
 writeVcf(vcf, opt$outFile)
 cat("done\n")
 

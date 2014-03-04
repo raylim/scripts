@@ -9,7 +9,7 @@ optList <- list(
                 make_option("--geneCol1", default = NULL, help = "gene column 1"),
                 make_option("--geneCol2", default = NULL, help = "gene column 2"),
                 make_option("--sampleCol", default = NULL, help = "sample column"),
-                make_option("--outDir", default = NULL, help = "Output dir"));
+                make_option("--outPrefix", default = NULL, help = "Output prefix"));
 
 parser <- OptionParser(usage = "%prog [options] fusions_table", option_list = optList);
 
@@ -25,8 +25,8 @@ if (length(arguments$args) != 1) {
     cat("Need column name\n");
     print_help(parser);
     stop();
-} else if (is.null(opt$outDir)) {
-    cat("Need output dir\n");
+} else if (is.null(opt$outPrefix)) {
+    cat("Need output prefix\n");
     print_help(parser);
     stop();
 }
@@ -54,7 +54,7 @@ if (sum(rowSums(geneM) > 1) > 1) {
     recurGeneM <- recurGeneM[oo, ]
     recurGeneM <- ifelse(recurGeneM, 1, 0)
     recurGeneM <- transform(recurGeneM, Sum = rowSums(recurGeneM))
-    fn <- paste(opt$outDir, "/recurGenes.txt", sep = "")
+    fn <- paste(opt$outPrefix, ".gene.txt", sep = "")
     write.table(recurGeneM, file = fn, sep = '\t', quote = F, col.names = NA, row.names = T)
 }
 
@@ -75,7 +75,7 @@ if (sum(x) > 1) {
     recurGeneGeneM <- geneGeneM[x, x]
     oo <- order(rowSums(geneGeneM), decreasing = T)
     recurGeneGeneM <- geneGeneM[oo, oo]
-    fn <- paste(opt$outDir, "/recurGeneGene.txt", sep = "")
+    fn <- paste(opt$outPrefix, ".gene2gene.txt", sep = "")
     write.table(recurGeneGeneM, file = fn, sep = '\t', quote = F, col.names = NA, row.names = T)
 }
 
@@ -94,7 +94,7 @@ oo <- order(rowSums(recurGenePairM), decreasing = T)
 recurGenePairM <- recurGenePairM[oo, ]
 recurGenePairM <- ifelse(recurGenePairM, 1, 0)
 recurGenePairM <- transform(recurGenePairM, Sum = rowSums(recurGenePairM))
-fn <- paste(opt$outDir, "/recurGenePairs.txt", sep = "")
+fn <- paste(opt$outPrefix, ".pairs.txt", sep = "")
 write.table(recurGenePairM, file = fn, sep = '\t', quote = F, col.names = NA, row.names = T)
 
 

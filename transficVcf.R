@@ -48,11 +48,12 @@ if (length(passIds) > 0) {
     cmd <- paste(opt$transfic, opt$grouping, tmp1, ">", tmp2)
     system(cmd)
     results <- read.table(tmp2, sep = '\t', as.is = T)
+    newCols <- c('id', 'geneId', 'transficSIFT_score', 'transficSIFT_pred', 'transficPolyphen2_HVAR_score', 'transficPolyphen2_HVAR_pred', 'transficMutationAssessor_score', 'transficMutationAssessor_pred')
+    mergeCols <- newCols[3:length(newCols)]
+    colnames(results) <- newCols
 }
 
-newCols <- c('id', 'geneId', 'transficSIFT_score', 'transficSIFT_pred', 'transficPolyphen2_HVAR_score', 'transficPolyphen2_HVAR_pred', 'transficMutationAssessor_score', 'transficMutationAssessor_pred')
-mergeCols <- newCols[3:length(newCols)]
-colnames(results) <- newCols
+
 
 hinfoprime <- apply(as.data.frame(info(header(vcf))), 2, as.character)
 rownames(hinfoprime) <- rownames(info(header(vcf)))

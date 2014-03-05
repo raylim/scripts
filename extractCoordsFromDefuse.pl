@@ -38,14 +38,12 @@ while (my $line = <>) {
     my @arr = split /\t/, $line;
     my %F = map { $_ => shift @arr } @header;
 
-    my $upstream = ($F{upstream_gene} eq $F{gene_name1})? 1 : 2;
-    my $downstream = ($F{downstream_gene} eq $F{gene_name1})? 1 : 2;
 
     my $upstreamChr = "chr" . $F{"gene_chromosome" . $upstream };
     my $downstreamChr = "chr" . $F{"gene_chromosome" . $downstream };
 
-    my $upstreamPosn = $F{"genomic_break_pos" . $upstream };
-    my $downstreamPosn = $F{"genomic_break_pos" . $downstream };
+    my $upstreamPosn = (($F{upstream_gene} eq $F{gene_name1})? $F{"genomic_break_pos1"} : $F{"genomic_break_pos2"}) + 1;
+    my $downstreamPosn = (($F{downstream_gene} eq $F{gene_name1})? $F{"genomic_break_pos1" : $F{"genomic_break_pos2"}) - 1;
 
     print join("\t", ($upstreamChr, $upstreamPosn, $downstreamChr, $downstreamPosn, $tissueType)) . "\n";
 }

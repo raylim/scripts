@@ -1,0 +1,47 @@
+#!/bin/bash
+
+RCMD="R --vanilla --no-readline --quiet"
+TMPDIR="$HOME/share/tmp"
+QUEUE="jrf.q"
+
+while getopts "e:sm:n:" opt; do
+  case $opt in
+    e)
+    R=$OPTARG
+      ;;
+    m)
+    MEM=$OPTARG
+      ;;
+    n)
+    NAME=$OPTARG
+      ;;
+    s)
+    SGE=true
+      ;;
+    \:)
+      echo "Argument missing: -$OPTARG" >&2
+      exit -1
+      ;;
+    \?)
+      echo "Invalid option: -$OPTARG" >&2
+      exit -1
+      ;;
+  esac
+done
+ 
+if [[ -n "$R" ]]; then 
+    TMP=$(mktemp --tmpdir=$(TMPDIR))
+    #TMP=$(mktemp -t x)
+    trap "{ rm -f ${TMP}; exit 255;  }" SIGINT
+    echo "${R}" > ${TMP}
+    if [[ -n "$SGE" ]]; then
+        qrsh -V -now n -q $QUEUE -l virtual_free=$MEM,h_vmem=$MEM "${RCMD} < ${TMP}"
+    else
+        echo $MEM
+        $RCMD < ${TMP}
+    fi
+    rm -f ${TMP}
+else
+    echo "Undefined script" >&2
+    exit -1
+fi

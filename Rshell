@@ -3,9 +3,13 @@
 RCMD="R --vanilla --no-readline --quiet"
 TMPDIR="$HOME/share/tmp"
 QUEUE="jrf.q"
+LOGDIR=log/Rshell
 
-while getopts "e:sm:n:" opt; do
+while getopts "e:sm:n:l:" opt; do
   case $opt in
+    l)
+    LOGDIR=$OPTARG
+      ;;
     e)
     R=$OPTARG
       ;;
@@ -35,7 +39,8 @@ if [[ -n "$R" ]]; then
     trap "{ rm -f ${TMP}; exit 255;  }" SIGINT
     echo "${R}" > ${TMP}
     if [[ -n "$SGE" ]]; then
-        qrsh -cwd -V -now n -q $QUEUE -N X$NAME -l virtual_free=$MEM,h_vmem=$MEM "${RCMD} < ${TMP}"
+        mkdir -p $LOGDIR
+        qrsh -cwd -V -now n -q $QUEUE -N X$NAME -l virtual_free=$MEM,h_vmem=$MEM "${RCMD} < ${TMP}" &> $LOGDIR/$NAME.log
     else
         echo $MEM
         $RCMD < ${TMP}

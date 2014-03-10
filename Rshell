@@ -35,7 +35,7 @@ if [[ -n "$R" ]]; then
     trap "{ rm -f ${TMP}; exit 255;  }" SIGINT
     echo "${R}" > ${TMP}
     if [[ -n "$SGE" ]]; then
-        qrsh -V -now n -q $QUEUE -N X$NAME -l virtual_free=$MEM,h_vmem=$MEM "${RCMD} < ${TMP}"
+        qrsh -cwd -V -now n -q $QUEUE -N X$NAME -l virtual_free=$MEM,h_vmem=$MEM "${RCMD} < ${TMP}"
     else
         echo $MEM
         $RCMD < ${TMP}

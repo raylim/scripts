@@ -47,8 +47,8 @@ my $vcfHeader = <<ENDL;
 ##INFO=<ID=CHI2SCORE,Number=1,Type=Float,Description="Chi-2 score">
 ##INFO=<ID=COVRATIO,Number=1,Type=Float,Description="Coverage ratio">
 ##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
-##FORMAT=<ID=KAD,Number=1,Type=String,Description="K-mer allelic depth">
-##FORMAT=<ID=KAF,Number=1,Type=String,Description="K-mer variant allelic frequency">
+##FORMAT=<ID=AD,Number=1,Type=String,Description="K-mer allelic depth">
+##FORMAT=<ID=AF,Number=1,Type=String,Description="K-mer variant allelic frequency">
 ##PEDIGREE=<Derived=$tumor,Original=$normal>
 ENDL
 for my $contig (@contigs) {
@@ -58,7 +58,7 @@ for my $contig (@contigs) {
 $vcfHeader .= "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\t$tumor\t$normal\n";
 print $vcfHeader;
 
-my $format = "GT:KAD:KAF";
+my $format = "GT:AD:AF";
 
 
 my $headerLine = <>;
@@ -89,13 +89,13 @@ while (<>) {
     $tumorGT = join "/", (split '', $tumorGT);
 
     my ($normalRcov, $tumorRcov, $normalAcov, $tumorAcov) = $F{covState} =~ /^(\d+) (\d+)\/(\d+) (\d+)/;
-    my $normalKAD = "$normalRcov,$normalAcov";
-    my $tumorKAD = "$tumorRcov,$tumorAcov";
-    my $normalKAF = $normalAcov / ($normalRcov + $normalAcov);
-    my $tumorKAF = $tumorAcov / ($tumorRcov + $tumorAcov);
+    my $normalAD = "$normalRcov,$normalAcov";
+    my $tumorAD = "$tumorRcov,$tumorAcov";
+    my $normalAF = $normalAcov / ($normalRcov + $normalAcov);
+    my $tumorAF = $tumorAcov / ($tumorRcov + $tumorAcov);
 
-    my $tumorFormat = sprintf "%s:%s:%.2f", $tumorGT, $tumorKAD, $tumorKAF;
-    my $normalFormat = sprintf "%s:%s:%.2f", $normalGT, $normalKAD, $normalKAF;
+    my $tumorFormat = sprintf "%s:%s:%.2f", $tumorGT, $tumorAD, $tumorAF;
+    my $normalFormat = sprintf "%s:%s:%.2f", $normalGT, $normalAD, $normalAF;
 
     my $info = "SIZE=$F{size};INDELTYPE=$F{type};AVGKCOV=$F{avgKcov};MINKCOV=$F{minKcov};CHI2SCORE=$F{chi2score};COVRATIO=$F{covRatio}";
     print "$chrom\t$pos\t.\t$ref\t$alt\t.\tPASS\t$info\t$format\t$tumorFormat\t$normalFormat\n";

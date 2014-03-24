@@ -93,9 +93,11 @@ while(nrow(vcf <- readVcf(tab, genome = opt$genome))) {
     }
 
     # fix sample genotype order
-    x <- which(names(geno(vcf)) == "GT")
-    ord <- c(x, (1:length(geno(vcf)))[-x])
-    geno(vcf) <- geno(vcf)[ord]
+    if ("GT" %in% names(geno(vcf))) {
+        x <- which(names(geno(vcf)) == "GT")
+        ord <- c(x, (1:length(geno(vcf)))[-x])
+        geno(vcf) <- geno(vcf)[ord]
+    }
 
     setwd(oldwd)
     writeVcf(vcf, out)

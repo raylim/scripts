@@ -95,9 +95,11 @@ if (!is.null(results) && nrow(results) > 0) {
 
 #fix sample genotype order
 
-x <- which(names(geno(vcf)) == "GT")
-ord <- c(x, (1:length(geno(vcf)))[-x])
-geno(vcf) <- geno(vcf)[ord]
+if ("GT" %in% names(geno(vcf))) {
+    x <- which(names(geno(vcf)) == "GT")
+    ord <- c(x, (1:length(geno(vcf)))[-x])
+    geno(vcf) <- geno(vcf)[ord]
+}
 
 cat("Writing vcf to", opt$outFile, "... ")
 writeVcf(vcf, opt$outFile)

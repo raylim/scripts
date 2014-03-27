@@ -32,8 +32,9 @@ out <- file(outfn, open = 'a')
 cat('Reading vcf header ... ')
 # create new header
 vcfHeader <- scanVcfHeader(fn)
-newGeno <- DataFrame(rbind(apply(as.data.frame(geno(vcfHeader)), 2, as.character), AD = c(".", "Integer", "Allelic depth")))
-rownames(newGeno) <- c(rownames(geno(vcfHeader)), "AD")
+gen <- apply(as.data.frame(geno(vcfHeader)), 2, as.character)
+rownames(gen) <- rownames(geno(vcfHeader))
+newGeno <- DataFrame(rbind(gen, AD = c(".", "Integer", "Allelic depth")))
 hlist <- header(vcfHeader)
 hlist$FORMAT <- newGeno
 newVcfHeader <- new("VCFHeader", samples = vcfHeader@samples, header = hlist)

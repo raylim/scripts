@@ -37,14 +37,17 @@ vcf <- readVcf(fn, opt$genome)
 cat("done\n")
 
 cols <- c("dbNSFP_Ensembl_geneid", "dbNSFP_SIFT_score", "dbNSFP_Polyphen2_HVAR_score", "dbNSFP_MutationAssessor_score")
-passIds <- which(rowSums(is.na(as.data.frame(info(vcf)[,cols]))) == 0)
+passIds <- which(apply(as.data.frame(info(vcf)[,cols]), 1, function(x) all(unlist(x) != ".") && all(!is.na(unlist(x)))))
 
 results <- NULL
 if (length(passIds) > 0) {
     tmp1 <- tempfile()
     tmp2 <- tempfile()
     X <- as.data.frame(info(vcf)[passIds, cols])
-    X[,3] <- sapply(info(vcf)[passIds, "dbNSFP_Polyphen2_HVAR_score"], max)
+    X[,1] <- sapply(X[,1], function(x) x[1])
+    X[,2] <- sapply(X[,2], function(x) max(as.numeric(unlist(x, "\\|"))))
+    X[,3] <- sapply(X[,3], function(x) max(as.numeric(unlist(strsplit(x, "\\|")))))
+    X[,4] <- sapply(X[,4], function(x) max(as.numeric(unlist(x, "\\|"))))
     write.table(X, file = tmp1, quote = F, sep = '\t', col.names = F, row.names = T)
     cmd <- paste(opt$transfic, opt$grouping, tmp1, ">", tmp2)
     system(cmd)

@@ -45,9 +45,13 @@ if (length(passIds) > 0) {
     tmp2 <- tempfile()
     X <- as.data.frame(info(vcf)[passIds, cols])
     X[,1] <- sapply(X[,1], function(x) x[1])
-    X[,2] <- sapply(X[,2], function(x) max(as.numeric(unlist(x, "\\|"))))
-    X[,3] <- sapply(X[,3], function(x) max(as.numeric(unlist(strsplit(x, "\\|")))))
-    X[,4] <- sapply(X[,4], function(x) max(as.numeric(unlist(x, "\\|"))))
+    X[,2] <- sapply(X[,2], function(x) max(as.numeric(unlist(x))))
+    if (any(grepl("\\|", X[,3]))) {
+        X[,3] <- sapply(X[,3], function(x) max(as.numeric(unlist(strsplit(x, "\\|")))))
+    } else {
+        X[,3] <- sapply(X[,3], function(x) max(as.numeric(unlist(x))))
+    }
+    X[,4] <- sapply(X[,4], function(x) max(as.numeric(unlist(x))))
     write.table(X, file = tmp1, quote = F, sep = '\t', col.names = F, row.names = T)
     cmd <- paste(opt$transfic, opt$grouping, tmp1, ">", tmp2)
     system(cmd)

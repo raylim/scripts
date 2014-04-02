@@ -108,7 +108,7 @@ while(nrow(vcf <- readVcf(tab, genome = opt$genome))) {
 
     cat(paste('Chunk', i, "\n"))
     i <- i + 1
-    passIds <- which(rowData(vcf)$FILTER == "PASS")
+    passIds <- which(rowData(vcf)$FILTER == "PASS" & seqnames(rowData(vcf)) %in% seqnames(seqinfo(txdb)))
     if (length(passIds) == 0) {
         cat("No unfiltered variants\n")
     } else {

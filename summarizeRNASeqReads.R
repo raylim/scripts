@@ -6,11 +6,13 @@ suppressPackageStartupMessages(library(optparse));
 suppressPackageStartupMessages(library(GenomicFeatures));
 suppressPackageStartupMessages(library(Rsamtools));
 suppressPackageStartupMessages(library(TxDb.Hsapiens.UCSC.hg19.knownGene));
+suppressPackageStartupMessages(library(TxDb.Mmusculus.UCSC.mm10.knownGene));
 suppressPackageStartupMessages(library(org.Hs.eg.db))
 
 optionList <- list(
 	#make_option(c('-a', '--addChr'), action='store_true', default = TRUE, help = 'Set the flag to add chr as a prefix to each seqlevel. Necessarily when the bamFile has read containing the chr prefix and the txdbFile does not [%default]'),
 	make_option(c('-i', '--intronListFile'), action='store', default = NULL, help = 'Set a file containing intronIDs to include in the summarization [%default]'),
+	make_option(c('-g', '--genome'), action='store', default = 'hg19', help = 'genome to use [%default]'),
 	make_option(c('-o', '--outFile'), action='store', default = NULL, help = 'output file'),
 	make_option(c('-w', '--intronWindow'), action='store', type = 'integer', default = NULL, help = 'Set the intronic window to be first x bases from the start [%default]')
 	)
@@ -77,7 +79,16 @@ getExprs <- function( features, featureCounts, feature = 'gene' ){
 }
 
 print("Loading txdb ")
-txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
+if (opt$genome == "hg19") {
+    txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
+} else if (opt $genome == "mm10") {
+    txdb <- TxDb.Mmusculus.UCSC.mm10.knownGene
+} else {
+    cat("Unsupported genome\n")
+    print_help(parser);
+    stop();
+}
+
 print('... Done')
 
 print('Getting transcripts by gene')

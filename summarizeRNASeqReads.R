@@ -8,6 +8,7 @@ suppressPackageStartupMessages(library(Rsamtools));
 suppressPackageStartupMessages(library(TxDb.Hsapiens.UCSC.hg19.knownGene));
 suppressPackageStartupMessages(library(TxDb.Mmusculus.UCSC.mm10.knownGene));
 suppressPackageStartupMessages(library(org.Hs.eg.db))
+suppressPackageStartupMessages(library(org.Mm.eg.db))
 
 optionList <- list(
 	#make_option(c('-a', '--addChr'), action='store_true', default = TRUE, help = 'Set the flag to add chr as a prefix to each seqlevel. Necessarily when the bamFile has read containing the chr prefix and the txdbFile does not [%default]'),
@@ -164,7 +165,11 @@ print('... for introns ...')
 intronExprsVals <- getExprs( intronsByGene, countsForIntrons )
 print('... Done')
 
-geneSymbols <- sapply(mget(genes, org.Hs.egSYMBOL, ifnotfound = NA), function (x) x[1])
+if (opt$genome == "hg19") {
+    geneSymbols <- sapply(mget(genes, org.Hs.egSYMBOL, ifnotfound = NA), function (x) x[1])
+} else {
+    geneSymbols <- sapply(mget(genes, org.Mm.egSYMBOL, ifnotfound = NA), function (x) x[1])
+}
 
 print( paste('Saving results to', opt$outFile) )
 summarizedReads <- data.frame(geneID = genes, gene = geneSymbols, countsByGene = countsForGenes[genes], countsByExon = countsForExons[genes], countsByIntron = countsForIntrons[genes], exonRPM = exonExprsVals[['rpm']][genes], exonRPKM = exonExprsVals[['rpkm']][genes], intronRPM = intronExprsVals[['rpm']][genes], intronRPKM = intronExprsVals[['rpkm']][genes])

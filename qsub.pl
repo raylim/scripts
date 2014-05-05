@@ -6,10 +6,10 @@ use warnings;
 
 use Getopt::Std;
 my %opt;
-getopts('hd:', \%opt);
+getopts('hd:s:', \%opt);
 
 my $usage = <<ENDL;
-Usage: perl qsub.pl -d [sge dir] [qsub cmd]
+Usage: perl qsub.pl -s [sleep seconds] -d [sge dir] [qsub cmd]
 ENDL
 
 sub HELP_MESSAGE {
@@ -19,6 +19,18 @@ sub HELP_MESSAGE {
 
 HELP_MESSAGE if $opt{h};
 
+
+my $qdelCmd = "qdel";
+my $qstatCmd = "qstat";
+my $qacctCmd = "qacct";
+if ($opt{d}) {
+    $qdelCmd = $opt{d} . "/" . $qdelCmd if $opt{d};
+    $qstatCmd = $opt{d} . "/" . $qstatCmd if $opt{d};
+    $qacctCmd = $opt{d} . "/" . $qacctCmd if $opt{d};
+}
+
+
+my $sleepTime = 30 unless $opt{s};
 
 my $qsub = shift @ARGV; 
 
@@ -31,12 +43,21 @@ $qsubOut =~ m/Your job (\d+) /;
 my $jobId = $1;
 print "$qsubOut";
 
+
+sub signalHandler {
+    system "$qdelCmd $jobId";
+    die;
+}
+
+$SIG{INT} = \&signalHandler;
+$SIG{TERM} = \&signalHandler;
+
 do {
-    my $qstat = qx($opt{d}/qstat -j $jobId 2>&1);
-    sleep 30;
+    my $qstat = qx($qstatCmd -j $jobId 2>&1);
+    sleep $sleepTime;
 } until ($? != 0);
 
-my $exitStatus = qx($opt{d}/qacct -j $jobId | grep exit_status);
+my $exitStatus = qx($qacctCmd -j $jobId | grep exit_status);
 #print $exitStatus . "\n";
 my $exit = 1;
 if ($exitStatus =~ m/exit_status\s+(\d+)/) {

@@ -28,7 +28,7 @@ $shell = $opt{s} if $opt{s};
 
 my $scriptFile = File::Temp->new(TEMPLATE => 'tempXXXXX', SUFFIX => '.sge');
 
-print $scriptFile->filename . "\n";
+#print $scriptFile->filename . "\n";
 print $scriptFile "#!$shell\n";
 
 my $args = join " ", @ARGV;

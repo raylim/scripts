@@ -57,6 +57,7 @@ do {
     sleep $sleepTime + int(rand(10));
 } until ($? != 0);
 
+sleep 30;
 my $exitStatus = qx($qacctCmd -j $jobId | grep exit_status);
 #print $exitStatus . "\n";
 my $exit = 1;

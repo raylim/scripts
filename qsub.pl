@@ -26,7 +26,7 @@ HELP_MESSAGE if $opt{h};
 my $shell = "/bin/bash";
 $shell = $opt{s} if $opt{s};
 
-my $scriptFile = File::Temp->new(DIR => getcwd(), TEMPLATE => 'tempXXXXX', SUFFIX => '.sge');
+my $scriptFile = File::Temp->new(TEMPLATE => 'tempXXXXX', SUFFIX => '.sge');
 
 print $scriptFile->filename . "\n";
 print $scriptFile "#!$shell\n";
@@ -47,6 +47,9 @@ die drmaa_strerror($error) . "\n" . $diagnosis if $error;
 die drmaa_strerror($error) . "\n" . $diagnosis if $error;
 
 ($error, $diagnosis) = drmaa_set_attribute($jt, $DRMAA_NATIVE_SPECIFICATION, $args);
+die drmaa_strerror($error) . "\n" . $diagnosis if $error;
+
+($error, $diagnosis) = drmaa_set_attribute($jt, $DRMAA_WD, getcwd());
 die drmaa_strerror($error) . "\n" . $diagnosis if $error;
 
 ($error, my $jobid, $diagnosis) = drmaa_run_job($jt);

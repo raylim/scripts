@@ -4,12 +4,16 @@
 use strict;
 use warnings;
 
+use Schedule::DRMAAc qw/ :all /;
+use File::Temp();
+use Cwd;
+
 use Getopt::Std;
 my %opt;
-getopts('hd:s:', \%opt);
+getopts('hS:', \%opt);
 
 my $usage = <<ENDL;
-Usage: perl qsub.pl -s [min sleep seconds] -d [sge dir] [qsub cmd]
+Usage: perl qsub.pl -S [shell] -- [qsub args]
 ENDL
 
 sub HELP_MESSAGE {
@@ -19,55 +23,52 @@ sub HELP_MESSAGE {
 
 HELP_MESSAGE if $opt{h};
 
+my $shell = "/bin/bash";
+$shell = $opt{s} if $opt{s};
 
-my $qdelCmd = "qdel";
-my $qstatCmd = "qstat";
-my $qacctCmd = "qacct";
-if ($opt{d}) {
-    $qdelCmd = $opt{d} . "/" . $qdelCmd if $opt{d};
-    $qstatCmd = $opt{d} . "/" . $qstatCmd if $opt{d};
-    $qacctCmd = $opt{d} . "/" . $qacctCmd if $opt{d};
-}
+my $scriptFile = File::Temp->new(TEMPLATE => 'tempXXXXX', SUFFIX => '.sge');
 
-
-my $sleepTime = 5 unless $opt{s};
-
-my $qsub = shift @ARGV; 
+print $scriptFile->filename . "\n";
+print $scriptFile "#!$shell\n";
 
 my $args = join " ", @ARGV;
+while (<STDIN>) {
+    print $scriptFile $_;
+}
+close $scriptFile;
 
-my $qsubCmd = "$qsub $args";
-my $qsubOut = qx($qsubCmd);
+my ($error, $diagnosis) = drmaa_init(undef);
+die drmaa_strerror($error) . "\n" . $diagnosis if $error;
 
-$qsubOut =~ m/Your job (\d+) /;
-my $jobId = $1;
-print "$qsubOut";
+($error, my $jt, $diagnosis) = drmaa_allocate_job_template();
+die drmaa_strerror($error) . "\n" . $diagnosis if $error;
 
+($error, $diagnosis) = drmaa_set_attribute($jt, $DRMAA_REMOTE_COMMAND, $scriptFile->filename);
+die drmaa_strerror($error) . "\n" . $diagnosis if $error;
+
+($error, $diagnosis) = drmaa_set_attribute($jt, $DRMAA_NATIVE_SPECIFICATION, $args);
+die drmaa_strerror($error) . "\n" . $diagnosis if $error;
+
+($error, $diagnosis) = drmaa_set_attribute($jt, $DRMAA_WD, getcwd());
+die drmaa_strerror($error) . "\n" . $diagnosis if $error;
+
+($error, my $jobid, $diagnosis) = drmaa_run_job($jt);
+die drmaa_strerror($error) . "\n" . $diagnosis if $error;
 
 sub signalHandler {
-    system "$qdelCmd $jobId";
+    my ($error, $diagnosis) = drmaa_control($jobid, $DRMAA_CONTROL_TERMINATE);
+    die drmaa_strerror($error) . "\n" . $diagnosis if $error;
     die;
 }
 
 $SIG{INT} = \&signalHandler;
 $SIG{TERM} = \&signalHandler;
 
-do {
-    my $qstat = qx($qstatCmd -j $jobId 2>&1);
-    sleep $sleepTime + int(rand(10));
-} until ($? != 0);
+($error, my $jobIdOut, my $stat, $diagnosis) = drmaa_wait($jobid, 30);
+die drmaa_strerror($error) . "\n" . $diagnosis if $error;
 
-my $numRetry = 30;
-my $exitStatus;
-do {
-    $exitStatus = qx($qacctCmd -j $jobId | grep exit_status);
-    sleep 10;
-} until ($? == 0 && $numRetry-- > 0);
-#print $exitStatus . "\n";
-my $exit = 1;
-if ($exitStatus =~ m/exit_status\s+(\d+)/) {
-    $exit = $1;
-}
-#print "exit code: $exit\n";
-exit $exit;
+($error, my $exited, $diagnosis) = drmaa_wifexited($stat);
+die drmaa_strerror($error) . "\n" . $diagnosis if $error;
+
+exit $exited;
 

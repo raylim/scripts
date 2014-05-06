@@ -10,10 +10,10 @@ use Cwd;
 
 use Getopt::Std;
 my %opt;
-getopts('hS:', \%opt);
+getopts('h', \%opt);
 
 my $usage = <<ENDL;
-Usage: perl qsub.pl -S [shell] -- [qsub args]
+Usage: perl qsub.pl -h -- [qsub args]
 ENDL
 
 sub HELP_MESSAGE {
@@ -23,13 +23,7 @@ sub HELP_MESSAGE {
 
 HELP_MESSAGE if $opt{h};
 
-my $shell = "/bin/bash";
-$shell = $opt{s} if $opt{s};
-
-my $scriptFile = File::Temp->new(TEMPLATE => 'tempXXXXX', SUFFIX => '.sge');
-
-#print $scriptFile->filename . "\n";
-print $scriptFile "#!$shell\n";
+my $scriptFile = File::Temp->new(TEMPLATE => 'tempXXXXX', DIR => '/tmp', SUFFIX => '.sge');
 
 my $args = join " ", @ARGV;
 while (<STDIN>) {
@@ -58,17 +52,23 @@ die drmaa_strerror($error) . "\n" . $diagnosis if $error;
 sub signalHandler {
     my ($error, $diagnosis) = drmaa_control($jobid, $DRMAA_CONTROL_TERMINATE);
     die drmaa_strerror($error) . "\n" . $diagnosis if $error;
-    die;
+    die "Received interrupt: terminating job\n";
 }
 
 $SIG{INT} = \&signalHandler;
 $SIG{TERM} = \&signalHandler;
 
-($error, my $jobIdOut, my $stat, $diagnosis) = drmaa_wait($jobid, 30);
-die drmaa_strerror($error) . "\n" . $diagnosis if $error;
+my $jobidOut;
+my $stat;
+do {
+    ($error, $jobidOut, $stat, $diagnosis) = drmaa_wait($jobid, 10);
+    die drmaa_strerror($error) . "\n" . $diagnosis if $error;
+} until ($error == $DRMAA_ERRNO_INVALID_JOB );
 
 ($error, my $exited, $diagnosis) = drmaa_wifexited($stat);
 die drmaa_strerror($error) . "\n" . $diagnosis if $error;
 
-exit $exited;
+($error, $diagnosis) = drmaa_exit();
+die drmaa_strerror($error) . "\n" . $diagnosis if $error;
 
+exit $exited;

@@ -54,7 +54,7 @@ $SIG{TERM} = \&signalHandler;
 
 do {
     my $qstat = qx($qstatCmd -j $jobId 2>&1);
-    sleep $sleepTime + int(rand(5));
+    sleep $sleepTime + int(rand(10));
 } until ($? != 0);
 
 my $exitStatus = qx($qacctCmd -j $jobId | grep exit_status);

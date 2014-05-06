@@ -58,7 +58,7 @@ do {
 } until ($? != 0);
 
 my $numRetry = 30;
-my $exitstatus;
+my $exitStatus;
 do {
     $exitStatus = qx($qacctCmd -j $jobId | grep exit_status);
     sleep 10;

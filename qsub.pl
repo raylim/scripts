@@ -62,7 +62,6 @@ my $jobidOut;
 my $stat;
 do {
     ($error, $jobidOut, $stat, $diagnosis) = drmaa_wait($jobid, 10);
-    die drmaa_strerror($error) . "\n" . $diagnosis if $error;
 } until ($error == $DRMAA_ERRNO_INVALID_JOB );
 
 ($error, my $exited, $diagnosis) = drmaa_wifexited($stat);

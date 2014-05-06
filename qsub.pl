@@ -9,7 +9,7 @@ my %opt;
 getopts('hd:s:', \%opt);
 
 my $usage = <<ENDL;
-Usage: perl qsub.pl -s [sleep seconds] -d [sge dir] [qsub cmd]
+Usage: perl qsub.pl -s [min sleep seconds] -d [sge dir] [qsub cmd]
 ENDL
 
 sub HELP_MESSAGE {
@@ -30,7 +30,7 @@ if ($opt{d}) {
 }
 
 
-my $sleepTime = 30 unless $opt{s};
+my $sleepTime = 5 unless $opt{s};
 
 my $qsub = shift @ARGV; 
 
@@ -54,7 +54,7 @@ $SIG{TERM} = \&signalHandler;
 
 do {
     my $qstat = qx($qstatCmd -j $jobId 2>&1);
-    sleep $sleepTime;
+    sleep $sleepTime + int(rand(5));
 } until ($? != 0);
 
 my $exitStatus = qx($qacctCmd -j $jobId | grep exit_status);

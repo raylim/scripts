@@ -9,7 +9,9 @@ suppressPackageStartupMessages(library("org.Hs.eg.db"));
 options(warn = -1, error = quote({ traceback(); q('no', status = 1) }))
 
 optList <- list(
-                make_option("--outDir", default = NULL, help = "Output dir"))
+                make_option("--outDir", default = NULL, help = "Output dir"),
+                make_option("--knownVariants", default = NULL, help = "known variants file"),
+                make_option("--txdb", default = NULL, help = "txdb"))
 
 parser <- OptionParser(usage = "%prog [options] [list of ratio.txt files]", option_list = optList);
 
@@ -73,8 +75,12 @@ X <- as.matrix(mcols(gr))
 X[X > 3] <- 3
 
 
+if (!is.null(opt$txdb)) {
+    txdb <- loadDb(opt$txdb)
+} else {
+    txdb <- makeTranscriptDbFromBiomart('ensembl', 'hsapiens_gene_ensembl')
+}
 
-txdb <- makeTranscriptDbFromBiomart('ensembl', 'hsapiens_gene_ensembl')
 txs <- transcriptsBy(txdb, by = "gene")
 overlaps <- findOverlaps(gr, txs)
 ensids <- names(txs[subjectHits(overlaps)])
@@ -102,9 +108,6 @@ for (i in 1:length(gr)) {
     }
 }
 
-fn <- paste(opt$outDir, "/region_copynum.txt", sep = "")
-write.table(as.data.frame(gr), file = fn, sep = "\t", row.names = F, quote = F)
-
 fn <- paste(opt$outDir, "/gene_copynum_recurrent.txt", sep = "")
 x <- rowSums(geneCN != 2) > 1
 geneRecurrentCNV <- geneCN[x, ]
@@ -115,25 +118,27 @@ x <- rowSums(geneCN > 2) > 1
 geneRecurrentGainCNV <- geneCN[x, ]
 write.table(geneRecurrentGainCNV, file = fn, sep = "\t", quote = F)
 
-fn <- paste(opt$outDir, "/gene_copynum_recurrent_loss", sep = "")
+fn <- paste(opt$outDir, "/gene_copynum_recurrent_loss.txt", sep = "")
 x <- rowSums(geneCN < 2) > 1
 geneRecurrentLossCNV <- geneCN[x, ]
 write.table(geneRecurrentLossCNV, file = fn, sep = "\t", quote = F)
 
-dgv <- read.table('GRCh37_hg19_variants_2013-07-23.txt', header = T, quote = '', comment.char = '', as.is = T, sep = '\t')
-    grs[[s]] <- GRanges(seqnames = d[, 1], ranges = IRanges(d[, 2], end = d[, 3]), copynum = d[,4])
-dgv.gr <- GRanges(seqnames = dgv$chr, ranges = IRanges(dgv$start, end = dgv$end), id = dgv$variantaccession, observedgains = dgv$observedgains, observedlosses = dgv$observedlosses)
-small.dgv.gr <- sort(dgv.gr[width(dgv.gr) <= 500000])
-ols <- findOverlaps(gr, small.dgv.gr, minoverlap = 25000L)
-rs <- ranges(ols, ranges(gr), ranges(small.dgv.gr))
-olf <- width(rs) / width(gr)[queryHits(ols)]
-x <- ols[olf > 0.5]
-mcols(gr)$ID <- rep(".", length(gr))
-ids <- mcols(dgv.gr[subjectHits(x)])$id
-ids <- tapply(ids, queryHits(x), paste, collapse = '|')
-small.gr.index <- which(width(gr) <= 500000)
-mcols(gr)$ID[intersect(as.integer(names(ids)), small.gr.index)] <- ids
-mcols(gr) <- cbind(mcols(gr), mcols(small.dgv.gr[subjectHits(x)]))
+if (!is.null(opt$knownVariants)) {
+    dgv <- read.table(opt$knownVariants, header = T, quote = '', comment.char = '', as.is = T, sep = '\t')
+        grs[[s]] <- GRanges(seqnames = d[, 1], ranges = IRanges(d[, 2], end = d[, 3]), copynum = d[,4])
+    dgv.gr <- GRanges(seqnames = dgv$chr, ranges = IRanges(dgv$start, end = dgv$end), id = dgv$variantaccession, observedgains = dgv$observedgains, observedlosses = dgv$observedlosses)
+    small.dgv.gr <- sort(dgv.gr[width(dgv.gr) <= 500000])
+    ols <- findOverlaps(gr, small.dgv.gr, minoverlap = 25000L)
+    rs <- ranges(ols, ranges(gr), ranges(small.dgv.gr))
+    olf <- width(rs) / width(gr)[queryHits(ols)]
+    x <- ols[olf > 0.5]
+    mcols(gr)$ID <- rep(".", length(gr))
+    ids <- mcols(dgv.gr[subjectHits(x)])$id
+    ids <- tapply(ids, queryHits(x), paste, collapse = '|')
+    small.gr.index <- which(width(gr) <= 500000)
+    mcols(gr)$ID[intersect(as.integer(names(ids)), small.gr.index)] <- ids
+    mcols(gr) <- cbind(mcols(gr), mcols(small.dgv.gr[subjectHits(x)]))
+}
 
 fn <- paste(opt$outDir, "/region_copynum.txt", sep = "")
 write.table(as.data.frame(gr), file = fn, sep = "\t", row.names = F, quote = F)

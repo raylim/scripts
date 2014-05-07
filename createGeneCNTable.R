@@ -140,5 +140,5 @@ if (!is.null(opt$knownVariants)) {
     mcols(gr) <- cbind(mcols(gr), mcols(small.dgv.gr[subjectHits(x)]))
 }
 
-fn <- paste(opt$outDir, "/region_copynum.txt", sep = "")
+fn <- paste(opt$outDir, "/annotated_copynum.txt", sep = "")
 write.table(as.data.frame(gr), file = fn, sep = "\t", row.names = F, quote = F)

@@ -61,12 +61,12 @@ $SIG{TERM} = \&signalHandler;
 my $stat;
 do {
     ($error, my $jobidOut, $stat, $diagnosis) = drmaa_wait($jobid, 10);
-} until ($error == $DRMAA_ERRNO_INVALID_JOB );
+} until ($error != $DRMAA_ERRNO_EXIT_TIMEOUT);
 
-($error, my $exited, $diagnosis) = drmaa_wifexited($stat);
+($error, my $exitStatus, $diagnosis) = drmaa_wexitstatus($stat);
 die drmaa_strerror($error) . "\n" . $diagnosis if $error;
 
 ($error, $diagnosis) = drmaa_exit();
 die drmaa_strerror($error) . "\n" . $diagnosis if $error;
 
-exit $exited;
+exit $exitStatus;

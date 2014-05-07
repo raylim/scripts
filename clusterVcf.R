@@ -18,7 +18,7 @@ if (is.null(opt$outFile)) {
     cat("Need output file\n");
     print_help(parser);
     stop();
-} else if (length(arguments$args) <= 1) {
+} else if (length(arguments$args) < 1) {
     cat("Need vcf files\n");
     print_help(parser);
     stop();
@@ -29,9 +29,16 @@ vcfFile <- arguments$args[1]
 
 vcf <- readVcf(vcfFile, opt$genome)
 gt <- geno(vcf)$GT
+X <- matrix(0, nrow = nrow(gt), ncol = ncol(gt), dimnames = list(rownames(gt), colnames(gt)))
+X[gt == "0/0"] <- 0
+X[gt == "0/1"] <- 1
+X[gt == "1/1"] <- 2
+X[!gt %in% c("0/0", "0/1", "1/1")] <- NA
+plot(hclust(dist(t(X), method = 'manhattan')))
+
 gt <- matrix(as.integer(factor(gt)), nrow = nrow(gt), ncol = ncol(gt), dimnames = list(rownames(gt), colnames(gt)))
 
 png(opt$outFile, height = 900, width = 1000)
-plot(hclust(dist(t(gt))))
+null <- plot(hclust(dist(t(gt)), method = 'ward'))
 dev.off()
 

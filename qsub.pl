@@ -58,11 +58,9 @@ sub signalHandler {
 $SIG{INT} = \&signalHandler;
 $SIG{TERM} = \&signalHandler;
 
-my $jobidOut;
 my $stat;
 do {
-    ($error, $jobidOut, my $st, $diagnosis) = drmaa_wait($jobid, 10);
-    $stat = $st if ($error == $DRMAA_ERRNO_SUCCESS);
+    ($error, my $jobidOut, $stat, $diagnosis) = drmaa_wait($jobid, 10);
 } until ($error == $DRMAA_ERRNO_INVALID_JOB );
 
 ($error, my $exited, $diagnosis) = drmaa_wifexited($stat);

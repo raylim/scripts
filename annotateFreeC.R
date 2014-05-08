@@ -10,6 +10,7 @@ options(warn = -1, error = quote({ traceback(); q('no', status = 1) }))
 
 optList <- list(
                 make_option("--outDir", default = NULL, help = "Output dir"),
+                make_option("--includeChrY", action = 'store_true', default = F, help = "include Y chromosome"),
                 make_option("--knownVariants", default = NULL, help = "known variants file"),
                 make_option("--txdb", default = NULL, help = "txdb"))
 
@@ -24,6 +25,7 @@ if (length(arguments$args) < 1) {
 }
 
 files <- arguments$args;
+
 
 grs <- list()
 tables <- list()

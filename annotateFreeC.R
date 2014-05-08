@@ -14,19 +14,16 @@ optList <- list(
                 make_option("--txdb", default = NULL, help = "txdb"))
 
 parser <- OptionParser(usage = "%prog [options] [list of ratio.txt files]", option_list = optList);
-
 arguments <- parse_args(parser, positional_arguments = T);
 opt <- arguments$options;
-
-arguments <- commandArgs(T);
 
 if (length(arguments$args) < 1) {
     cat("Need input controlFreeC CNV files\n");
     print_help(parser);
     stop();
-} else {
-    files <- arguments$args;
 }
+
+files <- arguments$args;
 
 grs <- list()
 tables <- list()

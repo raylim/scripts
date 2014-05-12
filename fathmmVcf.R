@@ -100,11 +100,11 @@ while(nrow(vcf <- readVcf(tab, genome = opt$genome))) {
     # replace header
     exptData(vcf)$header <- newVcfHeader
     # pre-populate new info fields with NAs
-    infodprime <- info(vcf)
-    infodprime[,"fathmm_query"] <- rep(NA, nrow(infodprime))
-    infodprime[,"fathmm_pred"] <- rep(NA, nrow(infodprime))
-    infodprime[,"fathmm_score"] <- rep(NA, nrow(infodprime))
-    info(vcf) <- infodprime
+    #infodprime <- info(vcf)
+    #infodprime[,"fathmm_query"] <- rep(NA, nrow(infodprime))
+    #infodprime[,"fathmm_pred"] <- rep(NA, nrow(infodprime))
+    #infodprime[,"fathmm_score"] <- rep(NA, nrow(infodprime))
+    #info(vcf) <- infodprime
 
     cat(paste('Chunk', i, "\n"))
     i <- i + 1

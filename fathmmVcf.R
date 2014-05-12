@@ -116,7 +116,9 @@ while(nrow(vcf <- readVcf(tab, genome = opt$genome))) {
 
         cat("Predicting coding from reference...\n")
         vcfPass <- vcf[passIds, ]
-        seqlevels(vcfPass, force = T) <- seqlevels(vcfPass)[-which(!seqlevels(vcfPass) %in% c(1:22, "X", "Y"))]
+        if (any(!seqlevels(vcfPass) %in% seqlevels(txdb))) {
+            seqlevels(vcfPass, force = T) <- seqlevels(vcfPass)[-which(!seqlevels(vcfPass) %in% seqlevels(txdb))]
+        }
         predCod <- predictCoding(vcfPass, txdb, ref)
         #predCod <- predictCoding(vcf[passIds, ], txdb, ref)
         cat(" done\n")

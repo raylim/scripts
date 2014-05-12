@@ -39,8 +39,8 @@ cn <- cn[order(cn[,1], cn[,2]),]
 cn <- cbind(name = paste(cn[,1], cn[,2], sep="_"), cn[,c(1:3,7)])
 
 cgh <- make_cghRaw(cn)
-normalized <- normalize(cgh)
-segmented <- segmentData(normalized, relSDlong=2, undo.splits="sdundo", undo.SD=1.5)
+normalized <- normalize(cgh, smoothOutliers=T, trim=0.025, smooth.region=10, outlier.SD.scale=2.5)
+segmented <- segmentData(normalized, relSDlong=3, undo.splits="sdundo", undo.SD=2, alpha=0.000001, trim=0.025)
 calls <- CGHcall(segmented, nclass=3)
 excalls <- ExpandCGHcall(calls, segmented)
 

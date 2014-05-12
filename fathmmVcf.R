@@ -108,14 +108,19 @@ while(nrow(vcf <- readVcf(tab, genome = opt$genome))) {
 
     cat(paste('Chunk', i, "\n"))
     i <- i + 1
-    passIds <- which(rowData(vcf)$FILTER == "PASS" & seqnames(rowData(vcf)) %in% seqnames(seqinfo(txdb)))
+    passIds <- which(rowData(vcf)$FILTER == "PASS" & seqnames(rowData(vcf)) %in% c(1:22, "X", "Y"))
     if (length(passIds) == 0) {
         cat("No unfiltered variants\n")
     } else {
         cat(length(passIds), "variants pass\n")
 
         cat("Predicting coding from reference...\n")
-        predCod <- predictCoding(vcf[passIds, ], txdb, ref)
+        vcfPass <- vcf[passIds, ]
+        if (any(!seqlevels(vcfPass) %in% seqlevels(txdb))) {
+            seqlevels(vcfPass, force = T) <- seqlevels(vcfPass)[-which(!seqlevels(vcfPass) %in% seqlevels(txdb))]
+        }
+        predCod <- predictCoding(vcfPass, txdb, ref)
+        #predCod <- predictCoding(vcf[passIds, ], txdb, ref)
         cat(" done\n")
 
         if (sum(predCod$CONSEQUENCE == "nonsynonymous") == 0) {

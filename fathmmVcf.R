@@ -56,7 +56,7 @@ if (is.null(opt$ensemblTxdb)) {
 }
 cat('done\n')
 
-ref = FaFile(opt$ref)
+ref <- FaFile(opt$ref)
 
 cat('Connecting to ensembl ... ')
 ensembl = useMart("ensembl") #, host = 'localhost', port = 9000)

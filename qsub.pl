@@ -63,10 +63,20 @@ do {
     ($error, my $jobidOut, $stat, $diagnosis) = drmaa_wait($jobid, 10);
 } until ($error != $DRMAA_ERRNO_EXIT_TIMEOUT);
 
+# pull all exit related codes
 ($error, my $exitStatus, $diagnosis) = drmaa_wexitstatus($stat);
+die drmaa_strerror($error) . "\n" . $diagnosis if $error;
+($error, my $aborted, $diagnosis) = drmaa_wifaborted( $stat );
+die drmaa_strerror($error) . "\n" . $diagnosis if $error;
+($error, my $signaled, $diagnosis ) = drmaa_wifsignaled( $stat );
+die drmaa_strerror($error) . "\n" . $diagnosis if $error;
+($error, my $termsig, $diagnosis) = drmaa_wtermsig( $stat );
+die drmaa_strerror($error) . "\n" . $diagnosis if $error;
+($error, my $coreDumped, $diagnosis ) = drmaa_wcoredump( $stat );
 die drmaa_strerror($error) . "\n" . $diagnosis if $error;
 
 ($error, $diagnosis) = drmaa_exit();
 die drmaa_strerror($error) . "\n" . $diagnosis if $error;
 
-exit $exitStatus;
+
+exit $exitStatus + $aborted + $signaled + $termsig + $coreDumped;

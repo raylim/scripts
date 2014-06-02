@@ -58,11 +58,13 @@ sub signalHandler {
 $SIG{INT} = \&signalHandler;
 $SIG{TERM} = \&signalHandler;
 
+# loop to give a chance to receive sigint/sigterms
 my $stat;
 do {
     ($error, my $jobidOut, $stat, $diagnosis) = drmaa_wait($jobid, 10);
 } until ($error != $DRMAA_ERRNO_EXIT_TIMEOUT);
 
+# pull all exit-related codes
 ($error, my $exitStatus, $diagnosis) = drmaa_wexitstatus($stat);
 die drmaa_strerror($error) . "\n" . $diagnosis if $error;
 ($error, my $aborted, $diagnosis) = drmaa_wifaborted( $stat );

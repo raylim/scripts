@@ -38,7 +38,7 @@ plot(hclust(dist(t(X), method = 'manhattan')))
 
 gt <- matrix(as.integer(factor(gt)), nrow = nrow(gt), ncol = ncol(gt), dimnames = list(rownames(gt), colnames(gt)))
 
-png(opt$outFile, height = 900, width = 1000)
+png(opt$outFile, height = 900, width = 1500)
 null <- plot(hclust(dist(t(gt)), method = 'ward'))
 dev.off()
 

@@ -137,5 +137,5 @@ box()
 legend('top', legend = c("Del", "Loss", "Neutral", "Gain", "Amp"), fill = cols, horiz = T)
 #legend('top', legend = c("deletion", "loss", "neutral", "gain"), fill = cols, horiz = T)
 null <- dev.off()
-
-
+write.table(X, file="~/X.txt", sep="\t", col.names=NA, quote=F)
+save(gr, file="~/gr.RData")

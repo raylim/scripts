@@ -66,9 +66,9 @@ abline(v=cumsum(rle(towrite$Chr)$lengths), col="red", lty=3)
 if (!is.null(opt$centromereFile)) {
     for (j in unique(cen[,1])) {
         pos <- cen[which(cen[,1]==j)[1],3]
-        index <- towrite[which(towrite$Chromosome==j & towrite$Start > pos)[1],1]
+        index <- which(towrite$Chromosome==j & towrite$Start > pos)[1]
         if (!is.na(index)) {
-            abline(v=index, col="grey", lty=3)
+            abline(v=index, col="darkgrey", lty=3)
         }
         text(cumsum(rle(towrite$Chromosome)$lengths)-((rle(towrite$Chromosome)$lengths)/2), ylim[2]-0.25)
     }

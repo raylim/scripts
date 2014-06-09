@@ -3,6 +3,7 @@
 
 suppressPackageStartupMessages(library("optparse"));
 suppressPackageStartupMessages(library("VariantAnnotation"));
+suppressPackageStartupMessages(library("gplots"));
 
 options(error = quote(dump.frames("testdump", TRUE)))
 

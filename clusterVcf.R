@@ -46,6 +46,6 @@ dev.off()
 
 fn <- paste(opt$outPrefix, ".heatmap.png", sep = '')
 png(fn, height = 3000, width = 3000)
-null <- heatmap.2(as.matrix(dist(t(gt))), scale = 'none', trace = 'none', keysize = 0.7)
+null <- heatmap.2(as.matrix(dist(t(gt))), scale = 'none', trace = 'none', keysize = 0.3)
 dev.off()
 

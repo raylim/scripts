@@ -14,8 +14,8 @@ parser <- OptionParser(usage = "%prog vcf.files", option_list = optList);
 arguments <- parse_args(parser, positional_arguments = T);
 opt <- arguments$options;
 
-if (is.null(opt$outFile)) {
-    cat("Need output file\n");
+if (is.null(opt$outPrefix)) {
+    cat("Need output prefix\n");
     print_help(parser);
     stop();
 } else if (length(arguments$args) < 1) {

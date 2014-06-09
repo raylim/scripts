@@ -8,7 +8,7 @@ options(error = quote(dump.frames("testdump", TRUE)))
 
 optList <- list(
                 make_option("--genome", default = 'hg19', help = "genome build [default %default]"),
-                make_option("--outFile", default = NULL, help = "output file [default %default]"))
+                make_option("--outPrefix", default = NULL, help = "output prefix [default %default]"))
 
 parser <- OptionParser(usage = "%prog vcf.files", option_list = optList);
 arguments <- parse_args(parser, positional_arguments = T);
@@ -38,7 +38,13 @@ plot(hclust(dist(t(X), method = 'manhattan')))
 
 gt <- matrix(as.integer(factor(gt)), nrow = nrow(gt), ncol = ncol(gt), dimnames = list(rownames(gt), colnames(gt)))
 
-png(opt$outFile, height = 900, width = 1000)
+fn <- paste(opt$outPrefix, ".clust.png", sep = '')
+png(fn, height = 900, width = 1000)
 null <- plot(hclust(dist(t(gt)), method = 'ward'))
+dev.off()
+
+fn <- paste(opt$outPrefix, ".heatmap.png", sep = '')
+png(fn, height = 1000, width = 1000)
+null <- heatmap.2(as.matrix(dist(t(gt))), scale = 'none', trace = 'none')
 dev.off()
 

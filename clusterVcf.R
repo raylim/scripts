@@ -44,8 +44,8 @@ png(fn, height = 900, width = 1500)
 null <- plot(hclust(dist(t(gt)), method = 'ward'))
 dev.off()
 
-fn <- paste(opt$outPrefix, ".heatmap.png", sep = '')
-png(fn, height = 3000, width = 3000)
-null <- heatmap.2(as.matrix(dist(t(gt))), scale = 'none', trace = 'none', keysize = 0.3)
+fn <- paste(opt$outPrefix, ".heatmap.pdf", sep = '')
+pdf(fn, height = 30, width = 30)
+null <- heatmap.2(as.matrix(dist(t(gt))), scale = 'none', trace = 'none', keysize = 0.3, cexRow = 2, cexCol = 2)
 dev.off()
 

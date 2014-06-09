@@ -45,7 +45,7 @@ null <- plot(hclust(dist(t(gt)), method = 'ward'))
 dev.off()
 
 fn <- paste(opt$outPrefix, ".heatmap.png", sep = '')
-png(fn, height = 1000, width = 1000)
+png(fn, height = 2000, width = 2000)
 null <- heatmap.2(as.matrix(dist(t(gt))), scale = 'none', trace = 'none')
 dev.off()
 

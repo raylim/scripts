@@ -40,7 +40,7 @@ plot(hclust(dist(t(X), method = 'manhattan')))
 gt <- matrix(as.integer(factor(gt)), nrow = nrow(gt), ncol = ncol(gt), dimnames = list(rownames(gt), colnames(gt)))
 
 fn <- paste(opt$outPrefix, ".clust.png", sep = '')
-png(fn, height = 900, width = 1500)
+png(fn, height = 900, width = 1500, type = 'cairo')
 null <- plot(hclust(dist(t(gt)), method = 'ward'))
 dev.off()
 

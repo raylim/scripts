@@ -31,44 +31,52 @@ my @bamFiles = @ARGV;
 
 my $tmpBed = File::Temp->new(SUFFIX => '.bed');
 open IN, $cpaFile;
-my %chromPosAlts;
-my @cpaKeys;
+my $chromPosAlts = {};
 while (<IN>) {
     chomp;
-    my @F = split "\t";
-    print $tmpBed $F[0] . "\t" . ($F[1] - 1) . "\n";
-    my $cp = join ":", ($F[0], $F[1]);
-    push @{$chromPosAlts{$cp}}, uc($F[2]);
-    push @cpaKeys, join(":", @F);
+    my ($chrom, $pos, $alt) = split "\t";
+    $chromPosAlts->{$chrom} = {} unless exists $chromPosAlts->{$chrom};
+    $chromPosAlts->{$chrom}->{$pos} = [] unless exists $chromPosAlts->{$alt};
+    push @{$chromPosAlts->{$chrom}->{$pos}}, uc($alt);
 }
 close IN;
 
-my %af;
-my %dp;
+my $af = {};
+my $dp = {};
 my @names;
 for my $bamFile (@bamFiles) {
-    my $tmp = File::Temp->new();
-    my $sys = "$samtools mpileup -l $tmpBed -f $opt{f} $bamFile > $tmp";
-    print $sys . "\n";
-    system("$sys") == 0 or die "samtools failed : $?"; 
     my $n = $bamFile;
     $n =~ s/.*\///;
     $n =~ s/\..*//;
     push @names, $n;
-
-    $dp{$n} = {};
-    $af{$n} = {};
-    my $i = 0;
-    while (<$tmp>) {
-        print;
-        chomp;
-        my @F = split /\t/;
-        my $cov = $F[3];
-        my $readBases = uc $F[4];
-        for my $alt (@{$chromPosAlts{$cp}}) {
-            my $nAlt = $readBases =~ tr/$alt//;
-            $dp{$n}->{$cpa}, $cov;
-            $af{$n}->{$cpa}, $nAlt / $cov;
+    $dp->{$n} = {};
+    $af->{$n} = {};
+    for my $chrom (keys %{$chromPosAlts}) {
+        $dp->{$n}->{$chrom} = {};
+        $af->{$n}->{$chrom} = {};
+        for my $pos (keys %{$chromPosAlts->{$chrom}}) {
+            $dp->{$n}->{$chrom}->{$pos} = {};
+            $af->{$n}->{$chrom}->{$pos} = {};
+            my $region = "$chrom:$pos-$pos";
+            my @lines = `$samtools mpileup -r $region -f $opt{f} $bamFile 2> /dev/null`;
+            if (@lines == 0) {
+                # no sam output
+                for my $alt (@{$chromPosAlts->{$chrom}->{$pos}}) {
+                    $dp->{$n}->{$chrom}->{$pos}->{$alt} = 0;
+                    $af->{$n}->{$chrom}->{$pos}->{$alt} = 0;
+                }
+            } else {
+                my $samOut = $lines[0];
+                chomp $samOut;
+                my @F = split /\t/, $samOut;
+                my $cov = $F[3];
+                my $readBases = uc $F[4];
+                for my $alt (@{$chromPosAlts->{$chrom}->{$pos}}) {
+                    my $nAlt = $readBases =~ tr/$alt//;
+                    $dp->{$n}->{$chrom}->{$pos}->{$alt} = $cov;
+                    $af->{$n}->{$chrom}->{$pos}->{$alt} = $nAlt / $cov;
+                }
+            }
         }
     }
 }
@@ -76,20 +84,21 @@ for my $bamFile (@bamFiles) {
 open DP, ">$opt{o}.dp.txt";
 open AF, ">$opt{o}.af.txt";
 
-print "chromPosAlt\t" . join("\t", @names) . "\n";
-for my $cpa (@cpaKeys) {
-    print DP "$cpa";
-    print AF "$cpa\t";
-    for my $n (@names) {
-        my $d = (exists $dp{$n}->{$cpa})? $dp{$n}->${cpa} : 0;
-        my $a = (exists $af{$n}->{$cpa})? $af{$n}->${cpa} : 0;
-        print DP "\t$d";
-        print AF "\t$a";
+print DP "CHROM\tPOS\tALT\t" . join("\t", @names) . "\n";
+print AF "CHROM\tPOS\tALT\t" . join("\t", @names) . "\n";
+for my $chrom (keys %{$chromPosAlts}) {
+    for my $pos (keys %{$chromPosAlts->{$chrom}}) {
+        for my $alt (@{$chromPosAlts->{$chrom}->{$pos}}) {
+            print DP "$chrom\t$pos\t$alt";
+            print AF "$chrom\t$pos\t$alt";
+            for my $n (@names) {
+                print DP "\t" . $dp->{$n}->{$chrom}->{$pos}->{$alt};
+                print AF "\t" . $af->{$n}->{$chrom}->{$pos}->{$alt};
+            }
+            print DP "\n";
+            print AF "\n";
+        }
     }
-    print DP "\n";
-    print AF "\n";
 }
-
 close DP;
 close AF;
-

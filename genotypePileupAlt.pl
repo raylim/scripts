@@ -37,7 +37,7 @@ my $i = 0;
 while (<IN>) {
     chomp;
     my @F = split /\t/;
-    print $tmpBed $F[0] . "\t" . $F[1] - 1;
+    print $tmpBed $F[0] . "\t" . $F[1] - 1 . "\n";
     $chromPosAlts[$i] = join "\t", ($F[0], $F[1], $F[2]);
     $alts[$i] = $F[2];
     $i++;

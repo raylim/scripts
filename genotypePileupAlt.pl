@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use FIle::Temp qw/ tempfile tempdir /;
+use File::Temp qw/ tempfile tempdir /;
 
 use Getopt::Std;
 

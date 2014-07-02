@@ -60,6 +60,7 @@ for my $bamFile (@bamFiles) {
     $af{$n} = [];
     my $i = 0;
     while (<$tmp>) {
+        print;
         chomp;
         my @F = split /\t/;
         my $cov = $F[3];

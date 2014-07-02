@@ -54,17 +54,18 @@ for my $bamFile (@bamFiles) {
     $n =~ s/\..*//;
     push @names, $n;
 
+    $dp{$n} = [];
+    $af{$n} = [];
     my $i = 0;
     while (<$tmp>) {
         chomp;
         my @F = split /\t/;
         my $cov = $F[3];
         my $readBases = uc $F[4];
-        my $alt = uc $alts[$i];
+        my $alt = uc $alts[$i++];
         my $nAlt = $readBases =~ tr/$alt//;
-        my $dp{$n}[$i] = $cov;
-        my $af{$n}[$i] = $nAlt / $cov;
-        $i++;
+        push @{$dp{$n}}, $cov;
+        push @{$af{$n}}, $nAlt / $cov;
     }
 }
 
@@ -74,8 +75,8 @@ open AF, ">$opt{o}.af.txt";
 print "CHROM\tPOS\tALT\t" . join("\t", @names) . "\n";
 for my $n (@names) {
     for my $i (0 .. $#alts) {
-        print DP $chromPosAlt[$i] . "\t" . $dp{$n}[$i] . "\n";
-        print AF $chromPosAlt[$i] . "\t" . $af{$n}[$i] . "\n";
+        print DP $chromPosAlt[$i] . "\t" . $dp{$n}->[$i] . "\n";
+        print AF $chromPosAlt[$i] . "\t" . $af{$n}->[$i] . "\n";
     }
 }
 

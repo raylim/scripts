@@ -75,8 +75,8 @@ open AF, ">$opt{o}.af.txt";
 print "CHROM\tPOS\tALT\t" . join("\t", @names) . "\n";
 for my $n (@names) {
     for my $i (0 .. $#alts) {
-        print DP $chromPosAlt[$i] . "\t" . $dp{$n}->[$i] . "\n";
-        print AF $chromPosAlt[$i] . "\t" . $af{$n}->[$i] . "\n";
+        print DP $chromPosAlts[$i] . "\t" . $dp{$n}->[$i] . "\n";
+        print AF $chromPosAlts[$i] . "\t" . $af{$n}->[$i] . "\n";
     }
 }
 

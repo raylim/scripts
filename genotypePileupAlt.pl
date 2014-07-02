@@ -60,7 +60,7 @@ for my $bamFile (@bamFiles) {
         my @F = split /\t/;
         my $cov = $F[3];
         my $readBases = uc $F[4];
-        my $alt = uc $alts[$i++];
+        my $alt = uc $alts[$i];
         my $nAlt = $readBases =~ tr/$alt//;
         my $dp{$n}[$i] = $cov;
         my $af{$n}[$i] = $nAlt / $cov;

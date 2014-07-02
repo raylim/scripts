@@ -49,8 +49,8 @@ my %dp;
 my @names;
 for my $bamFile (@bamFiles) {
     my $tmp = File::Temp->new();
-    system("$samtools mpileup -r $tmpBed->filename -f $opt{f} $bamFile > $tmp->filename")
-        or die "samtools failed : $?"; 
+    my $sys = "$samtools mpileup -r $tmpBed->filename -f $opt{f} $bamFile > $tmp->filename"
+    system("$sys") or die "samtools failed : $?"; 
     my $n = $bamFile;
     $n =~ s/.*\///;
     $n =~ s/\..*//;

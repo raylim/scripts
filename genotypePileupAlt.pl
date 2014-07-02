@@ -31,16 +31,15 @@ my @bamFiles = @ARGV;
 
 my $tmpBed = File::Temp->new(SUFFIX => '.bed');
 open IN, $cpaFile;
-my @alts;
-my @chromPosAlts;
-my $i = 0;
+my %chromPosAlts;
+my @cpaKeys;
 while (<IN>) {
     chomp;
     my @F = split "\t";
     print $tmpBed $F[0] . "\t" . ($F[1] - 1) . "\n";
-    $chromPosAlts[$i] = join "\t", ($F[0], $F[1], $F[2]);
-    $alts[$i] = $F[2];
-    $i++;
+    my $cp = join ":", ($F[0], $F[1]);
+    push @{$chromPosAlts{$cp}}, uc($F[2]);
+    push @cpaKeys, join(":", @F);
 }
 close IN;
 
@@ -57,8 +56,8 @@ for my $bamFile (@bamFiles) {
     $n =~ s/\..*//;
     push @names, $n;
 
-    $dp{$n} = [];
-    $af{$n} = [];
+    $dp{$n} = {};
+    $af{$n} = {};
     my $i = 0;
     while (<$tmp>) {
         print;
@@ -66,22 +65,29 @@ for my $bamFile (@bamFiles) {
         my @F = split /\t/;
         my $cov = $F[3];
         my $readBases = uc $F[4];
-        my $alt = uc $alts[$i++];
-        my $nAlt = $readBases =~ tr/$alt//;
-        push @{$dp{$n}}, $cov;
-        push @{$af{$n}}, $nAlt / $cov;
+        for my $alt (@{$chromPosAlts{$cp}}) {
+            my $nAlt = $readBases =~ tr/$alt//;
+            $dp{$n}->{$cpa}, $cov;
+            $af{$n}->{$cpa}, $nAlt / $cov;
+        }
     }
 }
 
 open DP, ">$opt{o}.dp.txt";
 open AF, ">$opt{o}.af.txt";
 
-print "CHROM\tPOS\tALT\t" . join("\t", @names) . "\n";
-for my $n (@names) {
-    for my $i (0 .. $#alts) {
-        print DP $chromPosAlts[$i] . "\t" . $dp{$n}->[$i] . "\n";
-        print AF $chromPosAlts[$i] . "\t" . $af{$n}->[$i] . "\n";
+print "chromPosAlt\t" . join("\t", @names) . "\n";
+for my $cpa (@cpaKeys) {
+    print DP "$cpa";
+    print AF "$cpa\t";
+    for my $n (@names) {
+        my $d = (exists $dp{$n}->{$cpa})? $dp{$n}->${cpa} : 0;
+        my $a = (exists $af{$n}->{$cpa})? $af{$n}->${cpa} : 0;
+        print DP "\t$d";
+        print AF "\t$a";
     }
+    print DP "\n";
+    print AF "\n";
 }
 
 close DP;

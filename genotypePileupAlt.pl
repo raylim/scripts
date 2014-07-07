@@ -72,10 +72,12 @@ for my $chrom (keys %{$chromPosAlts}) {
                     my $samOut = $lines[0];
                     chomp $samOut;
                     my @F = split /\t/, $samOut;
-                    $dp = $F[3];
-                    my $readBases = uc $F[4];
-                    my $nAlt = $readBases =~ tr/$alt//;
-                    $af = $nAlt / $dp if ($dp > 0);
+                    if (@F > 5) {
+                        $dp = $F[3];
+                        my $readBases = uc $F[4];
+                        my $nAlt = $readBases =~ tr/$alt//;
+                        $af = $nAlt / $dp if ($dp > 0);
+                    }
                 }
                 print AF "\t$af";
                 print DP "\t$dp";

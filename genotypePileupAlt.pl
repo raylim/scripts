@@ -17,7 +17,7 @@ Usage: genotypePileupAlt.pl -o [output prefix] -s [samtools] -f [ref fasta file]
 -h: this help message
 -s: samtools binary to use
 -f: reference file
--o: output prefix for depth, alt depth, and af
+-o: output prefix for depth and af
 ENDL
 
 print "Missing ref fasta\n" and HELP_MESSAGE() unless $opt{f};
@@ -29,63 +29,72 @@ $samtools = $opt{s} if $opt{s};
 my $cpaFile = shift @ARGV;
 my @bamFiles = @ARGV;
 
-my $tmpBed = File::Temp->new(SUFFIX => '.bed');
+my $tmpBed = File::Temp->new();
 open IN, $cpaFile;
 my $chromPosAlts = {};
 while (<IN>) {
     chomp;
     my ($chrom, $pos, $alt) = split "\t";
     $chromPosAlts->{$chrom} = {} unless exists $chromPosAlts->{$chrom};
-    $chromPosAlts->{$chrom}->{$pos} = [] unless exists $chromPosAlts->{$alt};
+    $chromPosAlts->{$chrom}->{$pos} = [] unless exists $chromPosAlts->{$chrom}->{$pos};
     push @{$chromPosAlts->{$chrom}->{$pos}}, uc($alt);
 }
 close IN;
 
+my $adp = {};
+my $dp = {};
 my @names;
 for my $bamFile (@bamFiles) {
     my $n = $bamFile;
     $n =~ s/.*\///;
     $n =~ s/\..*//;
     push @names, $n;
+    $dp->{$n} = {};
+    $adp->{$n} = {};
+
+    print "$samtools view -L $cpaFile -f $opt{f} -b $bamFile | $samtools mpileup -d 20000 -BQ0 -l $cpaFile -f $opt{f} - 2> /dev/null\n";
+    my @lines = `$samtools view -L $cpaFile -f $opt{f} -b $bamFile | $samtools mpileup -d 20000 -BQ0 -l $cpaFile -f $opt{f} - 2> /dev/null`;
+    for my $line (@lines) {
+        chomp $line;
+        my @F = split /\t/, $line;
+        next if (scalar(@F) != 6);
+        my $chrom = $F[0];
+        my $pos = $F[1];
+        for my $alt (@{$chromPosAlts->{$chrom}->{$pos}}) {
+            my $cov = length($F[4]);
+            my $readBases = uc $F[4];
+            my $nAlt = $readBases =~ tr/$alt//;
+            $dp->{$n}->{$chrom}->{$pos}->{$alt} = $cov;
+            $adp->{$n}->{$chrom}->{$pos}->{$alt} = $nAlt;
+        }
+    }
 }
 
 open DP, ">$opt{o}.dp.txt";
+open ADP, ">$opt{o}.adp.txt";
 open AF, ">$opt{o}.af.txt";
-open ADP, ">$opt{o}.altdp.txt";
 
 print DP "CHROM\tPOS\tALT\t" . join("\t", @names) . "\n";
 print ADP "CHROM\tPOS\tALT\t" . join("\t", @names) . "\n";
 print AF "CHROM\tPOS\tALT\t" . join("\t", @names) . "\n";
 for my $chrom (keys %{$chromPosAlts}) {
     for my $pos (keys %{$chromPosAlts->{$chrom}}) {
-        my $region = "$chrom:$pos-$pos";
         for my $alt (@{$chromPosAlts->{$chrom}->{$pos}}) {
-            print ADP "$chrom\t$pos\t$alt";
             print DP "$chrom\t$pos\t$alt";
+            print ADP "$chrom\t$pos\t$alt";
             print AF "$chrom\t$pos\t$alt";
-            for my $bamFile (@bamFiles) {
+            for my $n (@names) {
+                my $cov = 0;
                 my $nAlt = 0;
-                my $dp = 0;
-                my $af = 0;
-                my @lines = `$samtools mpileup -r $region -f $opt{f} $bamFile 2> /dev/null`;
-                if (@lines != 0) {
-                    my $samOut = $lines[0];
-                    chomp $samOut;
-                    my @F = split /\t/, $samOut;
-                    if (@F > 5) {
-                        $dp = $F[3];
-                        my $readBases = uc $F[4];
-                        my $nAlt = $readBases =~ tr/$alt//;
-                        $af = $nAlt / $dp if ($dp > 0);
-                    }
-                }
-                print AF "\t$af";
-                print DP "\t$dp";
+                $cov = $dp->{$n}->{$chrom}->{$pos}->{$alt} if (exists $dp->{$n}->{$chrom}->{$pos}->{$alt});
+                $nAlt = $adp->{$n}->{$chrom}->{$pos}->{$alt} if (exists $adp->{$n}->{$chrom}->{$pos}->{$alt});
+                print DP "\t$cov";
                 print ADP "\t$nAlt";
+                print AF "\t" . (($cov > 0)? $nAlt / $cov : 0);
             }
-            print AF "\n";
             print DP "\n";
             print ADP "\n";
+            print AF "\n";
         }
     }
 }

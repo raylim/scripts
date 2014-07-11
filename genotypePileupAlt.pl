@@ -68,7 +68,7 @@ for my $bamFile (@bamFiles) {
             $dp->{$n}->{$chrom}->{$pos}->{$alt} = $cov;
             $adp->{$n}->{$chrom}->{$pos}->{$alt} = $nAlt;
         }
-        print "Processed $i loci" if ++$i % 200 == 0;
+        print "Processed $i loci\n" if ++$i % 1000 == 0;
     }
 }
 

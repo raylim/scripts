@@ -53,10 +53,11 @@ for my $bamFile (@bamFiles) {
     $adp->{$n} = {};
 
     print "$samtools view -L $cpaFile -f $opt{f} -b $bamFile | $samtools mpileup -d 20000 -BQ0 -l $cpaFile -f $opt{f} - 2> /dev/null\n";
-    my @lines = `$samtools view -L $cpaFile -f $opt{f} -b $bamFile | $samtools mpileup -d 20000 -BQ0 -l $cpaFile -f $opt{f} - 2> /dev/null`;
-    for my $line (@lines) {
-        chomp $line;
-        my @F = split /\t/, $line;
+    open SAM, "|$samtools view -L $cpaFile -f $opt{f} -b $bamFile | $samtools mpileup -d 20000 -BQ0 -l $cpaFile -f $opt{f} - 2> /dev/null";
+    my $i = 0;
+    while (<SAM>) {
+        chomp;
+        my @F = split /\t/;
         next if (scalar(@F) != 6);
         my $chrom = $F[0];
         my $pos = $F[1];
@@ -67,6 +68,7 @@ for my $bamFile (@bamFiles) {
             $dp->{$n}->{$chrom}->{$pos}->{$alt} = $cov;
             $adp->{$n}->{$chrom}->{$pos}->{$alt} = $nAlt;
         }
+        print "Processed $i loci" if ++$i % 1000 == 0;
     }
 }
 

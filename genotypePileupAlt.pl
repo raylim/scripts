@@ -53,7 +53,7 @@ for my $bamFile (@bamFiles) {
     $adp->{$n} = {};
 
     print "$samtools view -L $cpaFile -f $opt{f} -b $bamFile | $samtools mpileup -d 20000 -BQ0 -l $cpaFile -f $opt{f} - 2> /dev/null\n";
-    open SAM, "$samtools view -L $cpaFile -f $opt{f} -b $bamFile | $samtools mpileup -d 20000 -BQ0 -l $cpaFile -f $opt{f} - 2> /dev/null | " || die "Can't open $bamFile: $!";
+    open SAM, "$samtools view -L $cpaFile -f $opt{f} -b $bamFile | $samtools mpileup -d 20000 -BQ0 -l $cpaFile -f $opt{f} - 2> /dev/null |" || die "Can't open $bamFile: $!";
     my $i = 0;
     while (<SAM>) {
         chomp;
@@ -64,7 +64,8 @@ for my $bamFile (@bamFiles) {
         for my $alt (@{$chromPosAlts->{$chrom}->{$pos}}) {
             my $cov = length($F[4]);
             my $readBases = uc $F[4];
-            my $nAlt = $readBases =~ tr/$alt//;
+            my $nAlt = eval "\$readBases =~ tr/$alt//";
+            #print "$alt : $nAlt : $readBases\n";
             $dp->{$n}->{$chrom}->{$pos}->{$alt} = $cov;
             $adp->{$n}->{$chrom}->{$pos}->{$alt} = $nAlt;
         }

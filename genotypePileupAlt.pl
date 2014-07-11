@@ -53,7 +53,7 @@ for my $bamFile (@bamFiles) {
     $adp->{$n} = {};
 
     print "$samtools view -L $cpaFile -f $opt{f} -b $bamFile | $samtools mpileup -d 20000 -BQ0 -l $cpaFile -f $opt{f} - 2> /dev/null\n";
-    open SAM, "|$samtools view -L $cpaFile -f $opt{f} -b $bamFile | $samtools mpileup -d 20000 -BQ0 -l $cpaFile -f $opt{f} - 2> /dev/null";
+    open SAM, "$samtools view -L $cpaFile -f $opt{f} -b $bamFile | $samtools mpileup -d 20000 -BQ0 -l $cpaFile -f $opt{f} - 2> /dev/null | " || die "Can't open $bamFile: $!";
     my $i = 0;
     while (<SAM>) {
         chomp;
@@ -68,7 +68,7 @@ for my $bamFile (@bamFiles) {
             $dp->{$n}->{$chrom}->{$pos}->{$alt} = $cov;
             $adp->{$n}->{$chrom}->{$pos}->{$alt} = $nAlt;
         }
-        print "Processed $i loci" if ++$i % 1000 == 0;
+        print "Processed $i loci" if ++$i % 200 == 0;
     }
 }
 

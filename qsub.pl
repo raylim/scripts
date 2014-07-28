@@ -10,10 +10,11 @@ use Cwd;
 
 use Getopt::Std;
 my %opt;
-getopts('h', \%opt);
+getopts('ho:', \%opt);
 
 my $usage = <<ENDL;
 Usage: perl qsub.pl -h -- [qsub args]
+    -o [file]: check file for non-zero size
 ENDL
 
 sub HELP_MESSAGE {
@@ -77,5 +78,8 @@ die drmaa_strerror($error) . "\n" . $diagnosis if $error;
 ($error, $diagnosis) = drmaa_exit();
 die drmaa_strerror($error) . "\n" . $diagnosis if $error;
 
+if ($opt{o} && (!-e $opt{o} || !-s $opt{o})) {
+    die "Output file is size 0";
+}
 
 exit $exitStatus + $aborted + $signaled + $coreDumped;

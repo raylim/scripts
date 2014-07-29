@@ -62,5 +62,22 @@ if (!is.null(opt$centromereFile)) {
 }
 dev.off()
 
+png(paste(opt$prefix,".seg_plot.png", sep=""), type = 'cairo-png', height=400, width=2000)
+plot(as.numeric(Data$log2_ratio), pch=20, xlab='Position', ylab="Copy number", xaxt='n', ylim=ylim)
+abline(v=cumsum(rle(Data$Chr)$lengths), col="red", lty=3)
+
+if (!is.null(opt$centromereFile)) {
+    cen <- read.table(opt$centromereFile, sep = '\t')
+    for (j in unique(cen[,1])) {
+        pos <- cen[which(cen[,1]==j)[1],3]
+        index <- which(Data$Chromosome==j & Data$Start > pos)[1]
+        if (!is.na(index)) {
+            abline(v=index, col="darkgrey", lty=3)
+        }
+        text(cumsum(rle(Data$Chromosome)$lengths)-((rle(Data$Chromosome)$lengths)/2), ylim[2]-0.25)
+    }
+}
+dev.off()
+
 
 

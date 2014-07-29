@@ -38,7 +38,7 @@ excalls <- ExpandCGHcall(calls, segmented)
 Data <- cbind(fData(excalls), copynumber(excalls), segmented(excalls), calls(excalls))
 colnames(Data)[5:6] <- c("log2_ratio_seg", "Calls")
 
-write.table(Data, file = paste(opt$prefix, ".cgh_calls.txt", sep=""), col.names=NA, quote=F, sep="\t")
+write.table(Data, file = paste(opt$prefix, ".cgh_call.txt", sep=""), col.names=NA, quote=F, sep="\t")
 
 
 colours <- Data$Calls

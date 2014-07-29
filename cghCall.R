@@ -27,7 +27,6 @@ if (length(arguments$args) != 1) {
 }
 
 if (!is.null(opt$centromereFile)) {
-    cen <- read.table(opt$centromereFile, sep = '\t')
 }
 
 load(segFile)
@@ -55,6 +54,7 @@ plot(as.numeric(Data$log2_ratio), pch=20, xlab='Position', ylab="Copy number", x
 abline(v=cumsum(rle(Data$Chr)$lengths), col="red", lty=3)
 
 if (!is.null(opt$centromereFile)) {
+    cen <- read.table(opt$centromereFile, sep = '\t')
     for (j in unique(cen[,1])) {
         pos <- cen[which(cen[,1]==j)[1],3]
         index <- which(Data$Chromosome==j & Data$Start > pos)[1]

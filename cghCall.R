@@ -19,14 +19,11 @@ if (length(arguments$args) != 1) {
     print_help(parser);
     stop();
 } else if (is.null(opt$prefix)) {
-    cat("Need output prefix\n\n");
+    cat("Need output prefix\n\e");
     print_help(parser);
     stop();
 } else {
     segFile <- arguments$args[1];
-}
-
-if (!is.null(opt$centromereFile)) {
 }
 
 load(segFile)

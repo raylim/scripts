@@ -19,7 +19,7 @@ if (length(arguments$args) != 1) {
     print_help(parser);
     stop();
 } else if (is.null(opt$prefix)) {
-    cat("Need output prefix\n\e");
+    cat("Need output prefix\n\n");
     print_help(parser);
     stop();
 } else {

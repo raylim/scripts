@@ -75,5 +75,5 @@ fn <- paste(opt$outPrefix, ".loh.png", sep = "")
 cat("Plotting to", fn, "\n")
 png(filename = fn, res = 70, width = 2000,
     height = 1200, pointsize = 16, type = "cairo-png")
-do.plot.loh(loh, normal = normal, tumor = tumor, method = opt$cbsLohMethod, plot.style = "baf")
+do.plot.loh(loh, normal = normal, tumor = tumor, method = opt$cbsLohMethod, plot.style = "dev")
 dev.off()

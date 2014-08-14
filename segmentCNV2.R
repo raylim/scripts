@@ -46,7 +46,7 @@ write.table(Data, file = paste(opt$prefix, ".seg.txt", sep=""), col.names=NA, qu
 ylim <- c(min(as.numeric(Data$log2_ratio)), max(as.numeric(Data$log2_ratio)))
 ylim[2] <- ylim[2]+0.5
 pdf(paste(opt$prefix,".seg_plot.pdf", sep=""), height=5, width=18)
-plot(as.numeric(Data$log2_ratio), pch=20, xlab='Position', ylab="Copy number", xaxt='n', ylim=ylim)
+plot(as.numeric(Data[,4]), pch=20, xlab='Position', ylab="Copy number", xaxt='n', ylim=ylim)
 abline(v=cumsum(rle(Data$Chr)$lengths), col="red", lty=3)
 
 if (!is.null(opt$centromereFile)) {
@@ -63,7 +63,7 @@ if (!is.null(opt$centromereFile)) {
 dev.off()
 
 png(paste(opt$prefix,".seg_plot.png", sep=""), type = 'cairo-png', height=400, width=2000)
-plot(as.numeric(Data$log2_ratio), pch=20, xlab='Position', ylab="Copy number", xaxt='n', ylim=ylim)
+plot(as.numeric(Data[,4]), pch=20, xlab='Position', ylab="Copy number", xaxt='n', ylim=ylim)
 abline(v=cumsum(rle(Data$Chr)$lengths), col="red", lty=3)
 
 if (!is.null(opt$centromereFile)) {

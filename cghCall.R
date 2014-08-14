@@ -47,7 +47,7 @@ colours[which(colours==-2)] <- "red"
 ylim <- c(min(as.numeric(Data$log2_ratio)), max(as.numeric(Data$log2_ratio)))
 ylim[2] <- ylim[2]+0.5
 pdf(paste(opt$prefix,".seg_call_plot.pdf", sep=""), height=5, width=18)
-plot(as.numeric(Data$log2_ratio), pch=20, xlab='Position', ylab="Copy number", xaxt='n', col = colours, ylim=ylim)
+plot(as.numeric(Data[,4]), pch=20, xlab='Position', ylab="Copy number", xaxt='n', col = colours, ylim=ylim)
 abline(v=cumsum(rle(Data$Chr)$lengths), col="red", lty=3)
 
 if (!is.null(opt$centromereFile)) {

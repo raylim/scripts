@@ -27,11 +27,11 @@ if (length(arguments$args) < 1) {
 }
 args <- commandArgs()
 
-ratio <- data.frame(read.table(arguments$args[1], header = T))
+ratio <- read.table(arguments$args[1], header = T)
 
 ploidy <- opt$ploidy
 
-png(filename = paste(args[5],".png",sep = ""), width = 1180, height = 1180,
+png(opt$outFile, width = 1180, height = 1180,
     units = "px", pointsize = 20, bg = "white", res = NA, type = 'cairo-png')
 
 maxLevelToPlot <- 3
@@ -87,5 +87,4 @@ if (!is.null(opt$centromereTable)) {
     abline(v = cmPos + os[-length(os)], col = 'darkgrey', lty = 3)
 }
 
-
-dev.off()
+null <- dev.off()

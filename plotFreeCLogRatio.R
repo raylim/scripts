@@ -87,5 +87,4 @@ if (!is.null(opt$centromereTable)) {
     abline(v = cmPos + os[-length(os)], col = 'darkgrey', lty = 3)
 }
 
-
-dev.off()
+null <- dev.off()

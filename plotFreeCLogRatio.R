@@ -27,7 +27,7 @@ if (length(arguments$args) < 1) {
 }
 args <- commandArgs()
 
-ratio <- data.frame(read.table(args$arguments[1], header = T))
+ratio <- data.frame(read.table(arguments$args[1], header = T))
 
 ploidy <- opt$ploidy
 

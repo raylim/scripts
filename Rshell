@@ -36,7 +36,7 @@ while getopts "e:sm:n:l:p:" opt; do
   esac
 done
 
-if [[ -n "$PARALLEL" ]]; then
+if [[ $PARALLEL -gt 1 ]]; then
     PE="-pe smp $PARALLEL"
 fi
  

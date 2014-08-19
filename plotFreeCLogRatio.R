@@ -31,7 +31,7 @@ ratio <- read.table(arguments$args[1], header = T)
 
 ploidy <- opt$ploidy
 
-png(opt$outFile, width = 2000, height = 1000,
+png(opt$outFile, width = 1000, height = 500,
     units = "px", pointsize = 20, bg = "white", res = NA, type = 'cairo-png')
 
 maxLevelToPlot <- 3

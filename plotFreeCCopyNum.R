@@ -97,7 +97,7 @@ X[X > 4] <- 4
 #chrstart <- seqnames(gr)
 
 
-cols <- c('black', 'blue', 'white', 'red', 'green')
+cols <- c('Red', 'Darkred', 'white', 'Darkgreen', 'green')
 rng <- range(X)
 cols <- cols[(rng[1]:rng[2])+1]
 fn <- paste(opt$outPrefix, ".large.png", sep = '')

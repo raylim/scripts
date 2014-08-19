@@ -57,18 +57,20 @@ xx <- rle(as.character(ratio$Chromosome))
 os <- c(0, cumsum(as.numeric(ratio$Start[cumsum(xx$lengths)])))
 names(os) <- xx$values
 x <- ratio$Start + os[as.character(ratio$Chromosome)]
-plot(x, ratio$Ratio * ploidy, ylim = c(0, maxLevelToPlot*ploidy), xlab = "position", ylab = "normalized copy number profile",pch = ".",col = colors()[88], xaxt = 'n')
+plot(x, ratio$Ratio * ploidy, ylim = c(0, maxLevelToPlot*ploidy), xlab = "position", ylab = "normalized copy number profile",pch = ".",col = 'Black', xaxt = 'n')
 tt <- which(ratio$CopyNumber > ploidy)
-points(x[tt], ratio$Ratio[tt]*ploidy,pch = ".",col = colors()[136])
+points(x[tt], ratio$Ratio[tt]*ploidy,pch = ".",col = 'DarkGreen')
 
 tt <- which(ratio$Ratio == maxLevelToPlot & ratio$CopyNumber>ploidy)	
-points(x[tt], ratio$Ratio[tt] * ploidy,pch = ".",col = colors()[136],cex=4)
+points(x[tt], ratio$Ratio[tt] * ploidy,pch = ".",col = 'green',cex=4)
 
 tt <- which(ratio$CopyNumber < ploidy & ratio$CopyNumber!= -1)
-points(x[tt],ratio$Ratio[tt] * ploidy,pch = ".", col = colors()[461])
+points(x[tt],ratio$Ratio[tt] * ploidy,pch = ".", col = 'Darkred')
 
 xx <- rle(as.character(ratio$Chromosome))
-axis(1, at = os[-length(os)], labels = names(os)[-length(os)])
+chrMid <- os[-length(os)] + diff(os) / 2
+axis(1, at = chrMid, labels = names(os)[-length(os)], tick = F)
+axis(1, at = os, tick = T, labels = F)
 abline(v = os[-c(1,length(os))])
 
 if (!is.null(opt$centromereTable)) {

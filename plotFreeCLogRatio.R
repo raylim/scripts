@@ -59,9 +59,9 @@ names(os) <- xx$values
 x <- ratio$Start + os[as.character(ratio$Chromosome)]
 plot(x, ratio$Ratio * ploidy, ylim = c(0, maxLevelToPlot*ploidy), xlab = "position", ylab = "normalized copy number profile",pch = ".",col = 'Black', xaxt = 'n')
 tt <- which(ratio$CopyNumber > ploidy)
-points(x[tt], ratio$Ratio[tt]*ploidy,pch = ".",col = 'DarkGreen')
+points(x[tt], ratio$Ratio[tt]*ploidy,pch = ".",col = 'DarkGreen') # gain
 
-tt <- which(ratio$Ratio == maxLevelToPlot & ratio$CopyNumber>ploidy)	
+tt <- which(ratio$Ratio == maxLevelToPlot & ratio$CopyNumber > ploidy)	
 points(x[tt], ratio$Ratio[tt] * ploidy,pch = ".",col = 'green',cex=4)
 
 tt <- which(ratio$CopyNumber < ploidy & ratio$CopyNumber!= -1)

@@ -11,7 +11,7 @@ optList <- list(
                 make_option("--tumor", default = NULL, type = "character", action = "store", help ="tumor BAF file (required)"),
                 make_option("--normal", default = NULL, type = "character", action = "store", help ="normal BAF file (not required)"),
                 make_option("--lohMethod", default = "two.sample.fisher", type = "character", action = "store", help ="LoH calling method (default: %default)"),
-                make_option("--cbsLohMethod", default = "variance.f", type = "character", action = "store", help ="CBS LoH calling method (default: %default)"),
+                make_option("--cbsLohMethod", default = "two.sample.fisher", type = "character", action = "store", help ="CBS LoH calling method (default: %default)"),
                 make_option("--alpha", default = 0.05, action = "store", help ="LoH alpha (default: %default)"))
 
 parser <- OptionParser(usage = "%prog [options] ", option_list = optList);
@@ -64,8 +64,8 @@ cat("alpha:", opt$alpha, "\n")
 eLOH = LOH.analyze(normal = normal, tumor = tumor, alpha = opt$alpha, method = opt$lohMethod)
 
 cat("Merging segments\n")
-loh = multi.LOH.analyze(normal = normal, tumor = tumor, all.loh.ls = list(eLOH), test.alpha = 0.001, method = opt$cbsLohMethod, sdundo = c(0,0), alpha = c(0.05,0.01))
-
+#loh = multi.LOH.analyze(normal = normal, tumor = tumor, all.loh.ls = list(eLOH), test.alpha = 0.001, method = opt$cbsLohMethod, sdundo = c(0,0), alpha = c(0.05,0.01))
+loh = multi.LOH.analyze(normal = normal, tumor = tumor, all.loh.ls = list(eLOH), test.alpha = 0.001, method = opt$cbsLohMethod, sdundo = c(2,2), alpha = c(0.0005,0.0001))
 prefix <- paste(opt$outPrefix, sep = "")
 cat("Writing output (prefix: ", opt$outPrefix, ")\n", sep = "")
 fn <- paste(opt$outPrefix, '.loh.txt', sep = '')

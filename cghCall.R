@@ -26,9 +26,6 @@ if (length(arguments$args) != 1) {
     segFile <- arguments$args[1];
 }
 
-if (!is.null(opt$centromereFile)) {
-}
-
 load(segFile)
 
 calls <- CGHcall(segmented, nclass=3, minlsforfit = 0.3)
@@ -47,7 +44,7 @@ colours[which(colours==1)] <- "darkgreen"
 colours[which(colours==2)] <- "green"
 colours[which(colours==-2)] <- "red"
 
-ylim <- c(min(as.numeric(Data$log2_ratio)), max(as.numeric(Data$log2_ratio)))
+ylim <- c(min(as.numeric(Data[,4])), max(as.numeric(Data[,4])))
 ylim[2] <- ylim[2]+0.5
 pdf(paste(opt$prefix,".seg_call_plot.pdf", sep=""), height=5, width=18)
 plot(as.numeric(Data), pch=20, xlab='Position', ylab="Copy number", xaxt='n', col = colours, ylim=ylim)

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-RCMD="R --vanilla --no-readline --quiet"
+RCMD="Rscript"
 TMPDIR="$HOME/share/tmp"
 QUEUE="jrf.q"
 LOGDIR=log/Rshell
@@ -36,6 +36,8 @@ while getopts "e:sm:n:l:p:" opt; do
   esac
 done
 
+echo "#---------------------------------";
+
 if [[ $PARALLEL -gt 1 ]]; then
     PE="-pe smp $PARALLEL"
 fi
@@ -47,13 +49,18 @@ if [[ -n "$R" ]]; then
     echo "${R}" > ${TMP}
     if [[ -n "$SGE" ]]; then
         mkdir -p $LOGDIR
-        qrsh -cwd -V -now n -q $QUEUE -N X$NAME $PE -l virtual_free=$MEM,h_vmem=$MEM "${RCMD} < ${TMP}" &> $LOGDIR/$NAME.log
+        qrsh -cwd -V -now n -q $QUEUE -N X$NAME $PE -l virtual_free=$MEM,h_vmem=$MEM "${RCMD} ${TMP}" 2>&1 && RET_CODE=$? | tee $LOGDIR/$NAME.log
+        #echo "ret code:  $?"
+        RET_CODE=$?
     else
         echo $MEM
-        $RCMD < ${TMP}
+        $RCMD ${TMP}
+        RET_CODE=$?
     fi
     rm -f ${TMP}
+    exit ${RET_CODE}
 else
     echo "Undefined script" >&2
     exit -1
 fi
+

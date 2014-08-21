@@ -46,6 +46,7 @@ if [[ -n "$R" ]]; then
     TMP=$(mktemp --tmpdir=${TMPDIR})
     #TMP=$(mktemp -t x)
     trap "{ rm -f ${TMP}; exit 255;  }" SIGINT
+    #echo ${TMP}
     echo "${R}" > ${TMP}
     if [[ -n "$SGE" ]]; then
         mkdir -p $LOGDIR
@@ -53,7 +54,7 @@ if [[ -n "$R" ]]; then
         #echo "ret code:  $?"
         RET_CODE=$?
     else
-        echo $MEM
+        #echo $MEM
         $RCMD ${TMP}
         RET_CODE=$?
     fi

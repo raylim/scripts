@@ -28,10 +28,10 @@ if (is.null(opt$tumor)) {
     stop();
 }
 
-tumorName <- sub('\\..*', '', sub('.*/', '', opt$tumor))
+tumorName <- sub('_.*', '', sub('\\..*', '', sub('.*/', '', opt$tumor)))
 
 if (!is.null(opt$normal)) {
-    normalName <- sub('\\..*', '', sub('.*/', '', opt$normal))
+    normalName <- sub('.*_', '', sub('\\..*', '', sub('.*/', '', opt$normal)))
     cat("Reading", normalName, ":", opt$normal, "\n")
     normal <- read.delim(opt$normal, header = T)
 } else {
@@ -65,7 +65,7 @@ eLOH = LOH.analyze(normal = normal, tumor = tumor, alpha = opt$alpha, method = o
 
 cat("Merging segments\n")
 #loh = multi.LOH.analyze(normal = normal, tumor = tumor, all.loh.ls = list(eLOH), test.alpha = 0.001, method = opt$cbsLohMethod, sdundo = c(0,0), alpha = c(0.05,0.01))
-loh = multi.LOH.analyze(normal = normal, tumor = tumor, all.loh.ls = list(eLOH), test.alpha = 0.001, method = opt$cbsLohMethod, sdundo = c(2,2), alpha = c(0.0005,0.0001))
+loh = multi.LOH.analyze(normal = normal, tumor = tumor, all.loh.ls = list(eLOH), test.alpha = 0.001, method = opt$cbsLohMethod, sdundo = c(2,3), alpha = c(0.0005,0.0001))
 prefix <- paste(opt$outPrefix, sep = "")
 cat("Writing output (prefix: ", opt$outPrefix, ")\n", sep = "")
 fn <- paste(opt$outPrefix, '.loh.txt', sep = '')

@@ -43,10 +43,11 @@ Data <- cbind(fData(segmented), copynumber(segmented), segmented(segmented))
 colnames(Data)[5] <- "log2_ratio_seg"
 write.table(Data, file = paste(opt$prefix, ".seg.txt", sep=""), col.names=NA, quote=F, sep="\t")
 
-ylim <- c(min(as.numeric(Data$log2_ratio)), max(as.numeric(Data$log2_ratio)))
+ylim <- c(min(as.numeric(Data[,4])), max(as.numeric(Data[,4])))
 ylim[2] <- ylim[2]+0.5
 pdf(paste(opt$prefix,".seg_plot.pdf", sep=""), height=5, width=18)
 plot(as.numeric(Data[,4]), pch=20, xlab='Position', ylab="Copy number", xaxt='n', ylim=ylim)
+points(as.numeric(Data[,5]), pch = 20, col = 'blue')
 abline(v=cumsum(rle(Data$Chr)$lengths), col="red", lty=3)
 
 if (!is.null(opt$centromereFile)) {
@@ -64,6 +65,7 @@ dev.off()
 
 png(paste(opt$prefix,".seg_plot.png", sep=""), type = 'cairo-png', height=400, width=2000)
 plot(as.numeric(Data[,4]), pch=20, xlab='Position', ylab="Copy number", xaxt='n', ylim=ylim)
+points(as.numeric(Data[,5]), pch = 20, col = 'blue')
 abline(v=cumsum(rle(Data$Chr)$lengths), col="red", lty=3)
 
 if (!is.null(opt$centromereFile)) {

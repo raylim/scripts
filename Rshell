@@ -1,6 +1,6 @@
 #!/bin/bash
 
-RCMD="Rscript"
+RCMD="umask 022; Rscript"
 TMPDIR="$HOME/share/tmp"
 QUEUE="jrf.q"
 LOGDIR=log/Rshell

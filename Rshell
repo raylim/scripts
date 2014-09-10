@@ -48,7 +48,7 @@ if [[ -n "$R" ]]; then
     TMP=$(mktemp --tmpdir=${TMPDIR})
     #TMP=$(mktemp -t x)
     trap "{ rm -f ${TMP}; exit 255;  }" SIGINT
-    echo "Sys.umask(022)" > ${TMP}
+    echo "Sys.umask('022')" > ${TMP}
     echo "${R}" >> ${TMP}
     if [[ -n "$SGE" ]]; then
         mkdir -p $LOGDIR

@@ -1,3 +1,4 @@
+cd /ifs/e63data/reis-filho/
 find data projects -type d \
     \( -name bam -o -name tables -o -name alltables -o -name vcf \) \
     ! -path "*/log/*" ! -path "*/tmap/*" ! -path "*/gatk/*" ! -path "*/hydra/*" ! -path "*/bwa/*" \

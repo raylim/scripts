@@ -8,6 +8,7 @@ options(warn = -1, error = quote({ traceback(); q('no', status = 1) }))
 
 optList <- list(
                 make_option("--centromereFile", default = NULL, type = "character", action = "store", help ="centromere file"),
+                make_option("--alpha", default = 0.05, type = "double", action = "store", help ="alpha"),
                 make_option("--prefix", default = NULL, type = "character", action = "store", help ="Output prefix (required)"))
 
 parser <- OptionParser(usage = "%prog [options] inDir", option_list = optList);

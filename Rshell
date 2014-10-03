@@ -42,17 +42,17 @@ if [[ $PARALLEL -gt 1 ]]; then
     PE="-pe smp $PARALLEL"
 fi
 
-umask 022
+umask 002
  
 if [[ -n "$R" ]]; then 
     TMP=$(mktemp --tmpdir=${TMPDIR})
     #TMP=$(mktemp -t x)
     trap "{ rm -f ${TMP}; exit 255;  }" SIGINT
-    echo "Sys.umask('022')" > ${TMP}
+    echo "Sys.umask('002')" > ${TMP}
     echo "${R}" >> ${TMP}
     if [[ -n "$SGE" ]]; then
         mkdir -p $LOGDIR
-        qrsh -cwd -V -now n -q $QUEUE -N X$NAME $PE -l virtual_free=$MEM,h_vmem=$MEM "umask 022; ${RCMD} ${TMP}" 2>&1 && RET_CODE=$? | tee $LOGDIR/$NAME.log
+        qrsh -cwd -V -now n -q $QUEUE -N X$NAME $PE -l virtual_free=$MEM,h_vmem=$MEM "umask 002; ${RCMD} ${TMP}" 2>&1 && RET_CODE=$? | tee $LOGDIR/$NAME.log
         #echo "ret code:  $?"
         RET_CODE=$?
     else

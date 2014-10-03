@@ -10,6 +10,7 @@ optList <- list(
                 make_option("--centromereFile", default = NULL, type = "character", action = "store", help ="centromere file"),
                 make_option("--alpha", default = 0.000001, type = "double", action = "store", help ="alpha"),
                 make_option("--smooth.region", default = 10, type = "double", action = "store", help ="smooth.region"),
+                make_option("--outlier.SD.scale", default = 2.5, type = "double", action = "store", help ="smooth.region"),
                 make_option("--undo.SD", default = 2, type = "double", action = "store", help ="undo.SD"),
                 make_option("--prefix", default = NULL, type = "character", action = "store", help ="Output prefix (required)"))
 
@@ -37,8 +38,8 @@ cn[,1] <- as.numeric(cn[,1])
 cn <- cn[order(cn[,1], cn[,2]),]
 cn <- cbind(name = paste(cn[,1], cn[,2], sep="_"), cn[,c(1:3,7)])
 cgh <- make_cghRaw(cn)
-normalized <- normalize(cgh, smoothOutliers=T, trim=0.025, smooth.region=smooth.region, outlier.SD.scale=2.5)
-segmented <- segmentData(normalized, relSDlong=3, undo.splits="sdundo", undo.SD=undo.SD, alpha=alpha, trim=0.025)
+normalized <- normalize(cgh, smoothOutliers=T, trim=0.025, smooth.region=opt$smooth.region, outlier.SD.scale=opt$outlier.SD.scale)
+segmented <- segmentData(normalized, relSDlong=3, undo.splits="sdundo", undo.SD=opt$undo.SD, alpha=opt$alpha, trim=0.025)
 
 fn <- paste(opt$prefix, '.segment.Rdata', sep = '')
 save(segmented, file = fn)

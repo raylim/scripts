@@ -55,6 +55,7 @@ suppressPackageStartupMessages(library("xtable"))
 optList <- list(
                 make_option("--condition", default = 'Condition', help = "Factor of interest in pheno file [default %default]"),
                 make_option("--refCondition", default = 'Normal', help = "Reference condition [default %default]"),
+                make_option("--altCondition", default = 'Variant', help = "Reference condition [default %default]"),
                 make_option("--outFile", default = NULL, help = "Output results to this file [optional]"));
 
 parser <- OptionParser(usage = "%prog [options] [counts file] [pheno file]", option_list = optList);

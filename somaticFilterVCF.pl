@@ -24,6 +24,7 @@ sub HELP_MESSAGE {
 }
 
 HELP_MESSAGE if $opt{h};
+HELP_MESSAGE unless $opt{n};
 
 my @header;
 my @samples;
@@ -68,7 +69,7 @@ while (my $line = <IN>) {
     }
     my $filter = 0;
     if ($gtMap->{$opt{n}}->{GT} eq "./." || $gtMap->{$opt{n}}->{GT} ne "0/0") {
-        # filter unknown normal genotypes or homo ref normals
+        # filter unknown normal genotypes or non-homo ref normals
         $filter++;
     } elsif ($nvarGT && $normalAF > $opt{f}) {
         # filter above threshold heterozygous

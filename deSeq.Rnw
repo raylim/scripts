@@ -130,7 +130,7 @@ print(xtable(head(res[order(res$padj), ], 20), caption = capt))
 
 <<writeResults, echo = F>>=
 if (!is.null(opt$outFile)) {
-    write.table(res, file = opt$outFile, sep = '\t', quote = F)
+    write.table(res, file = opt$outFile, sep = '\t', quote = F, col.names=NA)
 }
 @
 

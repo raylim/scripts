@@ -112,7 +112,7 @@ do {
         }
         waitpid(-1, 0);
         $retcode = $? >> 8; # shift bits to get the real return code
-        if ($opt{m}) {
+        if ($opt{m} && ($retcode == 0 || $n > 0 || $n + 1 == $attempts)) {
             my $addrs = ($retcode > 0)? $err_email_addrs : $fin_email_addrs;
             my $mail_subject = "[$retcode] $name: job finished ($cwd)";
             $mail_subject = "**FINAL** $mail_subject" if ($n + 1 == $attempts);

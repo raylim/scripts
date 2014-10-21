@@ -9,9 +9,9 @@ options(warn = -1, error = quote({ traceback(); q('no', status = 1) }))
 optList <- list(
                 make_option("--centromereFile", default = NULL, type = "character", action = "store", help ="centromere file"),
                 make_option("--alpha", default = 0.000001, type = "double", action = "store", help ="alpha"),
-                make_option("--smooth.region", default = 10, type = "double", action = "store", help ="smooth.region"),
-                make_option("--outlier.SD.scale", default = 2.5, type = "double", action = "store", help ="smooth.region"),
-                make_option("--undo.SD", default = 2, type = "double", action = "store", help ="undo.SD"),
+                make_option("--smoothRegion", default = 10, type = "double", action = "store", help ="smooth region"),
+                make_option("--outlierSDscale", default = 2.5, type = "double", action = "store", help ="outlier SD scale"),
+                make_option("--undoSD", default = 2, type = "double", action = "store", help ="undo SD"),
                 make_option("--prefix", default = NULL, type = "character", action = "store", help ="Output prefix (required)"))
 
 parser <- OptionParser(usage = "%prog [options] inDir", option_list = optList);

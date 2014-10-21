@@ -38,8 +38,8 @@ cn[,1] <- as.numeric(cn[,1])
 cn <- cn[order(cn[,1], cn[,2]),]
 cn <- cbind(name = paste(cn[,1], cn[,2], sep="_"), cn[,c(1:3,7)])
 cgh <- make_cghRaw(cn)
-normalized <- normalize(cgh, smoothOutliers=T, trim=0.025, smooth.region=opt$smooth.region, outlier.SD.scale=opt$outlier.SD.scale)
-segmented <- segmentData(normalized, relSDlong=3, undo.splits="sdundo", undo.SD=opt$undo.SD, alpha=opt$alpha, trim=0.025)
+normalized <- normalize(cgh, smoothOutliers=T, trim=0.025, smooth.region=opt$smoothRegion, outlier.SD.scale=opt$outlierSDscale)
+segmented <- segmentData(normalized, relSDlong=3, undo.splits="sdundo", undo.SD=opt$undoSD, alpha=opt$alpha, trim=0.025)
 
 fn <- paste(opt$prefix, '.segment.Rdata', sep = '')
 save(segmented, file = fn)

@@ -8,7 +8,7 @@ find data projects -type d \
 
 while [ 1 ]; do
     cd /ifs/e63data/reis-filho/ && \
-    rsync --verbose --progress --append --partial -a -0 --files-from=${TMP} --prune-empty-dirs ./ /mount/limr/zedshared
+    rsync --verbose --progress --stats --recursive --append --partial -a -0 --files-from=${TMP} --prune-empty-dirs ./ /mount/limr/zedshared
     if [ "$?" = "0" ]; then
         echo "rsync complete"
         exit

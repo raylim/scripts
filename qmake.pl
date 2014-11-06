@@ -103,7 +103,7 @@ do {
         $mail_msg .=  "Log dir: $cwd/$logdir\n";
         $mail_msg .=  "Log file: $cwd/$logfile\n";
 
-        if ($opt{m}) {
+        if ($opt{m} || $n == 0 || $n == 1 || $n + 1 == $attempts) {
             my $mail_subject = "$name: job started ($cwd)";
             $mail_subject .= " Attempt " . ($n + 1) if $n > 0; 
             open(MAIL, "| mail -s '$mail_subject' $start_email_addrs");

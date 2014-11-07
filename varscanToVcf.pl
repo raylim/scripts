@@ -84,21 +84,22 @@ while (<>) {
     chomp;
     my @F = split /\t/;
     my %F = map { $_ => shift @F } @header;
-    my $chrom = $F{chrom};
-    my $pos = $F{position};
-    my $ref = $F{ref};
+    my $chrom = $F{Chrom};
+    my $pos = $F{Position};
+    my $ref = $F{Ref};
+    my $alt = $F{Alt};
 
     my $gt;
     my $numDel = 0;
     my @alts;
     # sort alt alleles by length: longest to shortest
-    if ($F{var} =~ /[+\-]/) {
+    if ($F{Var} =~ /[+\-]/) {
         # indels
         my @gts;
 
-        push @gts, "0" if $F{gt} =~ /\*/ || $F{gt} eq $F{ref};
+        push @gts, "0" if $F{Var} =~ /\*/ || $F{Var} eq $F{Ref};
         my $i = 0;
-        for my $alt (sort { length $b <=> length $a } (split /\//, $F{var})) {
+        for my $alt (sort { length $b <=> length $a } (split /\//, $F{Var})) {
             $i++;
             push @gts, $i if $F{gt} =~ /\Q$alt\E/;
             if ($alt =~ /^\+/) {
@@ -125,11 +126,11 @@ while (<>) {
         $gt = "1/1" if $gt eq "1";
     } else {
         # snp
-        my $alt = $F{var};
+        my $alt = $F{Var};
 
-        my @bases = $iupac{$F{gt}};
-        $gt = "0/0" if $ref eq $F{gt};
-        $gt = "1/1" if $alt eq $F{gt};
+        my @bases = $iupac{$F{Var}};
+        $gt = "0/0" if $ref eq $F{Var};
+        $gt = "1/1" if $alt eq $F{Var};
         $gt = "0/1" if $ref ~~ @bases && $alt ~~ @bases;
         $gt = "0/1/2" if scalar(@bases) == 3;
 

@@ -1,7 +1,7 @@
 #!/bin/bash
 #rename fastq files and create samples.txt and possibly samples.split.txt
 
-mkdir fastq
+mkdir -p fastq
 cd rawdata
 find -name '*.gz' | xargs prename 's:./([A-Z]+)_([0-9]{4})/(.*)\.fastq\.gz:./$1_$2/$3$2.fastq.gz:'
 find -name '*.gz' | xargs ln -t ../fastq

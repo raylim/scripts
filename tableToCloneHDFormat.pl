@@ -20,12 +20,12 @@ HELP_MESSAGE if $opt{h};
 
 my @samples = @ARGV;
 
-my $headerLine = <>;
+my $headerLine = <STDIN>;
 chomp $headerLine;
 $headerLine =~ s/^#//;
 my @header = split/\t/, $headerLine;
 
-while (<>) {
+while (<STDIN>) {
     my @F = split /\t/;
     my %F = map { $_ => shift @F } @header;
     my $line = "$F{CHROM}\t$F{POS}";

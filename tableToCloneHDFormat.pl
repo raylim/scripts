@@ -32,9 +32,10 @@ while (<STDIN>) {
     for my $s (@samples) {
         my $ad = $F{"$s.AD"};
         my @ad = split /,/, $ad;
+        print $ad[0] . "\n";
         $line .= "\t$ad[0]\t" . $ad[0] + $ad[1];
     }
-    print $line;
+    #print $line;
 }
 
 

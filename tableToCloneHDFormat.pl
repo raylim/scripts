@@ -34,7 +34,7 @@ while (<STDIN>) {
         my @ad = split /,/, $ad;
         $line .= "\t$ad[0]\t" . $ad[0] + $ad[1];
     }
-    print $line;
+    print $line . "\n";
 }
 
 

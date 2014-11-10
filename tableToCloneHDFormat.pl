@@ -32,7 +32,8 @@ while (<STDIN>) {
     for my $s (@samples) {
         my $ad = $F{$s . ".AD"};
         my @ad = ($ad ne ".")? split /,/, $ad : qw/0 0/;
-        $line .= "\t$ad[0]\t" . $ad[0] + $ad[1];
+        my $dp = $ad[0] + $ad[1];
+        $line .= "\t$ad[0]\t$dp";
     }
     print $line . "\n";
 }

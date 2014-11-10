@@ -31,7 +31,7 @@ while (<STDIN>) {
     my $line = "$F{CHROM}\t$F{POS}";
     for my $s (@samples) {
         my $ad = $F{"$s.AD"};
-        my @ad = split /,/, $ad;
+        my @ad = ($ad != ".")? split /,/, $ad : qw/0 0/;
         $line .= "\t$ad[0]\t" . $ad[0] + $ad[1];
     }
     print $line . "\n";

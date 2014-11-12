@@ -102,6 +102,5 @@ plotHeatmap <- function(allthresholdedfile, plotfile, pheno=NULL, genes=NULL, cy
 }
 
 fn <- arguments$args[1];
-cat(fn)
 plotHeatmap(fn, opt$out)
 

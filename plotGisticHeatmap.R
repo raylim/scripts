@@ -20,6 +20,11 @@ if (length(arguments$args) < 1) {
     print_help(parser);
     stop();
 }
+if (is.null(opt$out)) {
+    cat("Need output file\n");
+    print_help(parser);
+    stop();
+}
 
 collapseByCytoband <- function(tab, includesubbands=T) {
     if (!includesubbands) {
@@ -97,5 +102,6 @@ plotHeatmap <- function(allthresholdedfile, plotfile, pheno=NULL, genes=NULL, cy
 }
 
 fn <- arguments$args[1];
+cat(fn)
 plotHeatmap(fn, opt$out)
 

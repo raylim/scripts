@@ -8,7 +8,7 @@ options(warn = -1, error = quote({ traceback(); q('no', status = 1) }))
 
 optList <- list(
                 make_option("--out", default = NULL, help = "Output file pdf"),
-                make_option("--groupByGene", default = F, help = "do not collapse by cytoband"),
+                make_option("--groupByGene", action = 'store_true', default = F, help = "do not collapse by cytoband"),
                 make_option("--centromereMatrix", help = "Centromere position matrix"));
 
 parser <- OptionParser(usage = "%prog [options] allthresolded.by_genes.txt", option_list = optList);

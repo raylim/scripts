@@ -8,6 +8,7 @@ options(warn = -1, error = quote({ traceback(); q('no', status = 1) }))
 
 optList <- list(
                 make_option("--out", default = NULL, help = "Output file pdf"),
+                make_option("--groupByGene", default = F, help = "do not collapse by cytoband"),
                 make_option("--centromereMatrix", help = "Centromere position matrix"));
 
 parser <- OptionParser(usage = "%prog [options] allthresolded.by_genes.txt", option_list = optList);
@@ -86,12 +87,12 @@ plotHeatmap <- function(all_thresholded_file, plotfile, pheno=NULL, genes=NULL, 
         abline(h=i/(2*(ncol(mat2)-1)), col="white", lwd=2)
     }
 
-    dev.off()
+    null <- dev.off()
 }
 
 
 
-
+groupBy <- ifelse(opt$groupByGene, "gene", "cytoband")
 fn <- arguments$args[1];
-plotHeatmap(fn, opt$out)
+plotHeatmap(fn, opt$out, group.by = groupBy)
 

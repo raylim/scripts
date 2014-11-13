@@ -26,8 +26,6 @@ if (is.null(opt$out)) {
     stop();
 }
 
-AGE #######
-# plotHeatmap("all_thresholded.by_genes.txt", "gistic_copynumber_heatmap.pdf")
 
 
 collapseByCytoband <- function(tab, include_subbands=T) {

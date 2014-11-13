@@ -26,10 +26,12 @@ if (is.null(opt$out)) {
     stop();
 }
 
+AGE #######
+# plotHeatmap("all_thresholded.by_genes.txt", "gistic_copynumber_heatmap.pdf")
 
 
-collapseByCytoband <- function(tab, include <- subbands=T) {
-    if (!include <- subbands) {
+collapseByCytoband <- function(tab, include_subbands=T) {
+    if (!include_subbands) {
         tab$Cytoband <- unlist(lapply(tab$Cytoband, function(x) { strsplit(x, split=".", fixed=T)[[1]][1]}))}
     cyto <- unique(tab$Cytoband)    
 
@@ -43,9 +45,9 @@ collapseByCytoband <- function(tab, include <- subbands=T) {
     res
 }
 
-plotHeatmap <- function(all <- thresholded <- file, plotfile, pheno=NULL, genes=NULL, cytoband=NULL, group.by="cytoband", ...) {
+plotHeatmap <- function(all_thresholded_file, plotfile, pheno=NULL, genes=NULL, cytoband=NULL, group.by="cytoband", ...) {
 
-    mat <- read.delim(all <- thresholded <- file, as.is=T, row.names=1)
+    mat <- read.delim(all_thresholded_file, as.is=T, row.names=1)
     if (!is.null(genes)) {mat <- mat[which(row.names(mat) %in% genes),]}
 
 
@@ -88,6 +90,7 @@ plotHeatmap <- function(all <- thresholded <- file, plotfile, pheno=NULL, genes=
 
     dev.off()
 }
+
 
 
 

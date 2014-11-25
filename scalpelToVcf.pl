@@ -49,8 +49,8 @@ my $vcfHeader = <<ENDL;
 ##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
 ##FORMAT=<ID=AD,Number=1,Type=String,Description="K-mer allelic depth">
 ##FORMAT=<ID=AF,Number=1,Type=String,Description="K-mer variant allelic frequency">
-##PEDIGREE=<Derived=$tumor,Original=$normal>
 ENDL
+##PEDIGREE=<Derived=$tumor,Original=$normal>
 for my $contig (@contigs) {
     my @F = split /\t/, $contig;
     $vcfHeader .= "##contig=<ID=$F[0],length=$F[1]>\n";

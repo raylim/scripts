@@ -93,7 +93,7 @@ my $tumorSample = $tumorSampleFile;
 $tumorSample =~ s/.*\///;
 $tumorSample =~ s/\..*//;
 
-$header .= "##PEDIGREE=<Derived=$tumorSample,Original=$normalSample>\n";
+#$header .= "##PEDIGREE=<Derived=$tumorSample,Original=$normalSample>\n";
 $header .= "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\t$tumorSample\t$normalSample\n";
 print STDOUT $header;
 

@@ -13,6 +13,7 @@ optList <- list(
         make_option("--numClusters", default = 5, type = "integer", action = "store", help ="maximum number of clusters [default = %default]"),
         make_option("--tumorWig", default = NULL, type = "character", action = "store", help ="tumor wig (required)"),
         make_option("--normalWig", default = NULL, type = "character", action = "store", help ="normal wig (required)"),
+        make_option("--includeY", default = F, action = "store_true", help ="include Y chromosome"),
         make_option("--targetBed", default = NULL, type = "character", action = "store", help ="targeted interval bed"))
 
 parser <- OptionParser(usage = "%prog [options] [tumour allele count file]", option_list = optList);
@@ -35,8 +36,12 @@ if (length(arguments$args) < 1) {
     cat("Need mappability wig file\n\n")
     print_help(parser);
     stop();
-} else if (is.null(opt$tumourWig)) {
+} else if (is.null(opt$tumorWig)) {
     cat("Need tumour wig file\n\n")
+    print_help(parser);
+    stop();
+} else if (is.null(opt$normalWig)) {
+    cat("Need normal wig file\n\n")
     print_help(parser);
     stop();
 } else if (is.null(opt$vcf)) {
@@ -46,6 +51,11 @@ if (length(arguments$args) < 1) {
 }
 
 options(cores = opt$numCores)
+
+chroms <- c(1:22, "X")
+if (opt$includeY) {
+    chroms <- c(chroms, "Y")
+}
 
 fn <- arguments$args[1]
 Data <- loadAlleleCounts(fn)
@@ -65,10 +75,10 @@ logR <- getPositionOverlap(Data$chr, Data$posn, cnData)
 data$logr <- log(2^logR)
 rm(logR, cnData)
 
-data <- filterData(Data, c(1:22, "X"), minDepth = 10, maxDepth = 250)
+data <- filterData(Data, chroms, minDepth = 10, maxDepth = 250)
 mScore <- as.data.frame(wigToRangedData(opt$map))
 mScore <- getPositionOverlap(Data$chr, Data$posn, mScore[,-4])
-Data <- filterData(Data, c(1:22, "X"), minDepth = 10, maxDepth = 250, map = mScore, mapThres = 0.8)
+Data <- filterData(Data, chroms, minDepth = 10, maxDepth = 250, map = mScore, mapThres = 0.8)
 
 convergeParams <- runEMclonalCN(Data, gParams=params$genotypeParams, nParams=params$normalParams,
                                 pParams=params$ploidyParams, sParams=params$cellPrevParams,
@@ -94,16 +104,18 @@ norm <- convergeParams$n[length(convergeParams$n)]
 ploidy <- convergeParams$phi[length(convergeParams$phi)]
 
 #library(SNPchip)  ## use this library to plot chromosome idiogram (optional)
-outplot <- paste(opt$outPrefix, ".png", sep = '')
-png(outplot,width=1200,height=1000,res=100)
-par(mfrow=c(3,1))
-plotCNlogRByChr(results, chr, ploidy=ploidy, geneAnnot=NULL, spacing=4,ylim=c(-4,6),cex=0.5,main="Chr 2")
-plotAllelicRatio(results, chr, geneAnnot=NULL, spacing=4, ylim=c(0,1),cex=0.5,main="Chr 2")
-plotClonalFrequency(results, chr, normal=tail(convergeParams$n,1), geneAnnot=NULL, spacing=4,ylim=c(0,1),cex=0.5,main="Chr 2")
-if (opt$numClusters <= 2){ 
-    plotSubcloneProfiles(results, chr, cex = 2, spacing=6, main="Chr 2")
+for (chr in chroms) {
+    outplot <- paste(opt$outPrefix, ".chr", chr, ".png", sep = '')
+    png(outplot,width=1200,height=1000,res=100, type = 'cairo-png')
+    par(mfrow=c(3,1))
+    plotCNlogRByChr(results, chr, ploidy=ploidy, geneAnnot=NULL, spacing=4,ylim=c(-4,6),cex=0.5,main= paste("Chr", chr))
+    plotAllelicRatio(results, chr, geneAnnot=NULL, spacing=4, ylim=c(0,1),cex=0.5,main="Chr 2")
+    plotClonalFrequency(results, chr, normal=tail(convergeParams$n,1), geneAnnot=NULL, spacing=4,ylim=c(0,1),cex=0.5,main= paste("Chr", chr))
+    if (opt$numClusters <= 2){ 
+        plotSubcloneProfiles(results, chr, cex = 2, spacing=6, main=paste("Chr", chr))
+    }
+    #pI <- plotIdiogram(chr,build="hg19",unit="bp",label.y=-4.25,new=FALSE,ylim=c(-2,-1))
+    null <- dev.off()
 }
-#pI <- plotIdiogram(chr,build="hg19",unit="bp",label.y=-4.25,new=FALSE,ylim=c(-2,-1))
-dev.off()
 
 

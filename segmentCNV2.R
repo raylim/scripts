@@ -30,8 +30,10 @@ if (length(arguments$args) != 1) {
     cnFile <- arguments$args[1];
 }
 
+chroms <- c(1:22, "X")
+
 cn <- read.table(cnFile, header=T, as.is=T)
-keep <- which(cn[,1] %in% c(1:22, "X"))
+keep <- which(cn[,1] %in% chroms)
 if (length(rm) > 0) { cn <- cn[keep,]}
 cn[which(cn[,1]=="X"),1] <- 23
 cn[,1] <- as.numeric(cn[,1])
@@ -46,6 +48,12 @@ save(segmented, file = fn)
 Data <- cbind(fData(segmented), copynumber(segmented), segmented(segmented))
 colnames(Data)[5] <- "log2_ratio_seg"
 write.table(Data, file = paste(opt$prefix, ".seg.txt", sep=""), col.names=NA, quote=F, sep="\t")
+
+f <- factor(paste(Data$Chromosome, Data$log2_ratio_seg))
+sData <- split(Data, f)
+collapsedData <- do.call('rbind', lapply(sData, function(x) {
+                            c(Chromosome = x[1,"Chromosome"], Start = x[1, "Start"], End = x[nrow(x), "End"], nBins = nrow(x), log2Ratio = x[1, "log2_ratio_seg"]) }))
+write.table(collapsedData, file = paste(opt$prefix, ".collapsed_seg.txt", sep = ""), row.names = F, quote = F, sep = "\t")
 
 ylim <- c(min(as.numeric(Data[,4])), max(as.numeric(Data[,4])))
 ylim[2] <- ylim[2]+0.5
@@ -85,5 +93,31 @@ if (!is.null(opt$centromereFile)) {
 }
 dev.off()
 
+
+if (!is.null(opt$centromereFile)) {
+    cen <- read.table(opt$centromereFile, sep = '\t')
+}
+
+for (chr in chroms) {
+    chrData <- subset(Data, Chromosome == chr)
+    ylim <- c(min(as.numeric(chrData[,4])), max(as.numeric(chrData[,4])))
+    ylim[2] <- ylim[2]+0.5
+    png(paste(opt$prefix,".seg_plot.", chr, ".png", sep=""), type = 'cairo-png', height=500, width=500)
+    plot(as.numeric(chrData[,4]), pch=20, xlab='Position', ylab="Copy number", ylim=ylim, main = paste('Chromosome', chr))
+    points(as.numeric(chrData[,5]), pch = 20, col = 'blue')
+
+    if (!is.null(opt$centromereFile)) {
+        for (j in unique(cen[,1])) {
+            pos <- cen[which(cen[,1]==j)[1],3]
+            index <- which(chrData$Chromosome==j & chrData$Start > pos)[1]
+            if (!is.na(index)) {
+                abline(v=index, col="darkgrey", lty=3)
+            }
+            text(cumsum(rle(chrData$Chromosome)$lengths)-((rle(chrData$Chromosome)$lengths)/2), ylim[2]-0.25)
+        }
+    }
+    dev.off()
+
+}
 
 

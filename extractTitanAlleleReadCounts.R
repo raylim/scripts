@@ -3,7 +3,7 @@
 
 suppressPackageStartupMessages(library("optparse"));
 suppressPackageStartupMessages(library("TitanCNA"));
-suppressPackageStartupMessages(library("VariantAnnotatoin"));
+suppressPackageStartupMessages(library("VariantAnnotation"));
 
 options(warn = -1, error = quote({ traceback(); q('no', status = 1) }))
 

@@ -100,24 +100,25 @@ if (!is.null(opt$centromereFile)) {
 
 for (chr in chroms) {
     chrData <- subset(Data, Chromosome == chr)
-    ylim <- c(min(as.numeric(chrData[,4])), max(as.numeric(chrData[,4])))
-    ylim[2] <- ylim[2]+0.5
-    png(paste(opt$prefix,".seg_plot.", chr, ".png", sep=""), type = 'cairo-png', height=500, width=500)
-    plot(as.numeric(chrData[,4]), pch=20, xlab='Position', ylab="Copy number", ylim=ylim, main = paste('Chromosome', chr))
-    points(as.numeric(chrData[,5]), pch = 20, col = 'blue')
+    if (nrow(chrData) > 0) {
+        ylim <- c(min(as.numeric(chrData[,4])), max(as.numeric(chrData[,4])))
+        ylim[2] <- ylim[2]+0.5
+        png(paste(opt$prefix,".seg_plot.", chr, ".png", sep=""), type = 'cairo-png', height=500, width=500)
+        plot(as.numeric(chrData[,4]), pch=20, xlab='Position', ylab="Copy number", ylim=ylim, main = paste('Chromosome', chr))
+        points(as.numeric(chrData[,5]), pch = 20, col = 'blue')
 
-    if (!is.null(opt$centromereFile)) {
-        for (j in unique(cen[,1])) {
-            pos <- cen[which(cen[,1]==j)[1],3]
-            index <- which(chrData$Chromosome==j & chrData$Start > pos)[1]
-            if (!is.na(index)) {
-                abline(v=index, col="darkgrey", lty=3)
+        if (!is.null(opt$centromereFile)) {
+            for (j in unique(cen[,1])) {
+                pos <- cen[which(cen[,1]==j)[1],3]
+                index <- which(chrData$Chromosome==j & chrData$Start > pos)[1]
+                if (!is.na(index)) {
+                    abline(v=index, col="darkgrey", lty=3)
+                }
+                text(cumsum(rle(chrData$Chromosome)$lengths)-((rle(chrData$Chromosome)$lengths)/2), ylim[2]-0.25)
             }
-            text(cumsum(rle(chrData$Chromosome)$lengths)-((rle(chrData$Chromosome)$lengths)/2), ylim[2]-0.25)
         }
+        dev.off()
     }
-    dev.off()
-
 }
 
 

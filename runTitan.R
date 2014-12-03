@@ -90,9 +90,9 @@ optimalPath <- viterbiClonalCN(Data, convergeParams)
 
 fn <- paste(opt$outPrefix, '.titan_', opt$numClusters, ".txt", sep = "")
 if (opt$numClusters <= 2) {
-    results <- outputTitanResults(Data, convergeParams, optimalPath, filname = fn, posteriorProbs = F, sucloneProfiles = T)
+    results <- outputTitanResults(Data, convergeParams, optimalPath, filename = fn, posteriorProbs = F, sucloneProfiles = T)
 } else {
-    results <- outputTitanResults(Data, convergeParams, optimalPath, filname = fn, posteriorProbs = F)
+    results <- outputTitanResults(Data, convergeParams, optimalPath, filename = fn, posteriorProbs = F)
 }
 
 fn <- paste(opt$outPrefix, '.params_', opt$numClusters, ".txt", sep = "")

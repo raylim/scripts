@@ -103,20 +103,18 @@ norm <- convergeParams$n[length(convergeParams$n)]
 ploidy <- convergeParams$phi[length(convergeParams$phi)]
 
 #library(SNPchip)  ## use this library to plot chromosome idiogram (optional)
-for (chr in chroms) {
-    if (chr %in% results$Chr) {
-        outplot <- paste(opt$outPrefix, ".chr", chr, ".png", sep = '')
-        png(outplot,width=1200,height=1000,res=100, type = 'cairo-png')
-        par(mfrow=c(3,1))
-        plotCNlogRByChr(results, chr, ploidy=ploidy, geneAnnot=NULL, spacing=4,ylim=c(-4,6),cex=0.5,main= paste("Chr", chr))
-        plotAllelicRatio(results, chr, geneAnnot=NULL, spacing=4, ylim=c(0,1),cex=0.5,main=paste("chr", chr))
-        plotClonalFrequency(results, chr, normal=tail(convergeParams$n,1), geneAnnot=NULL, spacing=4,ylim=c(0,1),cex=0.5,main= paste("Chr", chr))
-        if (opt$numClusters <= 2){ 
-            plotSubcloneProfiles(results, chr, cex = 2, spacing=6, main=paste("Chr", chr))
-        }
-        #pI <- plotIdiogram(chr,build="hg19",unit="bp",label.y=-4.25,new=FALSE,ylim=c(-2,-1))
-        null <- dev.off()
+for (chr in intersect(results$Chr, chroms)) {
+    outplot <- paste(opt$outPrefix, ".chr", chr, ".png", sep = '')
+    png(outplot,width=1200,height=1000,res=100, type = 'cairo-png')
+    par(mfrow=c(3,1))
+    plotCNlogRByChr(results, chr, ploidy=ploidy, geneAnnot=NULL, spacing=4,ylim=c(-4,6),cex=0.5,main= paste("Chr", chr))
+    plotAllelicRatio(results, chr, geneAnnot=NULL, spacing=4, ylim=c(0,1),cex=0.5,main=paste("chr", chr))
+    plotClonalFrequency(results, chr, normal=tail(convergeParams$n,1), geneAnnot=NULL, spacing=4,ylim=c(0,1),cex=0.5,main= paste("Chr", chr))
+    if (opt$numClusters <= 2){ 
+        plotSubcloneProfiles(results, chr, cex = 2, spacing=6, main=paste("Chr", chr))
     }
+    #pI <- plotIdiogram(chr,build="hg19",unit="bp",label.y=-4.25,new=FALSE,ylim=c(-2,-1))
+    null <- dev.off()
 }
 
 

@@ -3,6 +3,7 @@
 suppressPackageStartupMessages(library("optparse"));
 suppressPackageStartupMessages(library("TitanCNA"));
 suppressPackageStartupMessages(library("rtracklayer"));
+suppressPackageStartupMessages(library("doMC"));
 
 options(warn = -1, error = quote({ traceback(); q('no', status = 1) }))
 
@@ -47,7 +48,8 @@ if (length(arguments$args) < 1) {
     stop();
 }
 
-options(cores = opt$numCores)
+#options(cores = opt$numCores)
+registerDoMC(opt$numCores)
 
 chroms <- c(1:22, "X")
 if (opt$includeY) {

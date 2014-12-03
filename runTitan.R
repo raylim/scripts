@@ -104,7 +104,7 @@ ploidy <- convergeParams$phi[length(convergeParams$phi)]
 
 #library(SNPchip)  ## use this library to plot chromosome idiogram (optional)
 for (chr in intersect(results$Chr, chroms)) {
-    outplot <- paste(opt$outPrefix, ".chr", chr, ".png", sep = '')
+    outplot <- paste(opt$outPrefix, '.titan_', opt$numClusters, ".chr", chr, ".png", sep = '')
     png(outplot,width=1200,height=1000,res=100, type = 'cairo-png')
     par(mfrow=c(3,1))
     plotCNlogRByChr(results, chr, ploidy=ploidy, geneAnnot=NULL, spacing=4,ylim=c(-4,6),cex=0.5,main= paste("Chr", chr))

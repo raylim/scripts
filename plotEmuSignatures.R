@@ -80,12 +80,13 @@ for (fn in spectraFiles) {
     }
 }
 
+samples <- scan(opt$samples, what = 'character')
+sampleSubset <- scan(opt$sampleSubset, what = 'character')
+
 mutations <- read.table(opt$mutations, sep = ' ')
 colnames(mutations) <- c('sample', 'chr', 'pos', 'snv')
 mutations <- subset(mutations, sample %in% sampleSubset)
 
-samples <- scan(opt$samples, what = 'character')
-sampleSubset <- scan(opt$sampleSubset, what = 'character')
 for (fn in assignedFiles) {
     assigned <- read.table(fn, sep = ' ')
     assigned <- as.matrix(assigned[,-ncol(assigned)])

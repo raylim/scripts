@@ -9,6 +9,7 @@ options(warn = -1, error = quote({ traceback(); q('no', status = 1) }))
 
 optList <- list(
         make_option("--outPrefix", default = NULL, type = "character", action = "store", help ="output prefix (required)"),
+        make_option("--plotPrefix", default = NULL, type = "character", action = "store", help ="plot output prefix (required)"),
         make_option("--gcWig", default = NULL, type = "character", action = "store", help ="GC wig (required)"),
         make_option("--mapWig", default = NULL, type = "character", action = "store", help ="mappability wig (required)"),
         make_option("--numCores", default = 1, type = "integer", action = "store", help ="number of cores [default = %default]"),
@@ -27,7 +28,11 @@ if (length(arguments$args) < 1) {
     print_help(parser);
     stop();
 } else if (is.null(opt$outPrefix)) {
-    cat("Need output prefix file\n\n")
+    cat("Need output prefix\n\n")
+    print_help(parser);
+    stop();
+} else if (is.null(opt$plotPrefix)) {
+    cat("Need plot output prefix\n\n")
     print_help(parser);
     stop();
 } else if (is.null(opt$gcWig)) {
@@ -104,7 +109,7 @@ ploidy <- convergeParams$phi[length(convergeParams$phi)]
 
 #library(SNPchip)  ## use this library to plot chromosome idiogram (optional)
 for (chr in intersect(results$Chr, chroms)) {
-    outplot <- paste(opt$outPrefix, '.titan_', opt$numClusters, ".chr", chr, ".png", sep = '')
+    outplot <- paste(opt$plotPrefix, '.titan_', opt$numClusters, ".chr", chr, ".png", sep = '')
     png(outplot,width=1200,height=1000,res=100, type = 'cairo-png')
     par(mfrow=c(3,1))
     plotCNlogRByChr(results, chr, ploidy=ploidy, geneAnnot=NULL, spacing=4,ylim=c(-4,6),cex=0.5,main= paste("Chr", chr))

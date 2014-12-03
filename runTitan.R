@@ -44,10 +44,6 @@ if (length(arguments$args) < 1) {
     cat("Need normal wig file\n\n")
     print_help(parser);
     stop();
-} else if (is.null(opt$vcf)) {
-    cat("Need vcf file\n\n")
-    print_help(parser);
-    stop();
 }
 
 options(cores = opt$numCores)

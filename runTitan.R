@@ -69,11 +69,11 @@ if (!is.null(opt$targetBed)) {
 }
 
 logR <- getPositionOverlap(Data$chr, Data$posn, cnData)
-data$logr <- log(2^logR)
+Data$logR <- log(2^logR)
 rm(logR, cnData)
 
-data <- filterData(Data, chroms, minDepth = 10, maxDepth = 250)
-mScore <- as.data.frame(wigToRangedData(opt$map))
+Data <- filterData(Data, chroms, minDepth = 10, maxDepth = 250)
+mScore <- as.data.frame(wigToRangedData(opt$mapWig))
 mScore <- getPositionOverlap(Data$chr, Data$posn, mScore[,-4])
 Data <- filterData(Data, chroms, minDepth = 10, maxDepth = 250, map = mScore, mapThres = 0.8)
 

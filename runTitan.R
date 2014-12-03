@@ -2,6 +2,7 @@
 
 suppressPackageStartupMessages(library("optparse"));
 suppressPackageStartupMessages(library("TitanCNA"));
+suppressPackageStartupMessages(library("rtracklayer"));
 
 options(warn = -1, error = quote({ traceback(); q('no', status = 1) }))
 

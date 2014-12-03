@@ -55,8 +55,8 @@ if (opt$includeY) {
 }
 
 fn <- arguments$args[1]
-Data <- loadAlleleCounts(fn)
-params <- loadDefaultParameters(copyNumber=5, numberClonalClusters=opt$numClusters, symmetric=TRUE)
+Data <- loadAlleleCounts(fn, header = F)
+params <- loadDefaultParameters(copyNumber=5, numberClonalClusters=opt$numClusters, symmetric=TRUE, data = Data)
 
 
 if (!is.null(opt$targetBed)) {

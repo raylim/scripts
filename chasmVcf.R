@@ -4,9 +4,9 @@
 suppressPackageStartupMessages(library("optparse"));
 suppressPackageStartupMessages(library("VariantAnnotation"));
 
-#options(warn = -1, error = quote({ traceback(2); q('no', status = 1) }))
+options(warn = -1, error = quote({ traceback(2); q('no', status = 1) }))
 #options(error = recover)
-options(error = quote(dump.frames("testdump", TRUE)))
+#options(error = quote(dump.frames("testdump", TRUE)))
 
 optList <- list(
                 make_option("--genome", default = 'hg19', help = "genome build [default %default]"),

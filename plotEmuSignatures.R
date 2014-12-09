@@ -13,7 +13,7 @@ optList <- list(
                 make_option("--outDir", default = NULL, help = "output dir (required)"),
                 make_option("--mutations", default = NULL, help = "mutations file (required)"),
                 make_option("--samples", default = NULL, help = "samples file"),
-                make_option("--sampleSubset", default = NULL, help = "sample subset file"),
+                make_option("--sampleSubset", default = NULL, help = "sample subset file: list of samples to plot contribution"),
                 make_option("--inDir", default = NULL, help = "EMu input directory (required)"))
 
 parser <- OptionParser(usage = "%prog [options]", option_list = optList);
@@ -94,7 +94,7 @@ for (fn in assignedFiles) {
     assigned <- assigned[sampleSubset, ]
 
     ofn <- paste(opt$outDir, "/", basename(fn), sep = '')
-    ofn <- sub('\\.txt$', paste("_", i, '.png', sep = ''), ofn)
+    ofn <- sub('\\.txt$', '.png', ofn)
 
     tab <- table(factor(mutations$sample))
     tab <- tab[sampleSubset]

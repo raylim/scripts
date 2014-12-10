@@ -4,6 +4,7 @@ suppressPackageStartupMessages(library("optparse"));
 suppressPackageStartupMessages(library("TitanCNA"));
 suppressPackageStartupMessages(library("rtracklayer"));
 suppressPackageStartupMessages(library("doMC"));
+suppressPackageStartupMessages(library("hwriter"));
 
 options(warn = -1, error = quote({ traceback(); q('no', status = 1) }))
 
@@ -61,6 +62,8 @@ if (opt$includeY) {
     chroms <- c(chroms, "Y")
 }
 
+pg <- openPage(paste(opt$outPrefix, '_report.html', sep = ''), title = 'TITAN Plots')
+
 fn <- arguments$args[1]
 Data <- loadAlleleCounts(fn, header = F)
 params <- loadDefaultParameters(copyNumber=5, numberClonalClusters=opt$numClusters, symmetric=TRUE, data = Data)
@@ -110,8 +113,13 @@ ploidy <- convergeParams$phi[length(convergeParams$phi)]
 #library(SNPchip)  ## use this library to plot chromosome idiogram (optional)
 for (chr in intersect(results$Chr, chroms)) {
     outplot <- paste(opt$plotPrefix, '.titan_', opt$numClusters, ".chr", chr, ".png", sep = '')
+    hwriteImage(basename(output), pg, br = T)
     png(outplot,width=1200,height=1000,res=100, type = 'cairo-png')
-    par(mfrow=c(3,1))
+    if (opt$numClusters <= 2) { 
+        par(mfrow=c(4,1))
+    } else {
+        par(mfrow=c(3,1))
+    }
     plotCNlogRByChr(results, chr, ploidy=ploidy, geneAnnot=NULL, spacing=4,ylim=c(-4,6),cex=0.5,main= paste("Chr", chr))
     plotAllelicRatio(results, chr, geneAnnot=NULL, spacing=4, ylim=c(0,1),cex=0.5,main=paste("chr", chr))
     plotClonalFrequency(results, chr, normal=tail(convergeParams$n,1), geneAnnot=NULL, spacing=4,ylim=c(0,1),cex=0.5,main= paste("Chr", chr))
@@ -122,4 +130,5 @@ for (chr in intersect(results$Chr, chroms)) {
     null <- dev.off()
 }
 
+closePage(pg)
 

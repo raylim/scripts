@@ -62,7 +62,7 @@ if (opt$includeY) {
     chroms <- c(chroms, "Y")
 }
 
-pg <- openPage(paste(opt$outPrefix, '_report.html', sep = ''), title = 'TITAN Plots')
+pg <- openPage(paste(opt$outPrefix, '_titan_report_', opt$numClusters, '.html', sep = ''), title = 'TITAN Plots')
 
 fn <- arguments$args[1]
 Data <- loadAlleleCounts(fn, header = F)

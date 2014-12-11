@@ -24,7 +24,7 @@ sub HELP_MESSAGE {
 
 HELP_MESSAGE if $opt{h};
 
-my $scriptFile = File::Temp->new(TEMPLATE => 'tempXXXXX', SUFFIX => '.sge');
+my $scriptFile = File::Temp->new(TEMPLATE => 'tempXXXXX', DIR => '/home/limr/share/tmp', SUFFIX => '.sge');
 
 my $args = join " ", @ARGV;
 while (<STDIN>) {

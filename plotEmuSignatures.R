@@ -57,8 +57,8 @@ for (fn in spectraFiles) {
     for (i in 1:nrow(spectra)) {
         ofn <- paste(opt$outDir, "/", basename(fn), sep = '')
         ofn <- sub('\\.txt$', paste("_", i, '.pdf', sep = ''), ofn)
-        pdf(ofn, height = 5, width = 10)
-        par(cex = 2)
+        pdf(ofn, height = 8, width = 10)
+        par(cex = 1.5)
         cols <- rep(c('LightBlue', 'Black', 'Red', 'Grey', 'Green', 'Magenta'), each = 16)
         barplot(t(spectra[i,]) * 100, beside = T, col = cols, border = cols, xaxt = 'n', main = paste("Signature", i), col.main = i, ylab = "% of mutations")
         labs <- c("C>A", "C>G", "C>T", "T>A", "T>C", "T>G")
@@ -102,7 +102,7 @@ for (fn in assignedFiles) {
     assigned <- assigned[oo, ]
 
     png(ofn, height = 1000, width = 1000, type = 'cairo-png')
-    par(mar = c(5, 10, 5, 1), cex = 1, mfrow = c(1, 2), cex = 2)
+    par(mar = c(5, 10, 5, 1), cex = 1, mfrow = c(1, 2), cex = 1.5)
     barplot(t(assigned / rowSums(assigned)), col = 1:5, space = 0, border = F, horiz = T, las = 2, xlab = "Contribution of signature")
     par(mar = c(5,1,5,5))
     barplot(tab[oo], las = 2, horiz = T, space = 0, border = F, xlab = "Number of Mutations", axisnames = F)
@@ -110,8 +110,8 @@ for (fn in assignedFiles) {
     hwriteImage(basename(ofn), pg, br = T)
 
     ofn <- sub('\\.png$', '.pdf', ofn)
-    pdf(ofn, height = 10, width = 10)
-    par(mar = c(5, 10, 5, 1), cex = 1, mfrow = c(1, 2), cex = 2)
+    pdf(ofn, height = 12, width = 12)
+    par(mar = c(5, 10, 5, 1), cex = 1, mfrow = c(1, 2), cex = 1.5)
     barplot(t(assigned / rowSums(assigned)), col = 1:5, space = 0, border = F, horiz = T, las = 2, xlab = "Contribution of signature")
     par(mar = c(5,1,5,5))
     barplot(tab[oo], las = 2, horiz = T, space = 0, border = F, xlab = "Number of Mutations", axisnames = F)

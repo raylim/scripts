@@ -48,7 +48,7 @@ assignedFiles <- Sys.glob(glob)
 
 pg <- openPage('index.html', dirname = opt$outDir, title = 'EMu results')
 
-set.seed(001)
+set.seed(002)
 palette(sample(rainbow(30)))
 
 for (fn in spectraFiles) {

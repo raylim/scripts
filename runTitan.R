@@ -67,7 +67,7 @@ pg <- openPage(paste(opt$outPrefix, '_titan_report_', opt$numClusters, '.html', 
 fn <- arguments$args[1]
 Data <- loadAlleleCounts(fn, header = F)
 params <- loadDefaultParameters(copyNumber=5, numberClonalClusters=opt$numClusters, symmetric=TRUE, data = Data)
-
+params$ploidyParams$phi_0 <- 2
 
 if (!is.null(opt$targetBed)) {
     targetGr <- import(opt$targetBed)
@@ -131,4 +131,7 @@ for (chr in intersect(results$Chr, chroms)) {
 }
 
 closePage(pg)
+
+fn <- paste(opt$outPrefix, '.titan_', opt$numClusters, '.Rdata', sep = '')
+save(Data, results, convergeParams, optimalPath, file = fn)
 

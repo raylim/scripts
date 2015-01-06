@@ -57,7 +57,7 @@ if [[ -n "$R" ]]; then
         RET_CODE=$?
     else
         #echo $MEM
-        $RCMD ${TMP}
+        $RCMD ${TMP} | tee $LOGDIR/$NAME.log
         RET_CODE=$?
     fi
     rm -f ${TMP}

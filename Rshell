@@ -52,7 +52,7 @@ if [[ -n "$R" ]]; then
     echo "${R}" >> ${TMP}
     if [[ -n "$SGE" ]]; then
         mkdir -p $LOGDIR
-        qrsh -cwd -V -now n -q $QUEUE -N X$NAME $PE -l virtual_free=$MEM,h_vmem=$MEM "umask 002; ${RCMD} ${TMP}" 2>&1 && RET_CODE=$? | tee $LOGDIR/$NAME.log
+        qrsh -o $LOGDIR/$NAME.log -cwd -V -now n -q $QUEUE -N X$NAME $PE -l virtual_free=$MEM,h_vmem=$MEM "umask 002; ${RCMD} ${TMP}" 2>&1 && RET_CODE=$?
         #echo "ret code:  $?"
         RET_CODE=$?
     else

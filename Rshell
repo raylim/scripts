@@ -50,14 +50,12 @@ if [[ -n "$R" ]]; then
     trap "{ rm -f ${TMP}; exit 255;  }" SIGINT
     echo "Sys.umask('002')" > ${TMP}
     echo "${R}" >> ${TMP}
+    echo "${R}" > $LOGDIR/$NAME.log
     if [[ -n "$SGE" ]]; then
         mkdir -p $LOGDIR
-        qrsh -o $LOGDIR/$NAME.log -cwd -V -now n -q $QUEUE -N X$NAME $PE -l virtual_free=$MEM,h_vmem=$MEM "umask 002; ${RCMD} ${TMP}" 2>&1 && RET_CODE=$?
-        #echo "ret code:  $?"
-        RET_CODE=$?
+        qrsh -cwd -V -now n -q $QUEUE -N X$NAME $PE -l virtual_free=$MEM,h_vmem=$MEM "umask 002; ${RCMD} ${TMP}" 2>&1 >> $LOGDIR/$NAME.log && RET_CODE=$?
     else
-        #echo $MEM
-        $RCMD ${TMP} | tee $LOGDIR/$NAME.log
+        $RCMD ${TMP} | tee -a $LOGDIR/$NAME.log
         RET_CODE=$?
     fi
     rm -f ${TMP}

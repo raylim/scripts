@@ -4,6 +4,7 @@
 # Authors: Raymond Lim and Fong Chun Chan <fongchunchan@gmail.com>
 suppressPackageStartupMessages(library(optparse));
 suppressPackageStartupMessages(library(GenomicFeatures));
+suppressPackageStartupMessages(library(rbamtools));
 suppressPackageStartupMessages(library(Rsamtools));
 suppressPackageStartupMessages(library(TxDb.Hsapiens.UCSC.hg19.knownGene));
 suppressPackageStartupMessages(library(TxDb.Mmusculus.UCSC.mm10.knownGene));
@@ -82,7 +83,7 @@ getExprs <- function( features, featureCounts, feature = 'gene' ){
 print("Loading txdb ")
 if (opt$genome == "hg19") {
     txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
-} else if (opt $genome == "mm10") {
+} else if (opt$genome == "mm10") {
     txdb <- TxDb.Mmusculus.UCSC.mm10.knownGene
 } else {
     cat("Unsupported genome\n")
@@ -135,7 +136,7 @@ if ( !is.null(opt$intronListFile) ){
 }
 
 txnames <- names(introns)
-map <- select(txdb, keys=txnames, keytype='TXNAME', cols='GENEID')
+map <- select(txdb, keys=txnames, keytype='TXNAME', columns='GENEID')
 idx <- map$GENEID[!is.na(map$GENEID)]
 intronsByGene <- split(introns[!is.na(map$GENEID)], idx)
 names(intronsByGene) <- unique(idx)
@@ -148,7 +149,7 @@ cat("Reading", bamFile, " ... ")
 si <- seqinfo(BamFile(bamFile));
 gr <- GRanges(seqnames(si), IRanges(100, seqlengths(si)-100));
 scf <- scanBamFlag( isDuplicate = FALSE ) # remove duplicate reads
-reads <- readBamGappedAlignments( bamFile, param = ScanBamParam( which = gr, flag = scf ) ); # grab reads in specific region
+reads <- scanBam( bamFile, param = ScanBamParam( which = gr, flag = scf ) ); # grab reads in specific region
 cat('Finished\n')
 
 print('Summarizing raw reads over the exon and introns ...')

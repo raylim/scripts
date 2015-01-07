@@ -54,7 +54,7 @@ cat("Reading", bamFile, " ... ")
 si <- seqinfo(BamFile(bamFile));
 gr <- GRanges(seqnames(si), IRanges(100, seqlengths(si)-100));
 scf <- scanBamFlag( isDuplicate = FALSE ) # remove duplicate reads
-reads <- readBamGappedAlignments( bamFile, param = ScanBamParam( which = gr, flag = scf ) ); # grab reads in specific region cat("Finished\n")
+reads <- scanBam( bamFile, param = ScanBamParam( which = gr, flag = scf ) ); # grab reads in specific region cat("Finished\n")
 #reads <- GRanges(seqnames = rname(reads), ranges = IRanges(start = start(reads), end = end(reads)), strand = rep('*', length(reads)));
 cat('Finished\n')
 

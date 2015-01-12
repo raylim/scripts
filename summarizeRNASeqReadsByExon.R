@@ -3,6 +3,7 @@
 # Authors: Fong Chun Chan <fongchunchan@gmail.com>
 suppressPackageStartupMessages(library(optparse));
 suppressPackageStartupMessages(library(GenomicFeatures));
+suppressPackageStartupMessages(library(GenomicAlignments));
 suppressPackageStartupMessages(library(Rsamtools));
 suppressPackageStartupMessages(library(TxDb.Hsapiens.UCSC.hg19.knownGene));
 

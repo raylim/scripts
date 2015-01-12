@@ -109,8 +109,8 @@ Data <- filterData(Data, chroms, minDepth = 10, maxDepth = 250, map = mScore, ma
 
 convergeParams <- runEMclonalCN(Data, gParams=params$genotypeParams, nParams=params$normalParams,
                                 pParams=params$ploidyParams, sParams=params$cellPrevParams,
-                                maxiter=20, maxiterUpdate=1500, txnExpLen=1e10, txnZstrength=1e5,
-                                useOutlierState=FALSE,
+                                maxiter=20, maxiterUpdate=1500, txnExpLen=opt$txnExpLen,
+                                txnZstrength=opt$txnZstrength, useOutlierState=FALSE,
                                 normalEstimateMethod="map", estimateS=TRUE, estimatePloidy=TRUE)
 
 

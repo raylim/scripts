@@ -6,6 +6,7 @@ suppressPackageStartupMessages(library(optparse));
 suppressPackageStartupMessages(library(GenomicFeatures));
 suppressPackageStartupMessages(library(rbamtools));
 suppressPackageStartupMessages(library(Rsamtools));
+suppressPackageStartupMessages(library(GenomicAlignments));
 suppressPackageStartupMessages(library(TxDb.Hsapiens.UCSC.hg19.knownGene));
 suppressPackageStartupMessages(library(TxDb.Mmusculus.UCSC.mm10.knownGene));
 suppressPackageStartupMessages(library(org.Hs.eg.db))
@@ -149,7 +150,7 @@ cat("Reading", bamFile, " ... ")
 si <- seqinfo(BamFile(bamFile));
 gr <- GRanges(seqnames(si), IRanges(100, seqlengths(si)-100));
 scf <- scanBamFlag( isDuplicate = FALSE ) # remove duplicate reads
-reads <- scanBam( bamFile, param = ScanBamParam( which = gr, flag = scf ) ); # grab reads in specific region
+reads <- readGappedReadsFromBam( bamFile, param = ScanBamParam( which = gr, flag = scf )); # grab reads in specific region
 cat('Finished\n')
 
 print('Summarizing raw reads over the exon and introns ...')

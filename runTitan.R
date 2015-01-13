@@ -140,7 +140,7 @@ for (chr in intersect(results$Chr, chroms)) {
     } else {
         par(mfrow=c(3,1))
     }
-    plotCNlogRByChr(results, chr, ploidy=ploidy, geneAnnot=NULL, spacing=4,ylim=c(-4,6),cex=0.5,main= paste("Chr", chr))
+    plotCNlogRByChr(results, chr, ploidy=ploidy, geneAnnot=NULL, spacing=4,ylim=c(-2,2),cex=0.5,main= paste("Chr", chr))
     plotAllelicRatio(results, chr, geneAnnot=NULL, spacing=4, ylim=c(0,1),cex=0.5,main=paste("chr", chr))
     plotClonalFrequency(results, chr, normal=tail(convergeParams$n,1), geneAnnot=NULL, spacing=4,ylim=c(0,1),cex=0.5,main= paste("Chr", chr))
     if (opt$numClusters <= 2){ 

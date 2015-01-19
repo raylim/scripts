@@ -16,7 +16,7 @@ optList <- list(
         make_option("--numCores", default = 1, type = "integer", action = "store", help ="number of cores [default = %default]"),
         make_option("--numClusters", default = 5, type = "integer", action = "store", help ="number of clusters [default = %default]"),
         make_option("--txnExpLen", default = 1e10, type = "double", action = "store", help ="self-transition probability [default = %default]"),
-        make_option("--txnZstrength", default = 5e3, type = "double", action = "store", help ="clonal-cluster transition probability [default = %default]"),
+        make_option("--txnZstrength", default = 5e5, type = "double", action = "store", help ="clonal-cluster transition probability [default = %default]"),
         make_option("--tumorWig", default = NULL, type = "character", action = "store", help ="tumor wig (required)"),
         make_option("--normalWig", default = NULL, type = "character", action = "store", help ="normal wig (required)"),
         make_option("--includeY", default = F, action = "store_true", help ="include Y chromosome"),

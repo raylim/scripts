@@ -131,6 +131,22 @@ norm <- convergeParams$n[length(convergeParams$n)]
 ploidy <- convergeParams$phi[length(convergeParams$phi)]
 
 #library(SNPchip)  ## use this library to plot chromosome idiogram (optional)
+outplot <- paste(opt$plotPrefix, '.titan_', opt$numClusters, ".png", sep = '')
+png(outplot,width=1200,height=1000,res=100, type = 'cairo-png')
+if (opt$numClusters <= 2) { 
+    par(mfrow=c(4,1))
+} else {
+    par(mfrow=c(3,1))
+}
+plotCNlogRByChr(results, chr = NULL, ploidy=ploidy, geneAnnot=NULL, spacing=4,ylim=c(-2,2),cex=0.5)
+plotAllelicRatio(results, chr = NULL, geneAnnot=NULL, spacing=4, ylim=c(0,1),cex=0.5)
+plotClonalFrequency(results, chr = NULL, normal=tail(convergeParams$n,1), geneAnnot=NULL, spacing=4,ylim=c(0,1),cex=0.5)
+if (opt$numClusters <= 2){ 
+    plotSubcloneProfiles(results, chr, cex = 2, spacing=6)
+}
+#pI <- plotIdiogram(chr,build="hg19",unit="bp",label.y=-4.25,new=FALSE,ylim=c(-2,-1))
+null <- dev.off()
+
 for (chr in intersect(results$Chr, chroms)) {
     outplot <- paste(opt$plotPrefix, '.titan_', opt$numClusters, ".chr", chr, ".png", sep = '')
     hwriteImage(basename(outplot), pg, br = T)

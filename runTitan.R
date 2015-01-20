@@ -80,24 +80,24 @@ if (!is.null(opt$targetBed)) {
     cnData <- correctReadDepth(opt$tumorWig, opt$normalWig, opt$gcWig, opt$mapWig)
 }
 
-getPositionOverlap <- function(chr, posn, dataVal) {
+#getPositionOverlap <- function(chr, posn, dataVal) {
 # use RangedData to perform overlap
-    dataIR <- RangedData(space = dataVal[, 1], 
-                    IRanges(start = dataVal[, 2], end = dataVal[, 3]),
-                    val = as.numeric(dataVal[, 4]))
+    #dataIR <- RangedData(space = dataVal[, 1], 
+                    #IRanges(start = dataVal[, 2], end = dataVal[, 3]),
+                    #val = as.numeric(dataVal[, 4]))
                     
     ## load chr/posn as data.frame first to use proper chr ordering by factors/levels
-    chrDF <- data.frame(space=chr,start=posn,end=posn)
-    chrDF$space <- factor(chrDF$space, levels = unique(chr))    
-    chrIR <- as(chrDF, "RangedData")
+    #chrDF <- data.frame(space=chr,start=posn,end=posn)
+    #chrDF$space <- factor(chrDF$space, levels = unique(chr))    
+    #chrIR <- as(chrDF, "RangedData")
     
-    hits <- findOverlaps(query = chrIR, subject = dataIR)
+    #hits <- findOverlaps(query = chrIR, subject = dataIR)
     
     ## create full dataval list ##
-    hitVal <- rep(NA, length = length(chr))
-    hitVal[queryHits(hits)] <- dataIR$val[subjectHits(hits)] 
-    return(hitVal) 
-}
+    #hitVal <- rep(NA, length = length(chr))
+    #hitVal[queryHits(hits)] <- dataIR$val[subjectHits(hits)] 
+    #return(hitVal) 
+#}
 logR <- getPositionOverlap(Data$chr, Data$posn, cnData)
 Data$logR <- log(2^logR)
 rm(logR, cnData)

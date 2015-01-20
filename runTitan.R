@@ -142,7 +142,7 @@ plotCNlogRByChr(results, chr = NULL, ploidy=ploidy, geneAnnot=NULL, spacing=4,yl
 plotAllelicRatio(results, chr = NULL, geneAnnot=NULL, spacing=4, ylim=c(0,1),cex=0.5)
 plotClonalFrequency(results, chr = NULL, normal=tail(convergeParams$n,1), geneAnnot=NULL, spacing=4,ylim=c(0,1),cex=0.5)
 if (opt$numClusters <= 2){ 
-    plotSubcloneProfiles(results, chr, cex = 2, spacing=6)
+    plotSubcloneProfiles(results, chr = NULL, cex = 2, spacing=6)
 }
 #pI <- plotIdiogram(chr,build="hg19",unit="bp",label.y=-4.25,new=FALSE,ylim=c(-2,-1))
 null <- dev.off()

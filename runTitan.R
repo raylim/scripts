@@ -15,6 +15,7 @@ optList <- list(
         make_option("--mapWig", default = NULL, type = "character", action = "store", help ="mappability wig (required)"),
         make_option("--numCores", default = 1, type = "integer", action = "store", help ="number of cores [default = %default]"),
         make_option("--numClusters", default = 5, type = "integer", action = "store", help ="number of clusters [default = %default]"),
+        make_option("--ploidyPrior", default = 2, type = "double", action = "store", help ="ploidy prior [default = %default]"),
         make_option("--txnExpLen", default = 1e10, type = "double", action = "store", help ="self-transition probability [default = %default]"),
         make_option("--txnZstrength", default = 5e5, type = "double", action = "store", help ="clonal-cluster transition probability [default = %default]"),
         make_option("--tumorWig", default = NULL, type = "character", action = "store", help ="tumor wig (required)"),
@@ -69,7 +70,7 @@ pg <- openPage(paste(opt$outPrefix, '_titan_report_', opt$numClusters, '.html', 
 fn <- arguments$args[1]
 Data <- loadAlleleCounts(fn, header = F)
 params <- loadDefaultParameters(copyNumber=5, numberClonalClusters=opt$numClusters, symmetric=TRUE, data = Data)
-params$ploidyParams$phi_0 <- 2
+params$ploidyParams$phi_0 <- opt$ploidyPrior
 
 if (!is.null(opt$targetBed)) {
     targetGr <- import(opt$targetBed)

@@ -65,7 +65,7 @@ if (opt$includeY) {
     chroms <- c(chroms, "Y")
 }
 
-pg <- openPage(paste(opt$outPrefix, '_titan_report_', opt$numClusters, '.html', sep = ''), title = 'TITAN Plots')
+#pg <- openPage(paste(opt$outPrefix, '_titan_report_', opt$numClusters, '.html', sep = ''), title = 'TITAN Plots')
 
 fn <- arguments$args[1]
 Data <- loadAlleleCounts(fn, header = F)
@@ -117,7 +117,7 @@ convergeParams <- runEMclonalCN(Data, gParams=params$genotypeParams, nParams=par
 
 optimalPath <- viterbiClonalCN(Data, convergeParams)
 
-fn <- paste(opt$outPrefix, '.titan_', opt$numClusters, ".txt", sep = "")
+fn <- paste(opt$outPrefix, '.titan.txt', sep = "")
 if (opt$numClusters <= 2) {
     results <- outputTitanResults(Data, convergeParams, optimalPath, filename = fn, posteriorProbs = F, subcloneProfiles = T)
 } else {
@@ -132,7 +132,7 @@ norm <- convergeParams$n[length(convergeParams$n)]
 ploidy <- convergeParams$phi[length(convergeParams$phi)]
 
 #library(SNPchip)  ## use this library to plot chromosome idiogram (optional)
-outplot <- paste(opt$plotPrefix, '.titan_', opt$numClusters, ".png", sep = '')
+outplot <- paste(opt$plotPrefix, '.titan.png', sep = '')
 png(outplot,width=1200,height=1000,res=100, type = 'cairo-png')
 if (opt$numClusters <= 2) { 
     par(mfrow=c(4,1))
@@ -149,8 +149,8 @@ if (opt$numClusters <= 2){
 null <- dev.off()
 
 for (chr in intersect(results$Chr, chroms)) {
-    outplot <- paste(opt$plotPrefix, '.titan_', opt$numClusters, ".chr", chr, ".png", sep = '')
-    hwriteImage(basename(outplot), pg, br = T)
+    outplot <- paste(opt$plotPrefix, '.titan.chr', chr, ".png", sep = '')
+    #hwriteImage(basename(outplot), pg, br = T)
     png(outplot,width=1200,height=1000,res=100, type = 'cairo-png')
     if (opt$numClusters <= 2) { 
         par(mfrow=c(4,1))
@@ -167,8 +167,8 @@ for (chr in intersect(results$Chr, chroms)) {
     null <- dev.off()
 }
 
-closePage(pg)
+#closePage(pg)
 
-fn <- paste(opt$outPrefix, '.titan_', opt$numClusters, '.Rdata', sep = '')
+fn <- paste(opt$outPrefix, '.titan.Rdata', sep = '')
 save(Data, results, convergeParams, optimalPath, file = fn)
 

@@ -36,15 +36,15 @@ while (my $line = <>) {
     my $genomic1 = $F{"genomic_strand1"};
     my $genomic2 = $F{"genomic_strand2"};
 
-    if ($gene1 eq $genomic1) {
+    if ($gene1 eq $genomic1 && $gene2 ne $genomic2) {
         $F{"upstream_gene"} = $F{"gene_name1"};
         $F{"downstream_gene"} = $F{"gene_name2"};
-    } else {
-        if (! $gene2 eq $genomic2) {
-            print STDERR "Unexpected pairing\n";
-        }
+    } elsif ($gene1 ne $genomic1 && $gene2 eq $genomic2) {
         $F{"upstream_gene"} = $F{"gene_name2"};
         $F{"downstream_gene"} = $F{"gene_name1"};
+    } else {
+        $F{"upstream_gene"} = "";
+        $F{"downstream_gene"} = "";
     }
 
     if ($F{'orf'} eq "N") { 

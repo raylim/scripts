@@ -124,7 +124,7 @@ if (opt$numClusters <= 2) {
     results <- outputTitanResults(Data, convergeParams, optimalPath, filename = fn, posteriorProbs = F)
 }
 
-fn <- paste(opt$outPrefix, '.params.txt", sep = "")
+fn <- paste(opt$outPrefix, '.params.txt', sep = "")
 outputModelParameters(convergeParams, results, fn)
 
 # plots

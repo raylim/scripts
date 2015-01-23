@@ -29,7 +29,9 @@ if (length(arguments$args) < 1) {
 fns <- arguments$args
 dir.create(opt$outDir, showWarnings = F)
 
+
 Data <- list()
+filenames <- list()
 for (fn in fns) {
     s <- sub(".*/", "", sub('\\..*', '', fn))
     i <- as.integer(str_match(fn, '\\.z([0-9])\\.params\\.txt')[,2])
@@ -45,6 +47,7 @@ for (fn in fns) {
     paramList[["avgTumorPloidyEstimate"]] <- params[["Average tumour ploidy estimate"]]
 
     Data[[s]][[i]] <- paramList
+    filenames[[s]][[as.character(i)]] <- fn
 }
 
 sdbwM <- matrix(NA, nrow = length(Data), ncol = length(Data[[1]]), dimnames = list(names(Data)))
@@ -92,10 +95,13 @@ normalContamEstOpt <- normalContamEstM[cbind(1:nrow(sdbwM), sdbwMin)]
 
 results <- data.frame(row.names = names(optClust), optClust = optClust, avgTumorPloidyEst = avgTumorPloidyEstOpt, normalContamEst = normalContamEstOpt)
 
+
 fn <- paste(opt$outDir, '/titan_summary.txt', sep = '')
 write.table(results, file = fn, sep = '\t', quote = F)
 
 exts <- c(".titan.png", ".titan.Rdata", ".titan.seg", ".titan.txt", ".titan_seg.txt", paste('.titan.chr', c(1:22, "X"), '.png', sep = ''))
-titanFns <- sub('\\.params\\.txt', '', fns)
-titanFns <- as.vector(sapply(titanFns, paste, exts, sep = ''))
-null <- file.copy(titanFns, opt$outDir, showWarnings = F, overwrite = T)
+
+optFns <- do.call('rbind', filenames)[cbind(names(optClust), optClust)]
+optFns <- sub('\\.params\\.txt', '', optFns)
+optFns <- as.vector(sapply(optFns, paste, exts, sep = ''))
+null <- file.copy(optFns, opt$outDir, showWarnings = F, overwrite = T)

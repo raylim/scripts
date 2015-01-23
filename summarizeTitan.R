@@ -32,7 +32,7 @@ dir.create(opt$outDir, showWarnings = F)
 Data <- list()
 for (fn in fns) {
     s <- sub(".*/", "", sub('\\..*', '', fn))
-    i <- as.integer(str_match(fn, '\\.z([0-9])_p[0-9]\\.params\\.txt')[,2])
+    i <- as.integer(str_match(fn, '\\.z([0-9])\\.params\\.txt')[,2])
     inlist <- strsplit(readLines(fn), ":\t")
     params <- lapply(inlist, tail, n = -1)
     names(params) <- lapply(inlist, head, n = 1)
@@ -95,8 +95,7 @@ results <- data.frame(row.names = names(optClust), optClust = optClust, avgTumor
 fn <- paste(opt$outDir, '/titan_summary.txt', sep = '')
 write.table(results, file = fn, sep = '\t', quote = F)
 
-path <- dirname(fns)
-patterns <- sub('\\.params\\.txt', '.*', basename(fns))
-titanFns <- sapply(patterns, function (x) list.files(path = path, pattern = x, include.dirs = T))
-file.copy(titanFns, opt$outDir)
-
+exts <- c(".titan.png", ".titan.Rdata", ".titan.seg", ".titan.txt", ".titan_seg.txt", paste('.titan.chr', c(1:22, "X"), '.png', sep = ''))
+titanFns <- sub('\\.params\\.txt', '', fns)
+titanFns <- as.vector(sapply(titanFns, paste, exts, sep = ''))
+file.copy(titanFns, opt$outDir, showWarnings = F, overwrite = T)

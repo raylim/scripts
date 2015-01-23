@@ -1,12 +1,17 @@
 #!/usr/bin/env Rscript
+# summarizes titan info and copies 
 
 suppressPackageStartupMessages(library("optparse"));
 suppressPackageStartupMessages(library("TitanCNA"));
+suppressPackageStartupMessages(library("stringr"));
+suppressPackageStartupMessages(library("inflection"));
+
 
 options(warn = -1, error = quote({ traceback(); q('no', status = 1) }))
 
 optList <- list(
-        make_option("--outFile", default = NULL, type = "character", action = "store", help ="output file (required)"))
+        make_option("--segFile", default = NULL, type = "character", action = "store", help ="titan seg file (required)"),
+        make_option("--outDir", default = NULL, type = "character", action = "store", help ="copy optimal files to this directory (required)"))
 
 parser <- OptionParser(usage = "%prog [options] [sample params files]", option_list = optList);
 arguments <- parse_args(parser, positional_arguments = T);
@@ -16,45 +21,87 @@ if (length(arguments$args) < 1) {
     cat("Need sample params files\n\n")
     print_help(parser);
     stop();
-} else if (is.null(opt$outFile)) {
-    cat("Need output file\n\n")
+} else if (is.null(opt$segFile)) {
+    cat("Need titan seg file\n\n")
+    print_help(parser);
+    stop();
+} else if (is.null(opt$outDir)) {
+    cat("Need output prefix dir\n\n")
     print_help(parser);
     stop();
 }
 
 fns <- arguments$args
+dir.create(opt$outDir, showWarnings = F)
 
 Data <- list()
 for (fn in fns) {
     s <- sub(".*/", "", sub('\\..*', '', fn))
-    i <- as.integer(sub(".*params_", "", sub("\\.txt", "", fn)))
+    i <- as.integer(str_match(fn, '\\.z([0-9])_p[0-9]\\.params\\.txt')[,2])
     inlist <- strsplit(readLines(fn), ":\t")
     params <- lapply(inlist, tail, n = -1)
     names(params) <- lapply(inlist, head, n = 1)
     params <- lapply(params, function(x) as.numeric(unlist(strsplit(x, "[[:space:]]+"))))
     paramList <- list()
-    paramList[["DbwIndex"]] <- params[["S_Dbw validity index (Both)"]]
+    paramList[["densBw"]] <- params[["S_Dbw dens.bw (Both)"]]
+    paramList[["scat"]] <- params[["S_Dbw scat (Both)"]]
+    paramList[["SDbwIndex"]] <- params[["S_Dbw validity index (Both)"]]
     paramList[["normalContaminationEstimate"]] <- params[["Normal contamination estimate"]]
     paramList[["avgTumorPloidyEstimate"]] <- params[["Average tumour ploidy estimate"]]
 
     Data[[s]][[i]] <- paramList
 }
 
-dbwM <- matrix(NA, nrow = length(Data), ncol = length(Data[[1]]), dimnames = list(names(Data)))
+sdbwM <- matrix(NA, nrow = length(Data), ncol = length(Data[[1]]), dimnames = list(names(Data)))
+scatM <- matrix(NA, nrow = length(Data), ncol = length(Data[[1]]), dimnames = list(names(Data)))
+densBwM <- matrix(NA, nrow = length(Data), ncol = length(Data[[1]]), dimnames = list(names(Data)))
 avgTumorPloidyEstM <- matrix(NA, nrow = length(Data), ncol = length(Data[[1]]), dimnames = list(names(Data)))
 normalContamEstM <- matrix(NA, nrow = length(Data), ncol = length(Data[[1]]), dimnames = list(names(Data)))
 for (s in names(Data)) {
     for (i in 1:length(Data[[1]])) {
-        dbwM[s, i] <- Data[[s]][[i]]$DbwIndex
+        sdbwM[s, i] <- Data[[s]][[i]]$SDbwIndex
+        densBwM[s, i] <- Data[[s]][[i]]$densBw
+        scatM[s, i] <- Data[[s]][[i]]$scat
         avgTumorPloidyEstM[s, i] <- Data[[s]][[i]]$avgTumorPloidyEstimate
         normalContamEstM[s, i] <- Data[[s]][[i]]$normalContaminationEstimate
     }
 }
-dbwMin <- apply(dbwM,1, which.min)
-avgTumorPloidyEstMin <- avgTumorPloidyEstM[cbind(1:nrow(dbwM), dbwMin)]
-normalContamEstMin <- normalContamEstM[cbind(1:nrow(dbwM), dbwMin)]
+sdbwMin <- apply(sdbwM, 1, which.min)
 
-results <- data.frame(row.names = names(dbwMin), argminSDbw = dbwMin, avgTumorPloidyEst = avgTumorPloidyEstMin, normalContamEst = normalContamEstMin)
+maxScale <- 100
+sc <- 1:maxScale
+ratio <- rep(NA, length(sc))
+for (i in 1:length(sc)){
+    SDbw <- sc[i] * densBwM + scatM
+    counts <- table(apply(SDbw, 1, which.min))
+    ratio[i] <- counts[1] / sum(counts[-1])  # clust1 / sum <- C (clustC)
+}
+fn <- paste(opt$outDir, '/sdbw_scale.png', sep = '')
+png(fn, type = 'cairo-png')
+plot(sc, ratio, type="o", pch=19, xaxt="n", las=2, ylab="Clonal:Subclonal Ratio",
+            xlab="Scale", main="S_Dbw = scale * dens + scat")
+axis(1)
 
-write.table(dbwM, file = 'titan_dbw_index.txt', sep = '\t', quote = F, col.names = F)
-write.table(results, file = 'titan_param_summary.txt', sep = '\t', quote = F)
+## find and plot inflection plot using EDE (R package inflection)
+inflectPt <- findiplist(x=as.matrix(sc), y=ratio, index=1)
+abline(v=inflectPt[2,1], col="red")
+mtext(text=sc[inflectPt[2,1]],side=3,at=inflectPt[2,1])
+null <- dev.off()
+
+SDbw <- sc[inflectPt[2,1]] * densBwM + scatM
+optClust <- apply(SDbw, 1, which.min)
+
+avgTumorPloidyEstOpt <- avgTumorPloidyEstM[cbind(1:nrow(sdbwM), optClust)]
+normalContamEstOpt <- normalContamEstM[cbind(1:nrow(sdbwM), sdbwMin)]
+
+
+results <- data.frame(row.names = names(optClust), optClust = optClust, avgTumorPloidyEst = avgTumorPloidyEstOpt, normalContamEst = normalContamEstOpt)
+
+fn <- paste(opt$outDir, '/titan_summary.txt', sep = '')
+write.table(results, file = fn, sep = '\t', quote = F)
+
+path <- dirname(fns)
+patterns <- sub('\\.params\\.txt', '.*', basename(fns))
+titanFns <- sapply(patterns, function (x) list.files(path = path, pattern = x, include.dirs = T))
+file.copy(titanFns, opt$outDir)
+

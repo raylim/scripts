@@ -10,7 +10,6 @@ suppressPackageStartupMessages(library("inflection"));
 options(warn = -1, error = quote({ traceback(); q('no', status = 1) }))
 
 optList <- list(
-        make_option("--segFile", default = NULL, type = "character", action = "store", help ="titan seg file (required)"),
         make_option("--outDir", default = NULL, type = "character", action = "store", help ="copy optimal files to this directory (required)"))
 
 parser <- OptionParser(usage = "%prog [options] [sample params files]", option_list = optList);
@@ -19,10 +18,6 @@ opt <- arguments$options;
 
 if (length(arguments$args) < 1) {
     cat("Need sample params files\n\n")
-    print_help(parser);
-    stop();
-} else if (is.null(opt$segFile)) {
-    cat("Need titan seg file\n\n")
     print_help(parser);
     stop();
 } else if (is.null(opt$outDir)) {

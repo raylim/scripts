@@ -61,13 +61,13 @@ print $vcfHeader;
 my $format = "GT:AD:AF";
 
 
-my $headerLine = <>;
-chomp $headerLine;
-$headerLine =~ s/^#//;
-my @header = split/\t/, $headerLine;
-
 while (<>) {
     chomp;
+    if (/^#chr/) {
+        $_ =~ s/^#//;
+        my @header = split/\t/;
+    }
+    next if /^#/;
     my @F = split /\t/;
     my %F = map { $_ => shift @F } @header;
     my $chrom = $F{chr};

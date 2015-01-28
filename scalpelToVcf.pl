@@ -63,9 +63,10 @@ my $format = "GT:AD:AF";
 
 while (<>) {
     chomp;
+    my @header;
     if (/^#chr/) {
         $_ =~ s/^#//;
-        my @header = split/\t/;
+        @header = split/\t/;
     }
     next if /^#/;
     my @F = split /\t/;

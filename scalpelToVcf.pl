@@ -67,6 +67,7 @@ while (<>) {
     if (/^#chr/) {
         $_ =~ s/^#//;
         @header = split/\t/;
+        next;
     }
     next if /^#/;
     my @F = split /\t/;

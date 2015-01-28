@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -o pipefail
+
 RCMD="Rscript"
 TMPDIR="$HOME/share/tmp"
 QUEUE="jrf.q"
@@ -53,13 +55,12 @@ if [[ -n "$R" ]]; then
     echo "${R}" > $LOGDIR/$NAME.log
     if [[ -n "$SGE" ]]; then
         mkdir -p $LOGDIR
-        qrsh -cwd -V -now n -q $QUEUE -N X$NAME $PE -l virtual_free=$MEM,h_vmem=$MEM "umask 002; ${RCMD} ${TMP}" 2>&1 | tee -a $LOGDIR/$NAME.log && RET_CODE=$?
+        qrsh -cwd -V -now n -q $QUEUE -N X$NAME $PE -l virtual_free=$MEM,h_vmem=$MEM "umask 002; ${RCMD} ${TMP}" 2>&1 | tee -a $LOGDIR/$NAME.log
     else
         $RCMD ${TMP} | tee -a $LOGDIR/$NAME.log
-        RET_CODE=$?
     fi
     rm -f ${TMP}
-    exit ${RET_CODE}
+    #exit ${RET_CODE}
 else
     echo "Undefined script" >&2
     exit -1

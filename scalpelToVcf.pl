@@ -69,7 +69,6 @@ while (<>) {
         next;
     }
     next if /^#/;
-    print "$_\n";
     my @F = split /\t/;
     my %F = map { $_ => shift @F } @header;
     my $chrom = $F{chr};

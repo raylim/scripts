@@ -48,6 +48,7 @@ if [[ $PARALLEL -gt 1 ]]; then
 fi
 
 umask 002
+mkdir -p $LOGDIR
  
 if [[ -n "$R" ]]; then 
     TMP=$(mktemp --tmpdir=${TMPDIR})

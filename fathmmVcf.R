@@ -8,6 +8,7 @@ suppressPackageStartupMessages(library("data.table"));
 suppressPackageStartupMessages(library(TxDb.Hsapiens.UCSC.hg19.knownGene));
 suppressPackageStartupMessages(library(BSgenome.Hsapiens.UCSC.hg19))
 suppressPackageStartupMessages(library(org.Hs.eg.db))
+suppressPackageStartupMessages(library(RMySQL))
 
 options(warn = -1, error = quote({ traceback(2); q('no', status = 1) }))
 
@@ -59,6 +60,10 @@ cat('done\n')
 ref <- FaFile(opt$ref)
 
 cat('Connecting to ensembl ... ')
+mydb <- dbConnect(MySQL(), host = "10.0.200.48", port = 38493)
+on.exit(dbDisconnect(mydb))
+
+
 ensembl = useMart("ensembl") #, host = 'localhost', port = 9000)
 ensembl = useDataset("hsapiens_gene_ensembl", mart = ensembl)
 cat('done\n')
@@ -138,6 +143,11 @@ while(nrow(vcf <- readVcf(tab, genome = opt$genome))) {
             rownames(aa) <- predCod$TXID
 
             cat("Looking up ensembl peptide IDs ... ")
+            query <- paste("SELECT P.stable_id AS peptide_id, T.stable_id AS transcript_id
+                           from transcript as T JOIN translation as P ON T.transcript_id = P.transcript_id
+                           where T.stable_id in (", paste(sQuote(enstIds), sep = ','), ")")
+            ids <- dbSendQuery(mydb, query)
+
             ids <- getBM(filters = 'ensembl_transcript_id', attributes = c('ensembl_transcript_id', 'ensembl_peptide_id'), values = enstIds, mart = ensembl)
             rownames(ids) <- names(enstIds)[match(ids$ensembl_transcript_id, enstIds)]
             ids <- cbind(aa, ids[rownames(aa), ])

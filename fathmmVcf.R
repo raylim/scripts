@@ -144,7 +144,7 @@ while(nrow(vcf <- readVcf(tab, genome = opt$genome))) {
             cat("Looking up ensembl peptide IDs ... ")
             query <- paste("SELECT P.stable_id AS peptide_id, T.stable_id AS transcript_id
                            from transcript as T JOIN translation as P ON T.transcript_id = P.transcript_id
-                           where T.stable_id in (", paste(sQuote(enstIds, useFancyQuotes = F), collapse = ','), ");")
+                           where T.stable_id in (", paste(sQuote(enstIds), collapse = ','), ");")
             rs <- dbSendQuery(mydb, query)
             ids <- fetch(rs, -1)
             #ids <- getBM(filters = 'ensembl_transcript_id', attributes = c('ensembl_transcript_id', 'ensembl_peptide_id'), values = enstIds, mart = ensembl)

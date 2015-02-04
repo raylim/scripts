@@ -93,8 +93,8 @@ while (<>) {
     my ($normalRcov, $tumorRcov, $normalAcov, $tumorAcov) = $F{covState} =~ /^(\d+) (\d+)\/(\d+) (\d+)/;
     my $normalAD = "$normalRcov,$normalAcov";
     my $tumorAD = "$tumorRcov,$tumorAcov";
-    my $normalAF = ($normalRcov + $normalAcov > 0)? $normalAcov / ($normalRcov + $normalAcov) : 0;
-    my $tumorAF = ($tumorRcov + $tumorAcov > 0)? $tumorAcov / ($tumorRcov + $tumorAcov) : 0;
+    my $normalAF = ($normalRcov + $normalAcov > 0)? $normalAcov / ($normalRcov + $normalAcov) : "nan";
+    my $tumorAF = ($tumorRcov + $tumorAcov > 0)? $tumorAcov / ($tumorRcov + $tumorAcov) : "nan";
 
     my $tumorFormat = sprintf "%s:%s:%.2f", $tumorGT, $tumorAD, $tumorAF;
     my $normalFormat = sprintf "%s:%s:%.2f", $normalGT, $normalAD, $normalAF;

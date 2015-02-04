@@ -61,7 +61,7 @@ cat('done\n')
 ref <- FaFile(opt$ref)
 
 cat('Connecting to ensembl ... ')
-mydb <- dbConnect(MySQL(), host = "10.0.200.48", port = 38493, user = '', dbname = 'homo_sapiens_core_78_38')
+mydb <- dbConnect(MySQL(), host = "10.0.200.48", port = 38493, user = "''", dbname = 'homo_sapiens_core_78_38')
 on.exit(dbDisconnect(mydb))
 #ensembl = useMart("ensembl") #, host = 'localhost', port = 9000)
 #ensembl = useDataset("hsapiens_gene_ensembl", mart = ensembl)

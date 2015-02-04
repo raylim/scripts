@@ -84,6 +84,7 @@ while (<>) {
         $ref =~ s/-//;
     }
     my ($normalR, $tumorR, $normalA, $tumorA) = $F{bestState} =~ /(\d)(\d)\/(\d)(\d)/;
+    next if ($normalR == 0 and $normalA == 0); # skip non-ref, non-alt normal positions
     my $normalGT = "0" x $normalR . "1" x $normalA;
     $normalGT = join "/", (split '', $normalGT);
     my $tumorGT = "0" x $tumorR . "1" x $tumorA;

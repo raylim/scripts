@@ -40,10 +40,10 @@ if (is.null(opt$outDir)) {
 glob <- paste(opt$inPrefix, '*_ml_spectra.txt', sep = '')
 spectraFiles <- Sys.glob(glob)
 
-glob <- paste(opt$inDir, '*_map_activities.txt', sep = '')
+glob <- paste(opt$inPrefix, '*_map_activities.txt', sep = '')
 activityFiles <- Sys.glob(glob)
 
-glob <- paste(opt$inDir, '*_assigned.txt', sep = '')
+glob <- paste(opt$inPrefix, '*_assigned.txt', sep = '')
 assignedFiles <- Sys.glob(glob)
 
 pg <- openPage('index.html', dirname = opt$outDir, title = 'EMu results')

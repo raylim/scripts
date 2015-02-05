@@ -14,7 +14,7 @@ optList <- list(
                 make_option("--mutations", default = NULL, help = "mutations file (required)"),
                 make_option("--samples", default = NULL, help = "samples file"),
                 make_option("--sampleSubset", default = NULL, help = "sample subset file: list of samples to plot contribution"),
-                make_option("--inDir", default = NULL, help = "EMu input directory (required)"))
+                make_option("--inPrefix", default = NULL, help = "EMu input prefix (required)"))
 
 parser <- OptionParser(usage = "%prog [options]", option_list = optList);
 
@@ -25,8 +25,8 @@ if (is.null(opt$outDir)) {
     cat("Need output dir\n");
     print_help(parser);
     stop();
-} else if (is.null(opt$inDir)) {
-    cat("Need EMu input directory\n");
+} else if (is.null(opt$inPrefix)) {
+    cat("Need EMu input prefix\n");
     print_help(parser);
     stop();
 } else if (is.null(opt$mutations)) {
@@ -37,13 +37,13 @@ if (is.null(opt$outDir)) {
     files <- arguments$args;
 }
 
-glob <- paste(opt$inDir, '/*_ml_spectra.txt', sep = '')
+glob <- paste(opt$inPrefix, '*_ml_spectra.txt', sep = '')
 spectraFiles <- Sys.glob(glob)
 
-glob <- paste(opt$inDir, '/*_map_activities.txt', sep = '')
+glob <- paste(opt$inDir, '*_map_activities.txt', sep = '')
 activityFiles <- Sys.glob(glob)
 
-glob <- paste(opt$inDir, '/*_assigned.txt', sep = '')
+glob <- paste(opt$inDir, '*_assigned.txt', sep = '')
 assignedFiles <- Sys.glob(glob)
 
 pg <- openPage('index.html', dirname = opt$outDir, title = 'EMu results')

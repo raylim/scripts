@@ -19,11 +19,11 @@ allOutputFile = strcat(outputPrefix, '.mat');
 
 for totalSignatures = minNumSig : maxNumSig
     outputFile = strcat(outputPrefix, '_', num2str(totalSignatures), '.mat');
-    
+
     % Decipher the signatures of mutational processes from catalogues of mutations
     [input allProcesses allExposures idx processes exposures processStab processStabAvg] = ...
-        decipherMutationalProcesses(iterationsPerCore, totalSignatures, inputFile, ...
-            [ outputFile ] );
+    decipherMutationalProcesses(iterationsPerCore, totalSignatures, inputFile, ...
+    [ outputFile ] );
     % Record the stability and average Frobenius reconstruction error
     stability(totalSignatures-minNumberOfSignature+1) = mean(processStabAvg);
     reconstructionError(totalSignatures-minNumberOfSignature+1) = norm(input.originalGenomes - processes*exposures, 'fro');
@@ -38,4 +38,4 @@ end
 
 %% Saving the data
 save(allOutputFile);
-
+end

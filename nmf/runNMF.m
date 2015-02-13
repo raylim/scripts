@@ -4,6 +4,8 @@ addpath(strcat(nmfDir, '/source/'));
 addpath(strcat(nmfDir, '/plotting/'));
 clc;
 
+mkdir('temp');
+
 minNumSig = str2num(minNumSig);
 maxNumSig = str2num(maxNumSig);
 

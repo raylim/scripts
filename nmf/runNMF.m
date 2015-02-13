@@ -4,6 +4,8 @@ addpath(strcat(nmfDir, '/source/'));
 addpath(strcat(nmfDir, '/plotting/'));
 clc;
 
+minNumSig = str2num(minNumSig);
+maxNumSig = str2num(maxNumSig);
 
 %% Open matlabpool
 if ( matlabpool('size') == 0 )

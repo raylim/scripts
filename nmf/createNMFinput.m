@@ -13,5 +13,5 @@ sampleNames = sampleNames{1};
 load(typesFile);
 
 save(inputFile, 'originalGenomes', 'subtypes', 'types', 'sampleNames', 'cancerType');
-
+quit
 end

@@ -12,8 +12,8 @@ end
 
 %% Define parameters
 iterationsPerCore = 100;
-tability = zeros(maxNumberOfSignature, 1);
-reconstructionError = zeros(maxNumberOfSignature, 1);
+tability = zeros(maxNumSig, 1);
+reconstructionError = zeros(maxNumSig, 1);
 allOutputFile = strcat(outputPrefix, '.mat');
 
 for totalSignatures = minNumSig : maxNumSig
@@ -24,13 +24,13 @@ for totalSignatures = minNumSig : maxNumSig
     decipherMutationalProcesses(iterationsPerCore, totalSignatures, inputFile, ...
     [ outputFile ] );
     % Record the stability and average Frobenius reconstruction error
-    stability(totalSignatures-minNumberOfSignature+1) = mean(processStabAvg);
-    reconstructionError(totalSignatures-minNumberOfSignature+1) = norm(input.originalGenomes - processes*exposures, 'fro');
+    stability(totalSignatures-minNumSig+1) = mean(processStabAvg);
+    reconstructionError(totalSignatures-minNumSig+1) = norm(input.originalGenomes - processes*exposures, 'fro');
 end
 
 %% Plotting the stability and average Frobenius reconstruction error
 try %% Some versions of MATLAB plotyy has a bug under linux with -nodisplay -nosplash -nodesktop options
-      plotSignatureStabilityAndReconstruction(minNumberOfSignature:maxNumberOfSignature, stability, reconstructionError, input);
+      plotSignatureStabilityAndReconstruction(minNumSig:maxNumSig, stability, reconstructionError, input);
 catch ME
         %% Do not do anything - just ignore the plot in order to save the final output daya
 end

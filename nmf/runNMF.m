@@ -12,7 +12,7 @@ end
 
 %% Define parameters
 iterationsPerCore = 100;
-tability = zeros(maxNumSig, 1);
+stability = zeros(maxNumSig, 1);
 reconstructionError = zeros(maxNumSig, 1);
 allOutputFile = strcat(outputPrefix, '.mat');
 

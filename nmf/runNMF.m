@@ -38,4 +38,6 @@ end
 
 %% Saving the data
 save(allOutputFile);
+
+quit
 end

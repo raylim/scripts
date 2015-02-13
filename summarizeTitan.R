@@ -104,4 +104,4 @@ exts <- c(".titan.png", ".titan.Rdata", ".titan.seg", ".titan.txt", ".titan_seg.
 optFns <- do.call('rbind', filenames)[cbind(names(optClust), optClust)]
 optFns <- sub('\\.params\\.txt', '', optFns)
 optFns <- as.vector(sapply(optFns, paste, exts, sep = ''))
-null <- file.copy(optFns, opt$outDir, showWarnings = F, overwrite = T)
+null <- file.copy(optFns, opt$outDir, overwrite = T)

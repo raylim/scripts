@@ -34,7 +34,9 @@ end
 
 %% Plotting the stability and average Frobenius reconstruction error
 try %% Some versions of MATLAB plotyy has a bug under linux with -nodisplay -nosplash -nodesktop options
-      plotSignatureStabilityAndReconstruction(minNumSig:maxNumSig, stability, reconstructionError, input);
+    fig = figure;
+    plotSignatureStabilityAndReconstruction(minNumSig:maxNumSig, stability, reconstructionError, input);
+    saveas(fig, strcat(outputPrefix, '_stab_reconstruction.png'))
 catch ME
         %% Do not do anything - just ignore the plot in order to save the final output daya
 end

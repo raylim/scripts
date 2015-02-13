@@ -1,6 +1,5 @@
 function runNMF( inputFile, outputPrefix, nmfDir, minNumSig, maxNumSig )
 % run NMF 
-clear all;
 addpath(strcat(nmfDir, '/source/'));
 addpath(strcat(nmfDir, '/plotting/'));
 clc;

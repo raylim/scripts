@@ -21,7 +21,7 @@ reconstructionError = zeros(maxNumSig, 1);
 allOutputFile = strcat(outputPrefix, '.mat');
 
 for totalSignatures = minNumSig : maxNumSig
-    outputFile = strcat(outputPrefix, '_', num2str(totalSignatures), '.mat');
+    outputFile = strcat(outputPrefix, '_ts', num2str(totalSignatures), '.mat');
 
     % Decipher the signatures of mutational processes from catalogues of mutations
     [input allProcesses allExposures idx processes exposures processStab processStabAvg] = ...
@@ -34,9 +34,7 @@ end
 
 %% Plotting the stability and average Frobenius reconstruction error
 try %% Some versions of MATLAB plotyy has a bug under linux with -nodisplay -nosplash -nodesktop options
-    fig = figure;
-    plotSignatureStabilityAndReconstruction(minNumSig:maxNumSig, stability, reconstructionError, input);
-    saveas(fig, strcat(outputPrefix, '_stab_reconstruction.png'))
+    plotSignatureStabilityAndReconstructionToFile(strcat(outputPrefix, '_stab_reconstruction.png'), minNumSig:maxNumSig, stability, reconstructionError, input);
 catch ME
         %% Do not do anything - just ignore the plot in order to save the final output daya
 end

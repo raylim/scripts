@@ -175,6 +175,8 @@ while(nrow(vcf <- readVcf(tab, genome = opt$genome))) {
                 cat("Selecting minimum scores ... ")
                 results <- rbindlist(lapply(split.results, function(x) x[which.min(x$Score), ]))
                 cat("done\n")
+            } else {
+                results <- NULL
             }
             if (!is.null(results) && nrow(results) > 0) {
                 cat("Merging fathmm results ... ")

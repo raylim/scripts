@@ -148,7 +148,7 @@ while(nrow(vcf <- readVcf(tab, genome = opt$genome))) {
             rs <- dbSendQuery(mydb, query)
             ids <- fetch(rs, -1)
             #ids <- getBM(filters = 'ensembl_transcript_id', attributes = c('ensembl_transcript_id', 'ensembl_peptide_id'), values = enstIds, mart = ensembl)
-            if (nrow(ids) > 0 && ncol(ids) > 0) {
+            if (nrow(ids) > 0 && ncol(ids) > 0 && "peptide_id" %in% colnames(ids)) {
                 rownames(ids) <- names(enstIds)[match(ids$transcript_id, enstIds)]
                 xx <- intersect(rownames(aa), rownames(ids))
                 ids <- cbind(aa[xx, ], ids[xx, ])

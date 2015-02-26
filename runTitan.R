@@ -66,6 +66,9 @@ if (opt$includeY) {
     chroms <- c(chroms, "Y")
 }
 
+if (opt$genomeStyle == "UCSC")
+    chroms <- paste('chr', chroms, sep = '')
+
 #pg <- openPage(paste(opt$outPrefix, '_titan_report_', opt$numClusters, '.html', sep = ''), title = 'TITAN Plots')
 
 fn <- arguments$args[1]
@@ -150,7 +153,7 @@ if (opt$numClusters <= 2){
 null <- dev.off()
 
 for (chr in intersect(results$Chr, chroms)) {
-    outplot <- paste(opt$plotPrefix, '.titan.chr', chr, ".png", sep = '')
+    outplot <- paste(opt$plotPrefix, '.titan.', chr, ".png", sep = '')
     #hwriteImage(basename(outplot), pg, br = T)
     png(outplot,width=1200,height=1000,res=100, type = 'cairo-png')
     if (opt$numClusters <= 2) { 
@@ -158,11 +161,11 @@ for (chr in intersect(results$Chr, chroms)) {
     } else {
         par(mfrow=c(3,1))
     }
-    plotCNlogRByChr(results, chr, ploidy=ploidy, geneAnnot=NULL, spacing=4,ylim=c(-2,2),cex=0.5,main= paste("Chr", chr))
-    plotAllelicRatio(results, chr, geneAnnot=NULL, spacing=4, ylim=c(0,1),cex=0.5,main=paste("chr", chr))
-    plotClonalFrequency(results, chr, normal=tail(convergeParams$n,1), geneAnnot=NULL, spacing=4,ylim=c(0,1),cex=0.5,main= paste("Chr", chr))
+    plotCNlogRByChr(results, chr, ploidy=ploidy, geneAnnot=NULL, spacing=4,ylim=c(-2,2),cex=0.5,main=  chr)
+    plotAllelicRatio(results, chr, geneAnnot=NULL, spacing=4, ylim=c(0,1),cex=0.5,main= chr)
+    plotClonalFrequency(results, chr, normal=tail(convergeParams$n,1), geneAnnot=NULL, spacing=4,ylim=c(0,1),cex=0.5,main= chr)
     if (opt$numClusters <= 2){ 
-        plotSubcloneProfiles(results, chr, cex = 2, spacing=6, main=paste("Chr", chr))
+        plotSubcloneProfiles(results, chr, cex = 2, spacing=6, main=chr)
     }
     #pI <- plotIdiogram(chr,build="hg19",unit="bp",label.y=-4.25,new=FALSE,ylim=c(-2,-1))
     null <- dev.off()

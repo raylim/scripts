@@ -20,6 +20,7 @@ optList <- list(
         make_option("--txnZstrength", default = 5e5, type = "double", action = "store", help ="clonal-cluster transition probability [default = %default]"),
         make_option("--tumorWig", default = NULL, type = "character", action = "store", help ="tumor wig (required)"),
         make_option("--normalWig", default = NULL, type = "character", action = "store", help ="normal wig (required)"),
+        make_option("--genomeStyle", default = "NCBI", type = "character", action = "store", help ="genome style: NCBI (no chr) or UCSC (include chr) [default %default]"),
         make_option("--includeY", default = F, action = "store_true", help ="include Y chromosome"),
         make_option("--targetBed", default = NULL, type = "character", action = "store", help ="targeted interval bed"))
 
@@ -76,9 +77,9 @@ if (!is.null(opt$targetBed)) {
     targetGr <- import(opt$targetBed)
     targets <- as.data.frame(targetGr)[,1:3]
     colnames(targets) <- c("chr", "start", "stop")
-    cnData <- correctReadDepth(opt$tumorWig, opt$normalWig, opt$gcWig, opt$mapWig, targetedSequence = targets)
+    cnData <- correctReadDepth(opt$tumorWig, opt$normalWig, opt$gcWig, opt$mapWig, targetedSequence = targets, genomeStyle = opt$genomeStyle)
 } else {
-    cnData <- correctReadDepth(opt$tumorWig, opt$normalWig, opt$gcWig, opt$mapWig)
+    cnData <- correctReadDepth(opt$tumorWig, opt$normalWig, opt$gcWig, opt$mapWig, genomeStyle = opt$genomeStyle)
 }
 
 #getPositionOverlap <- function(chr, posn, dataVal) {

@@ -69,7 +69,7 @@ if (opt$includeY) {
 #pg <- openPage(paste(opt$outPrefix, '_titan_report_', opt$numClusters, '.html', sep = ''), title = 'TITAN Plots')
 
 fn <- arguments$args[1]
-Data <- loadAlleleCounts(fn, header = F)
+Data <- loadAlleleCounts(fn, header = F, genomeStyle = opt$genomeStyle)
 params <- loadDefaultParameters(copyNumber=5, numberClonalClusters=opt$numClusters, symmetric=TRUE, data = Data)
 params$ploidyParams$phi_0 <- opt$ploidyPrior
 

@@ -20,6 +20,7 @@ optList <- list(
         make_option("--txnZstrength", default = 5e5, type = "double", action = "store", help ="clonal-cluster transition probability [default = %default]"),
         make_option("--tumorWig", default = NULL, type = "character", action = "store", help ="tumor wig (required)"),
         make_option("--normalWig", default = NULL, type = "character", action = "store", help ="normal wig (required)"),
+        make_option("--genomeStyle", default = "NCBI", type = "character", action = "store", help ="genome style: NCBI (no chr) or UCSC (include chr) [default %default]"),
         make_option("--includeY", default = F, action = "store_true", help ="include Y chromosome"),
         make_option("--targetBed", default = NULL, type = "character", action = "store", help ="targeted interval bed"))
 
@@ -65,10 +66,13 @@ if (opt$includeY) {
     chroms <- c(chroms, "Y")
 }
 
+if (opt$genomeStyle == "UCSC")
+    chroms <- paste('chr', chroms, sep = '')
+
 #pg <- openPage(paste(opt$outPrefix, '_titan_report_', opt$numClusters, '.html', sep = ''), title = 'TITAN Plots')
 
 fn <- arguments$args[1]
-Data <- loadAlleleCounts(fn, header = F)
+Data <- loadAlleleCounts(fn, header = F, genomeStyle = opt$genomeStyle)
 params <- loadDefaultParameters(copyNumber=5, numberClonalClusters=opt$numClusters, symmetric=TRUE, data = Data)
 params$ploidyParams$phi_0 <- opt$ploidyPrior
 
@@ -76,9 +80,9 @@ if (!is.null(opt$targetBed)) {
     targetGr <- import(opt$targetBed)
     targets <- as.data.frame(targetGr)[,1:3]
     colnames(targets) <- c("chr", "start", "stop")
-    cnData <- correctReadDepth(opt$tumorWig, opt$normalWig, opt$gcWig, opt$mapWig, targetedSequence = targets)
+    cnData <- correctReadDepth(opt$tumorWig, opt$normalWig, opt$gcWig, opt$mapWig, targetedSequence = targets, genomeStyle = opt$genomeStyle)
 } else {
-    cnData <- correctReadDepth(opt$tumorWig, opt$normalWig, opt$gcWig, opt$mapWig)
+    cnData <- correctReadDepth(opt$tumorWig, opt$normalWig, opt$gcWig, opt$mapWig, genomeStyle = opt$genomeStyle)
 }
 
 #getPositionOverlap <- function(chr, posn, dataVal) {
@@ -149,7 +153,7 @@ if (opt$numClusters <= 2){
 null <- dev.off()
 
 for (chr in intersect(results$Chr, chroms)) {
-    outplot <- paste(opt$plotPrefix, '.titan.chr', chr, ".png", sep = '')
+    outplot <- paste(opt$plotPrefix, '.titan.', chr, ".png", sep = '')
     #hwriteImage(basename(outplot), pg, br = T)
     png(outplot,width=1200,height=1000,res=100, type = 'cairo-png')
     if (opt$numClusters <= 2) { 
@@ -157,11 +161,11 @@ for (chr in intersect(results$Chr, chroms)) {
     } else {
         par(mfrow=c(3,1))
     }
-    plotCNlogRByChr(results, chr, ploidy=ploidy, geneAnnot=NULL, spacing=4,ylim=c(-2,2),cex=0.5,main= paste("Chr", chr))
-    plotAllelicRatio(results, chr, geneAnnot=NULL, spacing=4, ylim=c(0,1),cex=0.5,main=paste("chr", chr))
-    plotClonalFrequency(results, chr, normal=tail(convergeParams$n,1), geneAnnot=NULL, spacing=4,ylim=c(0,1),cex=0.5,main= paste("Chr", chr))
+    plotCNlogRByChr(results, chr, ploidy=ploidy, geneAnnot=NULL, spacing=4,ylim=c(-2,2),cex=0.5,main=  chr)
+    plotAllelicRatio(results, chr, geneAnnot=NULL, spacing=4, ylim=c(0,1),cex=0.5,main= chr)
+    plotClonalFrequency(results, chr, normal=tail(convergeParams$n,1), geneAnnot=NULL, spacing=4,ylim=c(0,1),cex=0.5,main= chr)
     if (opt$numClusters <= 2){ 
-        plotSubcloneProfiles(results, chr, cex = 2, spacing=6, main=paste("Chr", chr))
+        plotSubcloneProfiles(results, chr, cex = 2, spacing=6, main=chr)
     }
     #pI <- plotIdiogram(chr,build="hg19",unit="bp",label.y=-4.25,new=FALSE,ylim=c(-2,-1))
     null <- dev.off()

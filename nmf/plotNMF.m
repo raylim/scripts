@@ -1,5 +1,5 @@
 function plotNMF( prefix, nmfDir, minNumSig, maxNumSig )
-% run NMF 
+% run NMF
 addpath(strcat(nmfDir, '/source/'));
 addpath(strcat(nmfDir, '/plotting/'));
 mkdir('temp');
@@ -17,4 +17,4 @@ end
 
 quit
 end
-    
+

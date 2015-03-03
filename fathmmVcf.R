@@ -148,32 +148,36 @@ while(nrow(vcf <- readVcf(tab, genome = opt$genome))) {
             rs <- dbSendQuery(mydb, query)
             ids <- fetch(rs, -1)
             #ids <- getBM(filters = 'ensembl_transcript_id', attributes = c('ensembl_transcript_id', 'ensembl_peptide_id'), values = enstIds, mart = ensembl)
-            rownames(ids) <- names(enstIds)[match(ids$transcript_id, enstIds)]
-            xx <- intersect(rownames(aa), rownames(ids))
-            ids <- cbind(aa[xx, ], ids[xx, ])
-            cat("done\n")
+            if (nrow(ids) > 0 && ncol(ids) > 0 && all(c('aa', "peptide_id") %in% colnames(ids))) {
+                rownames(ids) <- names(enstIds)[match(ids$transcript_id, enstIds)]
+                xx <- intersect(rownames(aa), rownames(ids))
+                ids <- cbind(aa[xx, ], ids[xx, ])
+                cat("done\n")
 
-            fathmmInput <- subset(ids, peptide_id != "", select = c('peptide_id', 'aa'))
+                fathmmInput <- subset(ids, peptide_id != "", select = c('peptide_id', 'aa'))
 
-            cat("Calling fathmm: ")
-            tmp1 <- tempfile()
-            tmp2 <- tempfile()
-            setwd(paste(opt$fathmmDir, '/cgi-bin', sep = ''))
-            cmd <- paste(opt$python, 'fathmm.py -w', opt$fathmmAlg, '-p', opt$fathmmOnt, tmp1, tmp2)
-            write.table(subset(ids, peptide_id != "", select = c('peptide_id', 'aa')), file = tmp1, quote = F, sep = ' ', row.names = F, col.names = F)
-            #cmd <- paste('python fathmm.py -w Cancer', tmp1, tmp2)
-            system(cmd)
-            cat("\ndone\n")
+                cat("Calling fathmm: ")
+                tmp1 <- tempfile()
+                tmp2 <- tempfile()
+                setwd(paste(opt$fathmmDir, '/cgi-bin', sep = ''))
+                cmd <- paste(opt$python, 'fathmm.py -w', opt$fathmmAlg, '-p', opt$fathmmOnt, tmp1, tmp2)
+                write.table(subset(ids, peptide_id != "", select = c('peptide_id', 'aa')), file = tmp1, quote = F, sep = ' ', row.names = F, col.names = F)
+                #cmd <- paste('python fathmm.py -w Cancer', tmp1, tmp2)
+                system(cmd)
+                cat("\ndone\n")
 
-            cat("Reading results ... ")
-            results <- read.table(tmp2, sep = '\t', header = T, comment.char = '', row.names = 1, quote = '')
-            cat("done\n")
-            results <- merge(ids, results, by.x = c('aa', 'peptide_id'), by.y = c('Substitution', 'Protein.ID'))
+                cat("Reading results ... ")
+                results <- read.table(tmp2, sep = '\t', header = T, comment.char = '', row.names = 1, quote = '')
+                cat("done\n")
+                results <- merge(ids, results, by.x = c('aa', 'peptide_id'), by.y = c('Substitution', 'Protein.ID'))
 
-            split.results <- split(results, factor(results$queryId))
-            cat("Selecting minimum scores ... ")
-            results <- rbindlist(lapply(split.results, function(x) x[which.min(x$Score), ]))
-            cat("done\n")
+                split.results <- split(results, factor(results$queryId))
+                cat("Selecting minimum scores ... ")
+                results <- rbindlist(lapply(split.results, function(x) x[which.min(x$Score), ]))
+                cat("done\n")
+            } else {
+                results <- NULL
+            }
             if (!is.null(results) && nrow(results) > 0) {
                 cat("Merging fathmm results ... ")
                 infodprime <- info(vcf)

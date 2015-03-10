@@ -58,13 +58,6 @@ while(nrow(vcf <- readVcf(tab, genome = opt$genome))) {
     ol <- findOverlaps(rowData(vcf), genes, select = 'first')
     info(vcf)[,opt$name] <- !is.na(ol)
 
-    #fix sample genotype order
-    if ("GT" %in% names(geno(vcf))) {
-        x <- which(names(geno(vcf)) == "GT")
-        ord <- c(x, (1:length(geno(vcf)))[-x])
-        geno(vcf) <- geno(vcf)[ord]
-    }
-
     cat("Appending vcf chunk to", opt$outFile, "... ")
     writeVcf(vcf, out)
     cat("done\n")

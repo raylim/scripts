@@ -55,7 +55,7 @@ i <- 1
 while(nrow(vcf <- readVcf(tab, genome = opt$genome))) {
     # replace header
     newInfo <- DataFrame(Number = 0, Type = "Flag", Description = paste(opt$name, ": variant is in gene list", sep = ''), row.names = opt$name)
-    info(vcf) <- rbind(info(vcf), newInfo)
+    info(header(vcf)) <- rbind(info(header(vcf)), newInfo)
     ol <- findOverlaps(rowData(vcf), genes, select = 'first')
     info(vcf)[,opt$name] <- !is.na(ol)
 

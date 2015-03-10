@@ -1,6 +1,7 @@
 #!/usr/bin/env Rscript
 # parse gene list
 # usage: ./addGeneListAnnotationToVcf.pl 
+suppressPackageStartupMessages(library("optparse"));
 suppressPackageStartupMessages(library("GenomicRanges"));
 suppressPackageStartupMessages(library("rtracklayer"));
 suppressPackageStartupMessages(library("VariantAnnotation"));

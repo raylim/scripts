@@ -150,7 +150,7 @@ while(nrow(vcf <- readVcf(tab, genome = opt$genome))) {
             ids <- fetch(rs, -1)
             cat(paste("Found", nrow(ids), "records\n"))
             #ids <- getBM(filters = 'ensembl_transcript_id', attributes = c('ensembl_transcript_id', 'ensembl_peptide_id'), values = enstIds, mart = ensembl)
-            if (nrow(ids) > 0 && ncol(ids) > 0 && all(c('aa', "peptide_id") %in% colnames(ids))) {
+            if (nrow(ids) > 0 && ncol(ids) > 0 && "peptide_id" %in% colnames(ids)) {
                 rownames(ids) <- names(enstIds)[match(ids$transcript_id, enstIds)]
                 xx <- intersect(rownames(aa), rownames(ids))
                 ids <- cbind(aa[xx, ], ids[xx, ])

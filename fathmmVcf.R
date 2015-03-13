@@ -141,12 +141,14 @@ while(nrow(vcf <- readVcf(tab, genome = opt$genome))) {
             aa = cbind(queryId = passIds[predCod$QUERYID], aa = paste(as.character(predCod$REFAA), lapply(predCod$PROTEINLOC, function(x) x[1]), as.character(predCod$VARAA), sep = ''))
             rownames(aa) <- predCod$TXID
 
-            cat("Looking up ensembl peptide IDs ... ")
             query <- paste("SELECT P.stable_id AS peptide_id, T.stable_id AS transcript_id
                            from transcript as T JOIN translation as P ON T.transcript_id = P.transcript_id
                            where T.stable_id in (", paste(sQuote(enstIds), collapse = ','), ");")
+            cat(paste(query, "\n", sep = ""));
+            cat("Looking up ensembl peptide IDs ...\n")
             rs <- dbSendQuery(mydb, query)
             ids <- fetch(rs, -1)
+            cat(paste("Found", nrow(ids), "records\n"))
             #ids <- getBM(filters = 'ensembl_transcript_id', attributes = c('ensembl_transcript_id', 'ensembl_peptide_id'), values = enstIds, mart = ensembl)
             if (nrow(ids) > 0 && ncol(ids) > 0 && all(c('aa', "peptide_id") %in% colnames(ids))) {
                 rownames(ids) <- names(enstIds)[match(ids$transcript_id, enstIds)]

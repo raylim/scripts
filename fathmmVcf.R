@@ -71,7 +71,6 @@ cat('done\n')
 #opt$ref <- '/home/limr/share/reference/GATK_bundle/2.3/human_g1k_v37.fasta'
 #opt$fathmmDir <- '~/share/usr/fathmm/'
 #opt$genome <- 'hg19'
-fn <- arguments$args[1];
 
 cat('Reading vcf header ... ')
 # create new header
@@ -150,10 +149,10 @@ while(nrow(vcf <- readVcf(tab, genome = opt$genome))) {
             ids <- fetch(rs, -1)
             cat(paste("Found", nrow(ids), "records\n"))
             #ids <- getBM(filters = 'ensembl_transcript_id', attributes = c('ensembl_transcript_id', 'ensembl_peptide_id'), values = enstIds, mart = ensembl)
-            if (nrow(ids) > 0 && ncol(ids) > 0 && "peptide_id" %in% colnames(ids)) {
+            if (nrow(ids) > 0 && ncol(ids) > 0) {
                 rownames(ids) <- names(enstIds)[match(ids$transcript_id, enstIds)]
                 xx <- intersect(rownames(aa), rownames(ids))
-                ids <- cbind(aa[xx, ], ids[xx, ])
+                ids <- cbind(aa[xx, , drop = F], ids[xx, , drop = F])
                 cat("done\n")
 
                 fathmmInput <- subset(ids, peptide_id != "", select = c('peptide_id', 'aa'))

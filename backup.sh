@@ -11,8 +11,9 @@ if mountpoint -q "/mount/limr/zedshared/"; then
 
         while [ 1 ]; do
             cd /ifs/e63data/reis-filho/ && \
-            rsync --verbose --progress --stats --recursive --append --partial -a -0 --files-from=${TMP} --prune-empty-dirs ./ /mount/limr/zedshared
+            rsync --verbose --checksum --progress --stats --recursive --append --partial -a -0 --files-from=${TMP} --prune-empty-dirs ./ /mount/limr/zedshared &
             echo $! > $PID
+            wait
             if [ "$?" = "0" ]; then
                 echo "rsync complete"
                 exit

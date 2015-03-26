@@ -59,9 +59,15 @@ while(nrow(vcf <- readVcf(tab, genome = opt$genome))) {
     ol <- findOverlaps(rowData(vcf), genes, select = 'first')
     info(vcf)[,opt$name] <- !is.na(ol)
 
+    cat(paste('Chunk', i, "\n"))
     cat("Appending vcf chunk to", opt$outFile, "... ")
     writeVcf(vcf, out)
     cat("done\n")
+    i <- i + 1
+}
+if (i == 1) {
+    cat("No entries, creating empty vcf file\n")
+    write(vcf, out)
 }
 close(tab)
 close(out)

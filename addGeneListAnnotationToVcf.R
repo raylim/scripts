@@ -67,7 +67,7 @@ while(nrow(vcf <- readVcf(tab, genome = opt$genome))) {
 }
 if (i == 1) {
     cat("No entries, creating empty vcf file\n")
-    write(vcf, out)
+    writeVcf(vcf, out)
 }
 close(tab)
 close(out)

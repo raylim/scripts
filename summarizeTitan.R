@@ -7,7 +7,7 @@ suppressPackageStartupMessages(library("stringr"));
 suppressPackageStartupMessages(library("inflection"));
 
 
-#options(warn = -1, error = quote({ traceback(); q('no', status = 1) }))
+options(warn = -1, error = quote({ traceback(); q('no', status = 1) }))
 
 optList <- list(
         make_option("--outDir", default = NULL, type = "character", action = "store", help ="copy optimal files to this directory (required)"))

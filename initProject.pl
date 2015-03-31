@@ -10,7 +10,7 @@ EXOME = true
 # gatk options
 HARD_FILTER_SNPS = true
 
-QSUB_PRIORITY = -500
+QSUB_PRIORITY = -800
 
 include modules/Makefile
 ENDL

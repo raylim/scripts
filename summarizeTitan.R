@@ -81,9 +81,11 @@ plot(sc, ratio, type="o", pch=19, xaxt="n", las=2, ylab="Clonal:Subclonal Ratio"
 axis(1)
 
 ## find and plot inflection plot using EDE (R package inflection)
-inflectPt <- findiplist(x=as.matrix(sc), y=ratio, index=1)
-abline(v=inflectPt[2,1], col="red")
-mtext(text=sc[inflectPt[2,1]],side=3,at=inflectPt[2,1])
+if (sum(ratio) != Inf) {
+    inflectPt <- findiplist(x=as.matrix(sc), y=ratio, index=1)
+    abline(v=inflectPt[2,1], col="red")
+    mtext(text=sc[inflectPt[2,1]],side=3,at=inflectPt[2,1])
+}
 null <- dev.off()
 
 SDbw <- sc[inflectPt[2,1]] * densBwM + scatM

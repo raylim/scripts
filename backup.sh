@@ -3,7 +3,7 @@
 PID=~/.backup.pid
 TMP=`mktemp`;
 if mountpoint -q "/mount/limr/zedshared/"; then
-    if [[ -s $PID ]] || [[ -z `pgrep -F $PID | xargs ps` ]]; then 
+    if [[ -s $PID ]] || [[ -z `pgrep -F $PID` ]]; then 
         echo "searching for files in /ifs/e63data/reis-filho/"
         cd /ifs/e63data/reis-filho/ && \
         find data projects -type d \

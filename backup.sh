@@ -1,7 +1,7 @@
 PID=~/.backup.pid
 TMP=`mktemp`;
 if mountpoint -q "/mount/limr/zedshared/"; then
-    if [[ ! -s $PID ]] || [[ -z `pgrep -F $PID | xargs ps | grep rsync` ]]; then 
+    if [[ ! -s $PID ]] || [[ -z `pgrep -F $PID | xargs ps` ]]; then 
         cd /ifs/e63data/reis-filho/ && \
         find data projects -type d \
             \( -name bam -o -name tables -o -name alltables -o -name vcf \) \

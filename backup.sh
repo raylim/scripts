@@ -1,13 +1,18 @@
+#!/bin/bash
+
 PID=~/.backup.pid
 TMP=`mktemp`;
 if mountpoint -q "/mount/limr/zedshared/"; then
-    if [[ ! -s $PID ]] || [[ -z `pgrep -F $PID | xargs ps` ]]; then 
+    if [[ -s $PID ]] || [[ -z `pgrep -F $PID | xargs ps` ]]; then 
+        echo "searching for files in /ifs/e63data/reis-filho/"
         cd /ifs/e63data/reis-filho/ && \
         find data projects -type d \
             \( -name bam -o -name tables -o -name alltables -o -name vcf \) \
             ! -path "*/log/*" ! -path "*/tmap/*" ! -path "*/gatk/*" ! -path "*/hydra/*" ! -path "*/bwa/*" \
             ! -path "*/varscan/*" ! -path "*/mutect/*" ! -path "*/scalpel/*" ! -path "*/som_sniper/*" ! -path "*/rawdata/*" \
-            ! -path "*/unprocessed_bam/*" ! -path "*/defuse/*" ! -path "*/chimscan/*" -print0 > ${TMP}
+            ! -path "*/unprocessed_bam/*" ! -path "*/defuse/*" ! -path "*/chimscan/*" -print0 > ${TMP} &
+        echo $! > $PID
+        wait
 
         while [ 1 ]; do
             cd /ifs/e63data/reis-filho/ && \

@@ -53,7 +53,7 @@ f <- factor(paste(Data$Chromosome, Data$log2_ratio_seg))
 sData <- split(Data, f)
 collapsedData <- do.call('rbind', lapply(sData, function(x) {
                             c(Chromosome = x[1,"Chromosome"], Start = x[1, "Start"], End = x[nrow(x), "End"], nBins = nrow(x), log2Ratio = x[1, "log2_ratio_seg"]) }))
-oo <- order(collapsedData$Chromosome, collapsedData$Start)
+oo <- order(collapsedData[, "Chromosome"], collapsedData[, "Start"])
 collapsedData <- collapsedData[oo, ]
 write.table(collapsedData, file = paste(opt$prefix, ".collapsed_seg.txt", sep = ""), row.names = F, quote = F, sep = "\t")
 

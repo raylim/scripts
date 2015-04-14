@@ -11,7 +11,7 @@ suppressPackageStartupMessages(library("GenomicRanges"));
 options(warn = -1, error = quote({ traceback(); q('no', status = 1) }))
 
 optList <- list(
-        make_option("--targetBed", default = NULL, type = "character", action = "store", help ="targeted interval bed"),
+        make_option("--titanSeg", default = NULL, type = "character", action = "store", help ="targeted titan segment file"),
         make_option("--outFile", default = NULL, type = "character", action = "store", help ="targeted interval bed"))
 # only hg19 is supported
 #make_option("--genome", default = 'hg19', type = "character", action = "store", help ="reference genome"))

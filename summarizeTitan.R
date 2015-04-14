@@ -107,3 +107,7 @@ optFns <- do.call('rbind', filenames)[cbind(names(optClust), optClust)]
 optFns <- sub('\\.params\\.txt', '', optFns)
 optFns <- as.vector(sapply(optFns, paste, exts, sep = ''))
 null <- file.copy(optFns, opt$outDir, overwrite = T)
+
+optFns2 <- sub('\\.z[0-9]', '', optFns)
+optFns2 <- sub('.*/', paste(opt$outDir, '/', sep = ''), optFns2)
+null <- file.copy(optFns, optFns2, overwrite = T)

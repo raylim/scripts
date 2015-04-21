@@ -8,7 +8,7 @@ suppressPackageStartupMessages(library("TxDb.Hsapiens.UCSC.hg19.knownGene"));
 suppressPackageStartupMessages(library("org.Hs.eg.db"))
 suppressPackageStartupMessages(library("GenomicRanges"));
 
-options(warn = -1, error = quote({ traceback(); q('no', status = 1) }))
+#options(warn = -1, error = quote({ traceback(); q('no', status = 1) }))
 
 optList <- list(
         make_option("--titanSeg", default = NULL, type = "character", action = "store", help ="targeted titan segment file"),
@@ -49,6 +49,8 @@ tx$titanCall[!is.na(ol)] <- titanGR$call[ol[!is.na(ol)]]
 tx$medianRatio[!is.na(ol)] <- titanGR$medianRatio[ol[!is.na(ol)]]
 tx$medianLogR[!is.na(ol)] <- titanGR$medianLogR[ol[!is.na(ol)]]
 titanTx <- transcriptsByOverlaps(txdb, titanGR)
+ol <- findOverlaps(titanTx, titanGR, select = 'first')
+mcols(titanTx) <- cbind(mcols(titanTx), mcols(titanGR[ol]))
 
 # output file
 outfn <- opt$outFile
@@ -73,12 +75,12 @@ while(nrow(vcf <- readVcf(tab, 'hg19'))) {
 
     seqlevels(vcf) <- sub('chr', '', seqlevels(vcf))
     ol <- findOverlaps(rowData(vcf), titanTx, select = 'first')
-    info(vcf)$titanCN[!is.na(ol)] <- titanGR$CN[ol[!is.na(ol)]]
-    info(vcf)$titanMinorCN[!is.na(ol)] <- titanGR$minorCN[ol[!is.na(ol)]]
-    info(vcf)$titanMajorCN[!is.na(ol)] <- titanGR$majorCN[ol[!is.na(ol)]]
-    info(vcf)$titanCall[!is.na(ol)] <- as.character(titanGR$call[ol[!is.na(ol)]])
-    info(vcf)$titanMedianRatio[!is.na(ol)] <- titanGR$medianRatio[ol[!is.na(ol)]]
-    info(vcf)$titanMedianLogR[!is.na(ol)] <- titanGR$medianLogR[ol[!is.na(ol)]]
+    info(vcf)$titanCN[!is.na(ol)] <- titanTx$CN[ol[!is.na(ol)]]
+    info(vcf)$titanMinorCN[!is.na(ol)] <- titanTx$minorCN[ol[!is.na(ol)]]
+    info(vcf)$titanMajorCN[!is.na(ol)] <- titanTx$majorCN[ol[!is.na(ol)]]
+    info(vcf)$titanCall[!is.na(ol)] <- as.character(titanTx$call[ol[!is.na(ol)]])
+    info(vcf)$titanMedianRatio[!is.na(ol)] <- titanTx$medianRatio[ol[!is.na(ol)]]
+    info(vcf)$titanMedianLogR[!is.na(ol)] <- titanTx$medianLogR[ol[!is.na(ol)]]
     writeVcf(vcf, out)
 }
 close(tab)

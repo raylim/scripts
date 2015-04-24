@@ -19,7 +19,7 @@ dir.create(figPath, showWarnings = F, recursive = T)
 dir.create(cachePath, showWarnings = F, recursive = T)
 
 opts_chunk$set(dev = c("png", 'pdf'), dev.args = list(png = list(type = 'cairo-png')), cache.path = cachePath) # , fig.path = file.path('mutsig_report/figure/'))
-opts_knit$set(root.dir = getwd(), base.dir = file.path(paste(outPrefix, '/', sep = '')))
+opts_knit$set(root.dir = getwd(), base.dir = file.path(paste(outPrefix, '/', sep = '')), progress = F, verbose = T)
 
 #options(warn = -1, error = quote({ traceback(2); q('no', status = 1) }))
 

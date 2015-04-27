@@ -83,15 +83,13 @@ plotMutBarplot <- function(tabs, tit) {
     cols <- c("lightblue", "black", "red", "grey", "lightgreen", "pink")
     names(cols) <- names(svcf)
     yl <- c(0, max(unlist(tabs)))
-    par(mfrow = c(1, 6), oma = c(2,2,2,2))
+    par(mfrow = c(1, 6), mar = c(5,0,5,0), oma = c(2,2,2,2))
     mut <- names(tabs)[1]
-    par(mar = c(5,5,5,0))
-    barplot(tabs[[mut]], ylim = yl, las = 2, col = cols[[mut]])
-    mtext(tit, outer = T, side = 3, line = -1)
-    for (mut in names(svcf)[-1]) {
-        par(mar = c(5,0,5,0))
+    for (mut in names(svcf)) {
         barplot(tabs[[mut]],  ylim = yl, las = 2, yaxt = 'n', col = cols[[mut]])
     }
+    axis(2, outer = T)
+    mtext(tit, outer = T, side = 3, line = -1)
 }
 
 mutTabs <- list()
@@ -146,13 +144,10 @@ for (s in names(vcfs)) {
     sample.int(nrow(tab), size = sum(tab$value), replace = T, prob = tab$value / sum(tab$value))
     boots <- boot(cbind(alexandrov, value = tab$value), bootFun, R = 1000, ran.gen = ranFun, sim = 'parametric')
     boots.sd <- apply(boots$t, 2, sd)
-    boot.pval <- c()
-    for (i in 1:ncol(sigs)) {
-        boot.pval[i] <- sum(abs(boots$t[,i]-1) > abs(boots$t0[i]-1))/(1+boots$R)
-    }
-    cols <- ifelse(boot.pval < 0.05, 'red', 'grey')
+    ci <- norm.ci(boots, index = 1:ncol(sigs))
+    cols <- ifelse(boots$t0 > ci[,2] & boots$t0 < ci[,3], 'grey', 'red')
     n <- sub('Signature.', '', colnames(sigs))
     barCenters <- barplot(boots$t0, ylim = c(min(boots$t - boots.sd), max(boots$t + boots.sd)), names.arg = n, col = cols, main = s)
-    arrows(barCenters, boots$t0 - boots.sd, barCenters, boots$t0+boots.sd, lwd = 1, angle = 90, code = 3)
+    segments(barCenters, boots$t0 - boots.sd, barCenters, boots$t0+boots.sd, lwd = 1)
 }
 ```

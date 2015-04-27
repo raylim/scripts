@@ -97,12 +97,14 @@ for (s in names(vcfs)) {
     svcf <- split(rowData(vcfs[[s]]), rowData(vcfs[[s]])$MUT)
     tabs <- list()
     for (mut in names(svcf)) {
-        seqs <- getSeq(genome, resize(flank(svcf[[mut]], width = 1, start = T, both = T), width = 3))
-        seqs[subseq(seqs,2,2) == "G"] <- reverseComplement(seqs[subseq(seqs,2,2) == "G"])
-        seqs[subseq(seqs, 2, 2) == "A"] <- reverseComplement(seqs[subseq(seqs,2,2) == "A"])
-        x <- as.character(subseq(seqs[1], 2, 2))
-        lvls <- paste(rep(bases, each = 4), x, bases, sep = '')
-        tabs[[mut]] <- table(factor(as.character(seqs), level = lvls))
+        if (length(svcf[[mut]]) > 0) {
+            seqs <- getSeq(genome, resize(flank(svcf[[mut]], width = 1, start = T, both = T), width = 3))
+            seqs[subseq(seqs,2,2) == "G"] <- reverseComplement(seqs[subseq(seqs,2,2) == "G"])
+            seqs[subseq(seqs, 2, 2) == "A"] <- reverseComplement(seqs[subseq(seqs,2,2) == "A"])
+            x <- as.character(subseq(seqs[1], 2, 2))
+            lvls <- paste(rep(bases, each = 4), x, bases, sep = '')
+            tabs[[mut]] <- table(factor(as.character(seqs), level = lvls))
+        }
     }
     mutTabs[[s]] <- tabs
 }

@@ -47,7 +47,7 @@ if (!is.null(opt$targetBed)) {
     genSeq <- getSeq(genome)
 }
 trintFq <- trinucleotideFrequency(genSeq)
-trintFq <- colSums(trintFq) / sum(trintFq)
+trintFq <- colSums(as.numeric(trintFq)) / sum(as.numeric(trintFq))
 ```
 
 ```{r loadvcf, include=F, cache=T}
@@ -72,7 +72,7 @@ for (vcfFile in vcfFiles) {
 ```{r pie}
 for (n in names(vcfs)) {
     vcf <- vcfs[[n]]
-    cols <- c("lightblue", "black", "red", "grey", "lightgreen", "pink")
+    cols <- c("C>A" = "lightblue", "C>G" = "black", "C>T" = "red", "T>A" = "grey", "T>C" = "lightgreen",  "T>G" = "pink")
     main <- paste(n, " (n=", length(rowData(vcf)), ")", sep = '')
     pie(table(rowData(vcf)$MUT), col = cols, main = main)
 }
@@ -80,7 +80,7 @@ for (n in names(vcfs)) {
 
 ```{r mutCounts}
 plotMutBarplot <- function(tabs, tit) {
-    cols <- c("lightblue", "black", "red", "grey", "lightgreen", "pink")
+    cols <- c("C>A" = "lightblue", "C>G" = "black", "C>T" = "red", "T>A" = "grey", "T>C" = "lightgreen",  "T>G" = "pink")
     names(cols) <- names(tabs)
     yl <- c(0, max(unlist(tabs)))
     par(mfrow = c(1, length(tabs)), mar = c(5,0,5,0), oma = c(2,2,2,2))
@@ -141,8 +141,10 @@ ranFun <- function(p, d) {
 for (s in names(vcfs)) {
     tabs <- mutTabs[[s]]
     tab <- melt(tabs)
-    sample.int(nrow(tab), size = sum(tab$value), replace = T, prob = tab$value / sum(tab$value))
-    boots <- boot(cbind(alexandrov, value = tab$value), bootFun, R = 1000, ran.gen = ranFun, sim = 'parametric')
+    X <- cbind(alexandrov, value = 0)
+    m <- match(paste(tab$L1, tab$Var.1), paste(X$Substitution.Type, X$Trinucleotide))
+    X$value[m] <- tab$value
+    boots <- boot(X, bootFun, R = 1000, ran.gen = ranFun, sim = 'parametric')
     boots.sd <- apply(boots$t, 2, sd)
     ci <- norm.ci(boots, index = 1:ncol(sigs))
     cols <- ifelse(boots$t0 > ci[,2] & boots$t0 < ci[,3], 'grey', 'red')

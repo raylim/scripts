@@ -81,11 +81,11 @@ for (n in names(vcfs)) {
 ```{r mutCounts}
 plotMutBarplot <- function(tabs, tit) {
     cols <- c("lightblue", "black", "red", "grey", "lightgreen", "pink")
-    names(cols) <- names(svcf)
+    names(cols) <- names(tabs)
     yl <- c(0, max(unlist(tabs)))
-    par(mfrow = c(1, 6), mar = c(5,0,5,0), oma = c(2,2,2,2))
+    par(mfrow = c(1, length(tabs)), mar = c(5,0,5,0), oma = c(2,2,2,2))
     mut <- names(tabs)[1]
-    for (mut in names(svcf)) {
+    for (mut in names(tabs)) {
         barplot(tabs[[mut]],  ylim = yl, las = 2, yaxt = 'n', col = cols[[mut]])
     }
     axis(2, outer = T)

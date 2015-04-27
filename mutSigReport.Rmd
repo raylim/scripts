@@ -47,7 +47,7 @@ if (!is.null(opt$targetBed)) {
     genSeq <- getSeq(genome)
 }
 trintFq <- trinucleotideFrequency(genSeq)
-trintFq <- colSums(as.numeric(trintFq)) / sum(as.numeric(trintFq))
+trintFq <- colSums(trintFq) / sum(as.numeric(trintFq))
 ```
 
 ```{r loadvcf, include=F, cache=T}

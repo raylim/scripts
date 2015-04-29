@@ -79,7 +79,7 @@ die drmaa_strerror($error) . "\n" . $diagnosis if $error;
 die drmaa_strerror($error) . "\n" . $diagnosis if $error;
 
 if ($opt{o} && (!-e $opt{o} || !-s $opt{o})) {
-    unlink $opt{o};
+    unlink "$opt{o}";
     die "Output file is size 0";
 }
 

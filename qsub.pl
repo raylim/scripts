@@ -79,8 +79,10 @@ die drmaa_strerror($error) . "\n" . $diagnosis if $error;
 die drmaa_strerror($error) . "\n" . $diagnosis if $error;
 
 if ($opt{o} && (!-e $opt{o} || !-s $opt{o})) {
-    system("rm -f $opt{o}");
-    die "Output file is size 0";
+    sleep 60; # wait for file system to update
+    system("rm $opt{o}");
+    #print "File not removed\n" if (-e $opt{o});
+    die "$opt{o}: file is size 0";
 }
 
 exit $exitStatus + $aborted + $signaled + $coreDumped;

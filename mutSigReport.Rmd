@@ -149,7 +149,10 @@ for (s in names(vcfs)) {
     ci <- norm.ci(boots, index = 1:ncol(sigs))
     cols <- ifelse(boots$t0 > ci[,2] & boots$t0 < ci[,3], 'grey', 'red')
     n <- sub('Signature.', '', colnames(sigs))
-    barCenters <- barplot(boots$t0, ylim = c(min(boots$t - boots.sd), max(boots$t + boots.sd)), names.arg = n, col = cols, main = s)
+    par(mfrow = c(2,1), mar = c(3,5,3,3))
+    barCenters <- barplot(boots$t0, ylim = c(min(boots$t - boots.sd), max(boots$t + boots.sd)), names.arg = n, col = cols, main = s, ylab = 'Correlation')
     segments(barCenters, boots$t0 - boots.sd, barCenters, boots$t0+boots.sd, lwd = 1)
+    # vote barplot
+    barplot(table(factor(n[apply(boots$t, 1, which.max)], levels = n)), ylab = '# Votes')
 }
 ```

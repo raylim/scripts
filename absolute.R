@@ -11,6 +11,7 @@ optList <- list(
         make_option("--platform", default = "SNP_6.0", help = "platform [default %default]"),
         make_option("--tumour", default = NULL, help = "tumour sample name"),
         make_option("--mafFile", default = NULL, help = "MAF file"),
+        make_option("--minMutAF", default = NULL, help = "Minimum Mutation Allele Frequency"),
         make_option("--resultsDir", default = NULL, help = "results directory"),
         make_option("--outPrefix", default = NULL, help = "output prefix")
         )
@@ -39,7 +40,7 @@ RunAbsolute(seg.dat.fn = fn, output.fn.base = opt$outPrefix,
     min.ploidy=0.95, max.ploidy=10, primary.disease=opt$disease,
     platform=opt$platform, sample.name=opt$tumour,
     results.dir=opt$resultsDir,
-    maf.fn = opt$mafFile,
+    maf.fn = opt$mafFile, min.mut.af=opt$minMutAF,
     max.as.seg.count=1500, copy_num_type="allelic",
     max.neg.genome=0, max.non.clonal=0,
     verbose=TRUE)

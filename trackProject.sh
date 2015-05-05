@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-find -ls > fls.txt 
+find . -ls -not -name '.*' > fls.txt 
 git add fls.txt
 
 git add sample_sets.txt

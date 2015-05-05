@@ -11,7 +11,7 @@ $repoName =~ s:/:_:g;
 
 system "bb create -c --owner jrflab --protocol ssh $repoName";
 system "git init";
-system "git remote add git\@bitbucket.org:jrflab/$repoName.git";
+system "git remote add origin git\@bitbucket.org:jrflab/$repoName.git";
 
 
 my $MAKEFILE = <<ENDL;
@@ -42,5 +42,5 @@ unless (-e "Makefile") {
 }
 system "git add Makefile";
 system "git commit -m 'makefile'";
-system "git push";
+system "git push --set-upstream origin master";
 

@@ -4,9 +4,12 @@ use strict;
 use warnings;
 
 use Cwd qw/ realpath /;
-use IO::Socket qw/ AF_UNIX SOCK_STREAM /;
+#use IO::Socket qw/ AF_UNIX SOCK_STREAM /;
+use IO::Socket::INET;
 use Path::Class qw/ file /;
 use File::Temp();
+use Cwd;
+use Storable qw/ nfreeze /;
 
 use Getopt::Std;
 my %opt;
@@ -25,30 +28,46 @@ sub HELP_MESSAGE {
 HELP_MESSAGE if $opt{h};
 
 my $args = join " ", @ARGV;
-my $scriptFile = File::Temp->new(TEMPLATE => 'tempXXXXX', DIR => '/home/limr/share/tmp', SUFFIX => '.sge');
-while (<STDIN>) {
-    print $scriptFile $_;
+my $socketPath = file($opt{s});
+#my $client = IO::Socket->new(
+#Domain => AF_UNIX,
+#Type => SOCK_STREAM,
+#Peer => $socketPath,
+#Timeout => 30,
+#) or die("Can't connect to server socket: $!\n");
+#
+
+my $client = IO::Socket::INET->new(
+    PeerHost => 'localhost',
+    PeerPort => '34383',
+    Proto => 'tcp',
+) or die "Can't connect to server socket: $!\n";
+eval 'END { close $client } 1' or die $@;
+
+
+print "Connected to server $socketPath\n";
+print "Sending server args: $args\n";
+print $client $args . "\n";
+print "Sending server cwd: " . getcwd() . "\n";
+print $client getcwd() . "\n";
+
+my $scriptFile = File::Temp->new(TEMPLATE => 'tempXXXXX', DIR => '/home/limr/share/tmp', SUFFIX => '.sge', UNLINK => 0);
+while (my $line = <STDIN>) {
+    print $scriptFile $line;
 }
 close $scriptFile;
+print "Sending server script: " . $scriptFile->filename . "\n";
+print $client $scriptFile->filename . "\n";
 
-my $socketPath = file(realpath($0))->dir()->file('socket');
-my $client = IO::Socket->new(
-    Domain => AF_UNIX,
-    Type => SOCK_STREAM,
-    Peer => $socketPath,
-) or die("Can't connect to server socket $!\n");
-
-print $client $args;
-print $client getcwd();
-print $client $scriptFile->filename;
-
-my $exitCode;
+my $exitCode = -1;
 while (<$client>) {
     if (/^Error:/) {
         print STDERR;
         $exitCode = -1;
+        last;
     } elsif (/^Code:/) {
-        ($exitCode) = $_ =~ /Exit: (\d+)/;
+        ($exitCode) = $_ =~ /Code: (\d+)/;
+        last;
     }
 }
 

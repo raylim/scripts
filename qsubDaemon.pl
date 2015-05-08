@@ -7,11 +7,10 @@ use warnings;
 use Proc::Daemon;
 use threads;
 use threads::shared;
-use Thread qw/ async /;
-use Thread::Queue;
 use Schedule::DRMAAc qw/ :all /;
 use File::Temp();
-use IO::Socket qw/ AF_UNIX SOCK_STREAM SOMAXCONN/;
+#use IO::Socket qw/ AF_UNIX SOCK_STREAM SOMAXCONN/;
+use IO::Socket::INET;
 use Path::Class qw/ file /;
 use Cwd;
 
@@ -22,74 +21,96 @@ $SIG{TERM} = \&done;
 $SIG{INT} = \&done;
 
 # process job
-my $jobQueue = new Thread::Queue;
-my $thr = async {
-    while (my $clientJob = $jobQueue->dequeue) {
-        my ($client, $jobid) = ($clientJob->[0], $clientJob->[1]);
-        
+sub job_thread {
+    my ($client, $jobid) = @_;
+    my $stat;
+    my $error;
+    my $diagnosis;
+    do {
         # delete jobs of disconnected clients
         unless ($client->connected) {
+            print "Client disconnected, terminating job\n";
             my ($error, $diagnosis) = drmaa_control($jobid, $DRMAA_CONTROL_TERMINATE);
             print "Error: " .drmaa_strerror($error) . " : " . $diagnosis . "\n" if $error;
         }
+        ($error, my $jobidOut, $stat, my $rusage, $diagnosis) = drmaa_wait($jobid, 20);
+        print $client "Keep Alive\n";
+    } until ($error != $DRMAA_ERRNO_EXIT_TIMEOUT);
+    print $client "Error: " .drmaa_strerror($error) . " : " . $diagnosis . "\n" if $error;
 
-        my ($error, $jobidOut, $stat, $diagnosis) = drmaa_wait($jobid, 3);
-        if ($error == $DRMAA_ERRNO_EXIT_TIMEOUT) {
-            # tell client job is complete
-            # pull all exit-related codes
-            ($error, my $exitStatus, $diagnosis) = drmaa_wexitstatus($stat);
-            print $client "Error: " .drmaa_strerror($error) . " : " . $diagnosis . "\n" if $error;
-            ($error, my $aborted, $diagnosis) = drmaa_wifaborted( $stat );
-            print $client "Error: " . drmaa_strerror($error) . " : " . $diagnosis . "\n" if $error;
-            ($error, $diagnosis) = drmaa_exit();
-            print $client "Error: " . drmaa_strerror($error) . " : " . $diagnosis . "\n" if $error;
-            }
-            print $client "Code: " . $exitStatus + $aborted + $signaled + $coreDumped;
-        } else {
-            # requeue the job
-            $jobQueue->enqueue($clientJob);
-        }
-    }
+    # tell client job is complete
+    # pull all exit-related codes
+    ($error, my $exitStatus, $diagnosis) = drmaa_wexitstatus($stat);
+    print $client "Error: " .drmaa_strerror($error) . " : " . $diagnosis . "\n" if $error;
+    ($error, my $aborted, $diagnosis) = drmaa_wifaborted( $stat );
+    print $client "Error: " . drmaa_strerror($error) . " : " . $diagnosis . "\n" if $error;
+    ($error, my $signaled, $diagnosis ) = drmaa_wifsignaled( $stat );
+    print $client "Error: " . drmaa_strerror($error) . " : " . $diagnosis . "\n" if $error;
+    ($error, my $coreDumped, $diagnosis ) = drmaa_wcoredump( $stat );
+    print $client "Error: " . drmaa_strerror($error) . " : " . $diagnosis . "\n" if $error;
+
+    print $client "Code: " . ($exitStatus + $aborted + $signaled + $coreDumped);
 };
 
-my $socketPath = file(realpath($0))->dir()->file('socket');
- 
-{
-    my $server = new IO::Socket->new (
-        Domain => AF_UNIX,
-        Type => SOCK_STREAM,
-        Local => $socketPath,
-        Listen => SOMAXCONN,
-    ) or die "Unable to create server soket: $!\n";
-    eval 'END { unlink $socketPath} 1' or die $@;
+#my $socketPath = file($ARGV[0]);
+#my $server = new IO::Socket->new (
+#Domain => AF_UNIX,
+#Type => SOCK_STREAM,
+#Local => $socketPath,
+#Listen => 3000,
+#) or die "Unable to create server socket: $!\n";
+#eval 'END { unlink $socketPath } 1' or die $@;
 
-    my ($error, $diagnosis) = drmaa_init(undef);
-    die drmaa_strerror($error) . "\n" . $diagnosis if $error;
+my $server = IO::Socket::INET->new(
+    LocalHost => 'localhost',
+    LocalPort => '34383',
+    Proto => 'tcp',
+    Listen => 1000,
+    Reuse => 1,
+);
 
-    while (my $client = $socket->accept()) {
-        my $clientArgs = <$clientsocket>;
-        my $clientCwd = <$clientsocket>;
-        my $clientScript = <$clientsocket>;
+my ($error, $diagnosis) = drmaa_init(undef);
+die drmaa_strerror($error) . "\n" . $diagnosis if $error;
 
-        my $scriptFile = File::Temp->new(TEMPLATE => 'tempXXXXX', DIR => '/home/limr/share/tmp', SUFFIX => '.sge');
-        print $scriptFile $clientScript;
-        close $scriptFile;
-        
-        ($error, $diagnosis) = drmaa_set_attribute($jt, $DRMAA_REMOTE_COMMAND, $scriptFile->filename);
-        print $client "Error: " . drmaa_strerror($error) . " : " . $diagnosis . "\n" and continue if $error;
+use threads ('yield',
+    'stack_size' => 64*4096,
+    'exit' => 'threads_only',
+    'stringify');
 
-        ($error, $diagnosis) = drmaa_set_attribute($jt, $DRMAA_NATIVE_SPECIFICATION, $args);
-        print $client "Error: " . drmaa_strerror($error) . " : " . $diagnosis . "\n" and continue if $error;
+while (my $client = $server->accept()) {
+    print "Client Connected\n";
+    my $clientArgs = <$client>;
+    chomp $clientArgs;
+    print "Client args: $clientArgs\n";
+    my $clientCwd = <$client>;
+    chomp $clientCwd;
+    print "Client wd: $clientCwd\n";
+    my $scriptFile = <$client>;
+    chomp $scriptFile;
+    print "Client script file: $scriptFile\n";
 
-        ($error, $diagnosis) = drmaa_set_attribute($jt, $DRMAA_WD, getcwd());
-        print $client "Error: " . drmaa_strerror($error) . " : " . $diagnosis . "\n" and continue if $error;
+    ($error, my $jt, $diagnosis) = drmaa_allocate_job_template();
+    print $client "Error: " . drmaa_strerror($error) . " : " . $diagnosis . "\n" and next if $error;
+    
+    ($error, $diagnosis) = drmaa_set_attribute($jt, $DRMAA_REMOTE_COMMAND, "$scriptFile");
+    print $client "Error: " . drmaa_strerror($error) . " : " . $diagnosis . "\n" and next if $error;
 
-        ($error, my $jobid, $diagnosis) = drmaa_run_job($jt);
-        print $client "Error: " . drmaa_strerror($error) . " : " . $diagnosis . "\n" and continue if $error;
+    ($error, $diagnosis) = drmaa_set_attribute($jt, $DRMAA_NATIVE_SPECIFICATION, $clientArgs);
+    print $client "Error: " . drmaa_strerror($error) . " : " . $diagnosis . "\n" and next if $error;
 
-        ($error, $diagnosis) = drmaa_delete_job_template($jt)
-        print $client "Error: " . drmaa_strerror($error) . " : " . $diagnosis . "\n" and continue if $error;
+    ($error, $diagnosis) = drmaa_set_attribute($jt, $DRMAA_WD, $clientCwd . "/");
+    print $client "Error: " . drmaa_strerror($error) . " : " . $diagnosis . "\n" and next if $error;
 
-        $jobQueue->enqueue([ $client, $jobid ]);
-    }
+    ($error, my $jobid, $diagnosis) = drmaa_run_job($jt);
+    print $client "Error: " . drmaa_strerror($error) . " : " . $diagnosis . "\n" and next if $error;
+
+    ($error, $diagnosis) = drmaa_delete_job_template($jt);
+    print $client "Error: " . drmaa_strerror($error) . " : " . $diagnosis . "\n" and next if $error;
+
+    unlink $scriptFile;
+
+    async(\&job_thread, $client, $jobid)->detach;
 }
+
+($error, $diagnosis) = drmaa_exit();
+die drmaa_strerror($error) . "\n" . $diagnosis if $error;

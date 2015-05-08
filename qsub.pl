@@ -50,7 +50,7 @@ die drmaa_strerror($error) . "\n" . $diagnosis if $error;
 ($error, my $jobid, $diagnosis) = drmaa_run_job($jt);
 die drmaa_strerror($error) . "\n" . $diagnosis if $error;
 
-($error, $diagnosis) = drmaa_delete_job_template($jt)
+($error, $diagnosis) = drmaa_delete_job_template($jt);
 die drmaa_strerror($error) . "\n" . $diagnosis if $error;
 
 sub signalHandler {

@@ -30,10 +30,10 @@ include modules/Makefile
 ENDL
 
 unless (-d "scripts") {
-    system "git clone https://github.com/raylim/scripts.git";
+    system "git clone git@github.com:raylim/scripts.git -b stable";
 }
 unless (-d "modules") {
-    system "git clone https://github.com/raylim/modules.git";
+    system "git clone git@github.com:raylim/modules.git -b stable";
 }
 
 unless (-e "Makefile") {

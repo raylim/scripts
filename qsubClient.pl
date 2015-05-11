@@ -45,10 +45,10 @@ my $client = IO::Socket::INET->new(
 eval 'END { close $client } 1' or die $@;
 
 
-print "Connected to server $socketPath\n";
-print "Sending server args: $args\n";
+#print "Connected to server $socketPath\n";
+#print "Sending server args: $args\n";
 print $client $args . "\n";
-print "Sending server cwd: " . getcwd() . "\n";
+#print "Sending server cwd: " . getcwd() . "\n";
 print $client getcwd() . "\n";
 
 my $scriptFile = File::Temp->new(TEMPLATE => 'tempXXXXX', DIR => '/home/limr/share/tmp', SUFFIX => '.sge', UNLINK => 0);
@@ -56,7 +56,7 @@ while (my $line = <STDIN>) {
     print $scriptFile $line;
 }
 close $scriptFile;
-print "Sending server script: " . $scriptFile->filename . "\n";
+#print "Sending server script: " . $scriptFile->filename . "\n";
 print $client $scriptFile->filename . "\n";
 
 my $exitCode = -1;

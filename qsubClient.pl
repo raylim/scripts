@@ -52,6 +52,7 @@ print $client $args . "\n";
 print $client getcwd() . "\n";
 
 my $scriptFile = File::Temp->new(TEMPLATE => 'tempXXXXX', DIR => '/home/limr/share/tmp', SUFFIX => '.sge', UNLINK => 0);
+chmod 0644, $scriptFile;
 while (my $line = <STDIN>) {
     print $scriptFile $line;
 }
